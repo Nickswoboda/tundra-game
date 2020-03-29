@@ -1,0 +1,3 @@
+[submodule "dependencies/Aegis"]
+	path = dependencies/Aegis
+	url = https://github.com/nickswoboda/Aegis
