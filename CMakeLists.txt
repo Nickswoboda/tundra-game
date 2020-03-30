@@ -8,8 +8,14 @@ project ("Tundra")
 add_subdirectory("dependencies/Aegis")
 
 # Add source to this project's executable.
-add_executable (Tundra "src/Tundra.cpp")
+add_executable (Tundra 
+	"src/main.cpp" 
+	"src/GameplayLayer.h"
+	"src/Player.cpp"
+	"src/Player.h")
+
 target_link_libraries(Tundra Aegis)
+
 include_directories(
 	"dependencies/Aegis/"
 	)
