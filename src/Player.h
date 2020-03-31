@@ -7,8 +7,8 @@ public:
 	void OnEvent(Aegis::Event& event);
 	void OnRender();
 
-	float x_pos_ = 0.0f;
-	float y_pos_ = 0.0f;
+	float x_pos_ = 50.0f;
+	float y_pos_ = 50.0f;
 
 	int width_ = 32;
 	int height_ = 32;
@@ -16,6 +16,8 @@ public:
 	float x_vel_ = 0.0f;
 	float y_vel_ = 0.0f;
 
-	float acceleration_ = 1.0f;
+	float acceleration_ = 0.4f;
+
+	glm::vec4 color_ = { 1.0, 1.0, 1.0, 1.0 };
 
 };
