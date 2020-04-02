@@ -11,8 +11,9 @@ add_subdirectory("dependencies/Aegis")
 add_executable (Tundra 
 	"src/main.cpp" 
 	"src/GameplayLayer.h"
-	"src/Player.cpp"
-	"src/Player.h")
+	"src/GameplayLayer.cpp"
+	"src/GameObject.cpp"
+	"src/GameObject.h")
 
 target_link_libraries(Tundra Aegis)
 

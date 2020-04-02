@@ -3,6 +3,6 @@
 int main()
 {
 	Aegis::Application app(640, 480);
-	app.PushLayer(new GameWorldLayer());
+	app.PushLayer(new GameplayLayer());
 	app.Run();
 }
