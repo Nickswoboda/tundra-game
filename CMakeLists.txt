@@ -13,7 +13,10 @@ add_executable (Tundra
 	"src/GameplayLayer.h"
 	"src/GameplayLayer.cpp"
 	"src/GameObject.cpp"
-	"src/GameObject.h")
+	"src/GameObject.h"
+	"src/Level.h"
+	"src/Level.cpp"
+	)
 
 target_link_libraries(Tundra Aegis)
 

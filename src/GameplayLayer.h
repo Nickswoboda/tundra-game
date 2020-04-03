@@ -1,8 +1,11 @@
-﻿#include "src/Aegis.h"
+﻿#pragma once
+
+#include "src/Aegis.h"
 #include "GameObject.h"
+#include "Level.h"
 
 #include <iostream>
-#include <memory>
+#include <stack>
 
 class GameplayLayer : public Aegis::Layer
 {
@@ -17,6 +20,5 @@ public:
 	void OnRender(float delta_time) override;
 
 	Player player_;
-	Wall walls_[80];
-	std::vector<std::unique_ptr<Pellet>> pellets_;
+	std::stack<Level> levels_;
 };

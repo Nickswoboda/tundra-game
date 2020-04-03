@@ -1,3 +1,5 @@
+#pragma once
+
 #include "src/Aegis.h"
 
 #include <glm/glm.hpp>
@@ -24,6 +26,8 @@ public:
 	float acceleration_ = 0.0f;
 
 	glm::vec4 color_ = { 1.0, 1.0, 1.0, 1.0 };
+
+	bool destructible_ = false;
 };
 
 class Pellet : public GameObject
@@ -31,7 +35,9 @@ class Pellet : public GameObject
 public:
 	Pellet()
 		: GameObject(0, 0, 16, 16)
-	{}
+	{
+		destructible_ = true;
+	}
 	void OnRender(float delta_time) const override
 	{
 		Aegis::Renderer2D::DrawQuad({ x_pos_, y_pos_ }, { width_, height_ }, { 0.5, 0.8, 0.2, 1.0 });

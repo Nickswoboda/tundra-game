@@ -3,28 +3,8 @@
 GameplayLayer::GameplayLayer()
 {
 	Aegis::Application::SetVsync(true);
-	for (int i = 0; i < 20; ++i) {
-		walls_[i].x_pos_ = i * 32;
-	}
-	for (int i = 20; i < 40; ++i) {
-		walls_[i].x_pos_ = (i - 20) * 32;
-		walls_[i].y_pos_ = 480 - 32;
-	}
-	for (int i = 40; i < 60; ++i) {
-		walls_[i].x_pos_ = 640 - 32;
-		walls_[i].y_pos_ = (i - 40) * 32;
-	}
-	for (int i = 60; i < 80; ++i) {
-		walls_[i].y_pos_ = (i - 60) * 32;
-	}
 
-	pellets_.emplace_back(new Pellet());
-	pellets_[0]->x_pos_ = 100;
-	pellets_[0]->y_pos_ = 40;
-
-	player_.x_pos_ = 40;
-	player_.y_pos_ = 40;
-
+	levels_.emplace(Level("assets/level/level1.txt", player_));
 }
 
 bool GameplayLayer::HasCollided(const GameObject& obj_1, const GameObject& obj_2)
@@ -67,20 +47,19 @@ void GameplayLayer::OnUpdate()
 {
 	player_.OnUpdate();
 
-	for (auto& wall : walls_) {
-		if (HasCollided(player_, wall)) {
-			ResolveCollision(player_, wall);
+	for (auto it = levels_.top().game_objects_.begin(); it != levels_.top().game_objects_.end();) {
+		if (HasCollided(player_, **it)) {
+			if ((**it).destructible_) {
+				it = levels_.top().game_objects_.erase(it);
+				continue;
+			}
+			else {
+				ResolveCollision(player_, **it);
+				++it;
+				continue;
+			}
 		}
-	}
-
-	for (auto i = pellets_.begin(); i != pellets_.end();) {
-		if (HasCollided(player_, **i)) {
-			i = pellets_.erase(i);
-		}
-		else {
-			++i;
-		}
-
+		++it;
 	}
 }
 void GameplayLayer::OnEvent(Aegis::Event& event)
@@ -92,12 +71,7 @@ void GameplayLayer::OnRender(float delta_time)
 {
 	Aegis::Renderer2D::Clear();
 	player_.OnRender(delta_time);
-	for (const auto& wall : walls_) {
-		wall.OnRender(delta_time);
-	}
-	for (const auto& pellet : pellets_) {
-		pellet->OnRender(delta_time);
-	}
+	levels_.top().OnRender(delta_time);
 	Aegis::Renderer2D::DrawText(std::to_string(Aegis::Application::GetFrameTime()), { 0, 0 }, { 1.0f, 1.0f, 1.0f, 1.0f });
 
 }
