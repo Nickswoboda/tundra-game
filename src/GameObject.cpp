@@ -28,10 +28,4 @@ void Player::OnRender(float delta_time) const
 	int lerp_x = x_pos_ + (x_vel_ * delta_time);
 	float lerp_y = y_pos_ + (y_vel_ * delta_time);
 	Aegis::Renderer2D::DrawQuad({ lerp_x, lerp_y }, { width_, height_ }, color_);
-
-	if (x_vel_ != 0) {
-		std::cout << lerp_x << "\n";
-	}
-
-	Aegis::Renderer2D::DrawQuad({ x_pos_, y_pos_ + 50 }, { width_, height_ }, color_);
 }

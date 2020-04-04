@@ -11,4 +11,5 @@ public:
 
 	std::vector<std::unique_ptr<GameObject>> game_objects_;
 	Player* player_;
+	int pellet_count_ = 0;
 };

@@ -23,4 +23,6 @@ target_link_libraries(Tundra Aegis)
 include_directories(
 	"dependencies/Aegis/"
 	)
-# TODO: Add tests and install targets if needed.
+
+
+file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})

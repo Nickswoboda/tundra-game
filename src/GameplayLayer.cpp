@@ -1,10 +1,12 @@
 #include "GameplayLayer.h"
 
 GameplayLayer::GameplayLayer()
+	:player_(Player(20, 20))
 {
 	Aegis::Application::SetVsync(true);
 
-	levels_.emplace(Level("assets/level/level1.txt", player_));
+	levels_.emplace(Level("assets/levels/level2.txt", player_));
+	levels_.emplace(Level("assets/levels/level1.txt", player_));
 }
 
 bool GameplayLayer::HasCollided(const GameObject& obj_1, const GameObject& obj_2)
@@ -51,6 +53,13 @@ void GameplayLayer::OnUpdate()
 		if (HasCollided(player_, **it)) {
 			if ((**it).destructible_) {
 				it = levels_.top().game_objects_.erase(it);
+				--levels_.top().pellet_count_;
+				if (levels_.top().pellet_count_ == 0) {
+					if (levels_.size() > 1) {
+						levels_.pop();
+					}
+					break;
+				}
 				continue;
 			}
 			else {

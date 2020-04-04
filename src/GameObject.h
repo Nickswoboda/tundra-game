@@ -33,8 +33,8 @@ public:
 class Pellet : public GameObject
 {
 public:
-	Pellet()
-		: GameObject(0, 0, 16, 16)
+	Pellet(int x, int y)
+		: GameObject(x, y, 16, 16)
 	{
 		destructible_ = true;
 	}
@@ -46,8 +46,8 @@ public:
 class Wall : public GameObject
 {
 public:
-	Wall()
-		: GameObject(0, 0, 32, 32)
+	Wall(int x, int y)
+		: GameObject(x, y, 32, 32)
 	{}
 	void OnRender(float delta_time) const override
 	{
@@ -58,8 +58,8 @@ public:
 class Player : public GameObject
 {
 public:
-	Player()
-		:GameObject(0,0,32,32)
+	Player(int x, int y)
+		:GameObject(x,y,32,32)
 	{
 		acceleration_ = 10.0f;
 	}
