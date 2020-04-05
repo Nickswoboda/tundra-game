@@ -47,7 +47,7 @@ void GameplayLayer::ResolveCollision(GameObject& obj_1, GameObject& obj_2) {
 }
 void GameplayLayer::OnUpdate()
 {
-	player_.OnUpdate();
+	player_.Update();
 
 	for (auto it = levels_.top().game_objects_.begin(); it != levels_.top().game_objects_.end();) {
 		if (HasCollided(player_, **it)) {
@@ -79,8 +79,8 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 void GameplayLayer::OnRender(float delta_time)
 {
 	Aegis::Renderer2D::Clear();
-	player_.OnRender(delta_time);
-	levels_.top().OnRender(delta_time);
+	levels_.top().Render(delta_time);
+	player_.Render(delta_time);
 	Aegis::Renderer2D::DrawText(std::to_string(Aegis::Application::GetFrameTime()), { 0, 0 }, { 1.0f, 1.0f, 1.0f, 1.0f });
 
 }

@@ -1,7 +1,7 @@
 #include "GameObject.h"
 
 #include <iostream>
-void Player::OnUpdate()
+void Player::Update()
 {
 	x_pos_ += x_vel_;
 	y_pos_ += y_vel_;
@@ -23,7 +23,7 @@ void Player::OnEvent(Aegis::Event& event)
 	}
 }
 
-void Player::OnRender(float delta_time) const
+void Player::Render(float delta_time) const
 {
 	int lerp_x = x_pos_ + (x_vel_ * delta_time);
 	float lerp_y = y_pos_ + (y_vel_ * delta_time);

@@ -4,47 +4,23 @@
 #include <sstream>
 
 Level::Level(const std::string& file_path, Player& player)
-	:player_(&player)
+	:player_(&player), tile_map_(file_path)
 {
-	std::ifstream file(file_path);
-	std::stringstream buffer;
-	buffer << file.rdbuf();
+	player_->x_pos_ = 32;
+	player_->y_pos_ = 32;
+}
 
-	int x = 0;
-	int y = 0;
-
-	for (const auto& tile : buffer.str()) {
-		switch (tile)
-		{
-		case '\n': y += 32; x = 0; break;
-		case ' ': x += 32; break;
-		case '0': {
-			game_objects_.emplace_back(std::make_unique<Wall>(x, y));
-			x += 32;
-			break;
-		}
-		case '1': {
-			
-			game_objects_.emplace_back(std::make_unique<Pellet>(x + 8, y + 8));
-			x += 32;
-			++pellet_count_;
-			break;
-		}
-		case '3': { player_->x_pos_ = x; player_->y_pos_ = y; x += 32; break; }
-		}
+void Level::Update()
+{
+	for (auto& obj : game_objects_) {
+		obj->Update();
 	}
 }
 
-void Level::OnUpdate()
+void Level::Render(float delta_time)
 {
+	tile_map_.Render();
 	for (auto& obj : game_objects_) {
-		obj->OnUpdate();
-	}
-}
-
-void Level::OnRender(float delta_time)
-{
-	for (auto& obj : game_objects_) {
-		obj->OnRender(delta_time);
+		obj->Render(delta_time);
 	}
 }
