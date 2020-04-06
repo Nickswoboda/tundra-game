@@ -4,7 +4,7 @@
 #include <sstream>
 
 Level::Level(const std::string& file_path, Player& player)
-	:player_(&player), tile_map_(file_path)
+	:player_(&player), tile_map_(file_path, 32)
 {
 	player_->x_pos_ = 32;
 	player_->y_pos_ = 32;

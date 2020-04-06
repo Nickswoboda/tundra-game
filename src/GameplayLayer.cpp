@@ -9,12 +9,13 @@ GameplayLayer::GameplayLayer()
 	levels_.emplace(Level("assets/levels/level1.txt", player_));
 }
 
-bool GameplayLayer::HasCollided(const GameObject& obj_1, const GameObject& obj_2)
+bool GameplayLayer::HasCollided(const GameObject& obj_1, const glm::vec2& tile_index)
 {
-	if ((int)obj_1.x_pos_ < obj_2.x_pos_ + obj_2.width_ &&
-		(int)obj_1.x_pos_ + obj_1.width_ > obj_2.x_pos_ &&
-		(int)obj_1.y_pos_ < obj_2.y_pos_ + obj_2.height_ &&
-		(int)obj_1.y_pos_ + obj_1.height_ > obj_2.y_pos_) {
+	auto& tile_map = levels_.top().tile_map_;
+	if ((int)obj_1.x_pos_ < tile_index.x * tile_map.tile_size_ + tile_map.tile_size_ &&
+		(int)obj_1.x_pos_ + obj_1.width_ > tile_index.x * tile_map.tile_size_ &&
+		(int)obj_1.y_pos_ < tile_index.y * tile_map.tile_size_ + tile_map.tile_size_ &&
+		(int)obj_1.y_pos_ + obj_1.height_ > tile_index.y * tile_map.tile_size_) {
 
 		std::cout << "Collision Detected\n";
 		return true;
@@ -23,52 +24,38 @@ bool GameplayLayer::HasCollided(const GameObject& obj_1, const GameObject& obj_2
 	return false;
 }
 
-void GameplayLayer::ResolveCollision(GameObject& obj_1, GameObject& obj_2) {
+void GameplayLayer::ResolveCollision(GameObject& obj_1, const glm::vec2& tile_index)
+{
+	auto& tile_map = levels_.top().tile_map_;
 	if (obj_1.x_vel_ > 0) {
-		int x_overlap = (int)obj_1.x_pos_ + obj_1.width_ - obj_2.x_pos_;
-		obj_1.x_pos_ -= x_overlap;
+		obj_1.x_pos_ = tile_index.x * tile_map.tile_size_ - obj_1.width_;
 	}
 	else if (obj_1.x_vel_ < 0) {
-		int x_overlap = obj_2.x_pos_ + obj_2.width_ - (int)obj_1.x_pos_;
-		obj_1.x_pos_ += x_overlap;
+		obj_1.x_pos_ = tile_index.x * tile_map.tile_size_ + tile_map.tile_size_;
 	}
-
-	if (obj_1.y_vel_ > 0) {
-		int y_overlap = (int)obj_1.y_pos_ + obj_1.height_ - obj_2.y_pos_;
-		obj_1.y_pos_ -= y_overlap;
+	else if (obj_1.y_vel_ > 0) {
+		obj_1.y_pos_ = tile_index.y * tile_map.tile_size_ - obj_1.height_;
 	}
 	else if (obj_1.y_vel_ < 0) {
-		int y_overlap = obj_2.y_pos_ + obj_2.height_ - (int)obj_1.y_pos_;
-		obj_1.y_pos_ += y_overlap;
+		obj_1.y_pos_ = tile_index.y * tile_map.tile_size_ + tile_map.tile_size_;
 	}
-
 	obj_1.x_vel_ = 0;
 	obj_1.y_vel_ = 0;
+
 }
 void GameplayLayer::OnUpdate()
 {
 	player_.Update();
-
-	for (auto it = levels_.top().game_objects_.begin(); it != levels_.top().game_objects_.end();) {
-		if (HasCollided(player_, **it)) {
-			if ((**it).destructible_) {
-				it = levels_.top().game_objects_.erase(it);
-				--levels_.top().pellet_count_;
-				if (levels_.top().pellet_count_ == 0) {
-					if (levels_.size() > 1) {
-						levels_.pop();
-					}
-					break;
+	
+	auto& tile_map = levels_.top().tile_map_;
+	for (int i = 0; i < tile_map.height_; ++i) {
+		for (int j = 0; j < tile_map.width_; ++j) {
+			if (tile_map.tiles_[i][j].is_solid_) {
+				if (HasCollided(player_, { j, i })) {
+					ResolveCollision(player_, { j, i });
 				}
-				continue;
-			}
-			else {
-				ResolveCollision(player_, **it);
-				++it;
-				continue;
 			}
 		}
-		++it;
 	}
 }
 void GameplayLayer::OnEvent(Aegis::Event& event)

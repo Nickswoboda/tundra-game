@@ -3,7 +3,8 @@
 #include <fstream>
 #include <sstream>
 
-TileMap::TileMap(const std::string& file_path)
+TileMap::TileMap(const std::string& file_path, int tile_size)
+	: tile_size_(tile_size)
 {
 	std::ifstream file(file_path);
 	std::stringstream buffer;
@@ -11,29 +12,37 @@ TileMap::TileMap(const std::string& file_path)
 
 	int x = 0;
 	int y = 0;
+	tiles_.push_back(std::vector<Tile>());
+
 
 	for (const auto& ch : buffer.str()) {
 		switch (ch)
 		{
-		case '\n': {
-			y += 32; x = 0; break;
-		}
-		case '0': {
-			tiles_.emplace_back(Wall(x, y)); x += 32; break;
-		}
-		case '1': {
-			tiles_.emplace_back(Ice(x, y)); x += 32;  break;
-		}
-		case ' ': {
-			tiles_.emplace_back(Ground(x, y)); x += 32;  break;
-		}
+			case '\n': {
+				tiles_.push_back(std::vector<Tile>());
+				++y; x = 0; break;
+			}
+			case '0': {
+				tiles_[y].emplace_back(Wall()); break;
+			}
+			case '1': {
+				tiles_[y].emplace_back(Ice()); break;
+			}
+			case ' ': {
+				tiles_[y].emplace_back(Ground()); break;
+			}
 		}
 	}
+	height_ = tiles_.size();
+	width_ = tiles_[height_ - 1].size();
 }
 
 void TileMap::Render()
 {
-	for (const auto& tile : tiles_) {
-		Aegis::Renderer2D::DrawQuad(tile.pos_, tile.size_, tile.color_);
+
+	for (int row = 0; row < tiles_.size(); ++row) {
+		for (int col = 0; col < tiles_[row].size(); ++col) {
+			Aegis::Renderer2D::DrawQuad({ col * tile_size_, row * tile_size_}, { tile_size_, tile_size_ }, tiles_[row][col].color_);
+		}
 	}
 }
