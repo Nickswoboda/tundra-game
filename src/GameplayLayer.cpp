@@ -2,9 +2,7 @@
 
 GameplayLayer::GameplayLayer()
 	:player_(32, 32), tile_map_("assets/levels/level1.txt", 32)
-{
-	//Aegis::SetVsync(true);
-}
+{}
 
 void GameplayLayer::ResolveCollision(GameObject& obj_1, const Tile& tile)
 {

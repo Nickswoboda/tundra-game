@@ -53,7 +53,7 @@ std::vector<Tile*> TileMap::GetTilesUnderneath(const GameObject& obj)
 	std::vector<Tile*> temp;
 
 	int left_index = obj.pos_.x / tile_size_;
-	int right_index = (obj.pos_.x + obj.size_.x - 1) / tile_size_;
+	int right_index = (obj.pos_.x + obj.size_.x) / tile_size_;
 	int top_index = obj.pos_.y / tile_size_;
 	int bottom_index = (obj.pos_.y + obj.size_.y - 1) / tile_size_;
 
