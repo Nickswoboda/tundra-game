@@ -12,15 +12,13 @@ public:
 	virtual void Update() {};
 	virtual void Render(float delta_time) const = 0;
 				 
+	Aegis::Vec4 color_ = { 1.0, 1.0, 1.0, 1.0 };
 	Aegis::Vec2 pos_;
 	Aegis::Vec2 size_;
-
-	float x_vel_ = 0.0f;
-	float y_vel_ = 0.0f;
+	Aegis::Vec2 vel_;
 
 	float acceleration_ = 0.0f;
 
-	Aegis::Vec4 color_ = { 1.0, 1.0, 1.0, 1.0 };
 
 	bool destructible_ = false;
 };
@@ -35,7 +33,7 @@ public:
 	}
 	void Render(float delta_time) const override
 	{
-		Aegis::Renderer2D::DrawQuad(pos_, size_, { 0.5, 0.8, 0.2, 1.0 });
+		Aegis::DrawQuad(pos_, size_, { 0.5, 0.8, 0.2, 1.0 });
 	}
 };
 

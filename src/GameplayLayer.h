@@ -12,8 +12,7 @@ class GameplayLayer : public Aegis::Layer
 public:
 	GameplayLayer();
 	
-	bool HasCollided(const GameObject& obj_1, int tile_x, int tile_y);
-	void ResolveCollision(GameObject& obj_1, int tile_x, int tile_y);
+	void ResolveCollision(GameObject& obj_1, const Tile& tile);
 	
 	void OnUpdate() override;
 	void OnEvent(Aegis::Event& event);
