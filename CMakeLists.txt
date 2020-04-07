@@ -14,8 +14,6 @@ add_executable (Tundra
 	"src/GameplayLayer.cpp"
 	"src/GameObject.cpp"
 	"src/GameObject.h"
-	"src/Level.h"
-	"src/Level.cpp"
 	"src/TileMap.h"
 	"src/TileMap.cpp"
 	"src/Tile.h")

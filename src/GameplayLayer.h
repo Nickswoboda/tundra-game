@@ -2,7 +2,7 @@
 
 #include "src/Aegis.h"
 #include "GameObject.h"
-#include "Level.h"
+#include "TileMap.h"
 
 #include <iostream>
 #include <stack>
@@ -12,13 +12,13 @@ class GameplayLayer : public Aegis::Layer
 public:
 	GameplayLayer();
 	
-	bool HasCollided(const GameObject& obj_1, const glm::vec2& tile_index);
-	void ResolveCollision(GameObject& obj_1, const glm::vec2& tile_index);
+	bool HasCollided(const GameObject& obj_1, int tile_x, int tile_y);
+	void ResolveCollision(GameObject& obj_1, int tile_x, int tile_y);
 	
 	void OnUpdate() override;
 	void OnEvent(Aegis::Event& event);
 	void OnRender(float delta_time) override;
 
 	Player player_;
-	std::stack<Level> levels_;
+	TileMap tile_map_;
 };

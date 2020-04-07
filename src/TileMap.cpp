@@ -42,7 +42,9 @@ void TileMap::Render()
 
 	for (int row = 0; row < tiles_.size(); ++row) {
 		for (int col = 0; col < tiles_[row].size(); ++col) {
-			Aegis::Renderer2D::DrawQuad({ col * tile_size_, row * tile_size_}, { tile_size_, tile_size_ }, tiles_[row][col].color_);
+			Aegis::Vec2 tile_pos = { col * tile_size_, row * tile_size_ };
+			Aegis::Vec2 size = { tile_size_, tile_size_ };
+			Aegis::Renderer2D::DrawQuad(tile_pos, size, tiles_[row][col].color_);
 		}
 	}
 }

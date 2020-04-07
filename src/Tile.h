@@ -5,7 +5,7 @@
 struct Tile
 {
 public:
-	glm::vec4 color_;
+	Aegis::Vec4 color_;
 	bool is_solid_ = false;
 	bool is_slippery_ = false;
 };

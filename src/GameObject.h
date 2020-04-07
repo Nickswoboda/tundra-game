@@ -2,30 +2,25 @@
 
 #include "src/Aegis.h"
 
-#include <glm/glm.hpp>
-
 class GameObject
 {
 public:
-	GameObject(float x, float y, int w, int h)
-		: x_pos_(x), y_pos_(y), width_(w), height_(h)
+	GameObject(float x, float y, float w, float h)
+		: pos_{ x, y }, size_{w, h}
 	{}
 		
 	virtual void Update() {};
 	virtual void Render(float delta_time) const = 0;
 				 
-	float x_pos_;
-	float y_pos_;
-				
-	int width_;
-	int height_;
+	Aegis::Vec2 pos_;
+	Aegis::Vec2 size_;
 
 	float x_vel_ = 0.0f;
 	float y_vel_ = 0.0f;
 
 	float acceleration_ = 0.0f;
 
-	glm::vec4 color_ = { 1.0, 1.0, 1.0, 1.0 };
+	Aegis::Vec4 color_ = { 1.0, 1.0, 1.0, 1.0 };
 
 	bool destructible_ = false;
 };
@@ -40,7 +35,7 @@ public:
 	}
 	void Render(float delta_time) const override
 	{
-		Aegis::Renderer2D::DrawQuad({ x_pos_, y_pos_ }, { width_, height_ }, { 0.5, 0.8, 0.2, 1.0 });
+		Aegis::Renderer2D::DrawQuad(pos_, size_, { 0.5, 0.8, 0.2, 1.0 });
 	}
 };
 

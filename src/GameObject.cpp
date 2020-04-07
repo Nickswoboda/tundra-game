@@ -1,10 +1,9 @@
 #include "GameObject.h"
 
-#include <iostream>
 void Player::Update()
 {
-	x_pos_ += x_vel_;
-	y_pos_ += y_vel_;
+	pos_.x += x_vel_;
+	pos_.y += y_vel_;
 }
 
 void Player::OnEvent(Aegis::Event& event)
@@ -25,7 +24,5 @@ void Player::OnEvent(Aegis::Event& event)
 
 void Player::Render(float delta_time) const
 {
-	int lerp_x = x_pos_ + (x_vel_ * delta_time);
-	float lerp_y = y_pos_ + (y_vel_ * delta_time);
-	Aegis::Renderer2D::DrawQuad({ lerp_x, lerp_y }, { width_, height_ }, color_);
+	Aegis::Renderer2D::DrawQuad(pos_, size_, color_);
 }
