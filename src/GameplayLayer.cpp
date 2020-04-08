@@ -36,6 +36,21 @@ void GameplayLayer::OnUpdate()
 }
 void GameplayLayer::OnEvent(Aegis::Event& event)
 {
+	auto click_event = dynamic_cast<Aegis::MouseClickEvent*>(&event);
+
+	if (click_event && click_event->action_ == GLFW_PRESS) {
+		auto mouse_pos = Aegis::Application::GetMousePos();
+		auto tile = tile_map_.GetTilesUnderneath(mouse_pos.x, mouse_pos.y, 1, 1);
+
+
+		if (tile.size() > 0) {
+			auto single_tile = tile[0];
+			auto index = tile_map_.GetTileIndex(*single_tile);
+
+			tile_map_.tiles_[index.y][index.x] = Wall(index.x * tile_map_.tile_size_, index.y * tile_map_.tile_size_);
+		}
+	}
+
 	player_.OnEvent(event);
 }
 
@@ -45,5 +60,4 @@ void GameplayLayer::OnRender(float delta_time)
 	tile_map_.Render();
 	player_.Render(delta_time);
 	Aegis::DrawText(std::to_string(Aegis::Application::GetFrameTime()), { 0, 0 }, { 1.0f, 1.0f, 1.0f, 1.0f });
-
 }

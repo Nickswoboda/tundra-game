@@ -42,20 +42,21 @@ void TileMap::Render()
 {
 	for (int row = 0; row < tiles_.size(); ++row) {
 		for (int col = 0; col < tiles_[row].size(); ++col) {
-			Aegis::Vec2 size = { tile_size_, tile_size_ };
-			Aegis::DrawQuad(tiles_[row][col].pos_, size, tiles_[row][col].color_);
+			
+			Aegis::DrawQuad(tiles_[row][col].pos_, Aegis::Vec2(tile_size_, tile_size_), tiles_[row][col].color_);
 		}
 	}
 }
 
-std::vector<Tile*> TileMap::GetTilesUnderneath(const GameObject& obj)
+std::vector<Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h)
 {
 	std::vector<Tile*> temp;
 
-	int left_index = obj.pos_.x / tile_size_;
-	int right_index = (obj.pos_.x + obj.size_.x) / tile_size_;
-	int top_index = obj.pos_.y / tile_size_;
-	int bottom_index = (obj.pos_.y + obj.size_.y - 1) / tile_size_;
+	int left_index = std::max(0, x / tile_size_);
+	int right_index = std::min(width_, (x + w - 1) / tile_size_);
+	int top_index = std::max(0, y / tile_size_);
+	int bottom_index = std::min(height_, (y + h - 1) / tile_size_);
+
 
 	for (int i = left_index; i <= right_index; ++i) {
 		for (int j = top_index; j <= bottom_index; ++j) {
@@ -64,4 +65,17 @@ std::vector<Tile*> TileMap::GetTilesUnderneath(const GameObject& obj)
 	}
 
 	return temp;
+}
+
+std::vector<Tile*> TileMap::GetTilesUnderneath(const GameObject& obj)
+{
+	return GetTilesUnderneath(obj.pos_.x, obj.pos_.y, obj.size_.x, obj.size_.y);
+}
+
+Aegis::Vec2 TileMap::GetTileIndex(const Tile& tile)
+{
+	int col = tile.pos_.x / tile_size_;
+	int row = tile.pos_.y / tile_size_;
+
+	return Aegis::Vec2(col, row);
 }
