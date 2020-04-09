@@ -12,7 +12,7 @@ public:
 	virtual void Update() {};
 	virtual void Render(float delta_time) const = 0;
 				 
-	Aegis::Vec4 color_ = { 1.0, 1.0, 1.0, 1.0 };
+	Aegis::Vec4 color_ = { 1.0, 0.0, 1.0, 1.0 };
 	Aegis::Vec2 pos_;
 	Aegis::Vec2 size_;
 	Aegis::Vec2 vel_;
@@ -27,7 +27,7 @@ class Pellet : public GameObject
 {
 public:
 	Pellet(int x, int y)
-		: GameObject(x, y, 16, 16)
+		: GameObject(x, y, 8, 8)
 	{
 		destructible_ = true;
 	}
@@ -41,7 +41,7 @@ class Player : public GameObject
 {
 public:
 	Player(int x, int y)
-		:GameObject(x,y,32,32)
+		:GameObject(x,y,20,20)
 	{
 		acceleration_ = 10.0f;
 	}

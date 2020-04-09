@@ -27,7 +27,8 @@ TileMap::TileMap(const std::string& file_path, int tile_size)
 				tiles_[y].emplace_back(Wall(x * tile_size, y * tile_size)); ++x; break;
 			}
 			case '1': {
-				tiles_[y].emplace_back(Ice(x * tile_size, y * tile_size)); ++x; break;
+				tiles_[y].emplace_back(Ice(x * tile_size, y * tile_size));
+				pellets_.emplace_back(Pellet(x * tile_size + 6, y * tile_size + 6)); ++x; break;
 			}
 			case ' ': {
 				tiles_[y].emplace_back(Ground(x * tile_size, y * tile_size)); ++x; break;
@@ -45,6 +46,11 @@ void TileMap::Render()
 			
 			Aegis::DrawQuad(tiles_[row][col].pos_, Aegis::Vec2(tile_size_, tile_size_), tiles_[row][col].color_);
 		}
+	}
+
+	for (auto& pellet : pellets_)
+	{
+		pellet.Render(0.0f);
 	}
 }
 
@@ -77,5 +83,12 @@ Aegis::Vec2 TileMap::GetTileIndex(const Tile& tile)
 	int col = tile.pos_.x / tile_size_;
 	int row = tile.pos_.y / tile_size_;
 
+	return Aegis::Vec2(col, row);
+}
+
+Aegis::Vec2 TileMap::GetGridIndexByPos(int x, int y)
+{
+	int col = x / tile_size_;
+	int row = y / tile_size_;
 	return Aegis::Vec2(col, row);
 }

@@ -2,7 +2,7 @@
 
 int main()
 {
-	Aegis::Application app(640, 480);
+	Aegis::Application app(1280, 720);
 	app.PushLayer(new GameplayLayer());
 	app.Run();
 }
