@@ -2,6 +2,7 @@
 
 #include "Tile.h"
 
+#include "src/Aegis.h"
 #include "GameObject.h"
 class TileMap
 {
@@ -9,7 +10,8 @@ public:
 	TileMap(const std::string& file_path, int tile_size);
 
 	void Render();
-	Tile& GetTileAt(int col, int row) { return tiles_[row][col]; }
+	Tile* GetTileByIndex(int col, int row);
+	Tile* GetTileByPos(int x_pos, int y_pos);
 	std::vector<Tile*> GetTilesUnderneath(int x, int y, int w, int h);
 	std::vector<Tile*> GetTilesUnderneath(const GameObject& obj);
 	Aegis::Vec2 GetTileIndex(const Tile& tile);
@@ -20,5 +22,6 @@ public:
 	int height_ = 0;
 
 	std::vector<Pellet> pellets_;
+	Aegis::Texture tile_atlas_;
 
 };

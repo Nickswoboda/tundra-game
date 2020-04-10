@@ -5,7 +5,7 @@
 
 #include <algorithm>
 TileMap::TileMap(const std::string& file_path, int tile_size)
-	: tile_size_(tile_size)
+	: tile_size_(tile_size), tile_atlas_("assets/textures/tundra-tile-map.png")
 {
 	std::ifstream file(file_path);
 	std::stringstream buffer;
@@ -44,7 +44,14 @@ void TileMap::Render()
 	for (int row = 0; row < tiles_.size(); ++row) {
 		for (int col = 0; col < tiles_[row].size(); ++col) {
 			
-			Aegis::DrawQuad(tiles_[row][col].pos_, Aegis::Vec2(tile_size_, tile_size_), tiles_[row][col].color_);
+			Aegis::Vec4 tex_coords;
+			tex_coords.x = tiles_[row][col].uv_coords_.x / (float) tile_atlas_.width_;
+			tex_coords.y = tiles_[row][col].uv_coords_.y / (float) tile_atlas_.height_;
+			tex_coords.z = tiles_[row][col].uv_coords_.z / (float) tile_atlas_.width_;
+			tex_coords.w = tiles_[row][col].uv_coords_.w / (float) tile_atlas_.height_;
+
+			//Aegis::DrawQuad(tiles_[row][col].pos_, Aegis::Vec2(tile_size_, tile_size_), tiles_[row][col].color_);
+			Aegis::DrawQuad(tiles_[row][col].pos_, Aegis::Vec2(tile_size_, tile_size_), std::make_unique<Aegis::Texture>(tile_atlas_), { 1.0f, 1.0f, 1.0f, 1.0f }, tex_coords);
 		}
 	}
 
@@ -52,6 +59,20 @@ void TileMap::Render()
 	{
 		pellet.Render(0.0f);
 	}
+}
+
+Tile* TileMap::GetTileByIndex(int col, int row)
+{
+	if (col >= height_ || col < 0 || row >= width_ || row < 0) {
+		return nullptr;
+	}
+
+	return &tiles_[col][row];
+}
+
+Tile* TileMap::GetTileByPos(int x_pos, int y_pos)
+{
+	return GetTileByIndex(x_pos / tile_size_, y_pos / tile_size_);
 }
 
 std::vector<Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h)
@@ -66,7 +87,10 @@ std::vector<Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h)
 
 	for (int i = left_index; i <= right_index; ++i) {
 		for (int j = top_index; j <= bottom_index; ++j) {
-			temp.push_back(&tiles_[j][i]);
+			Tile* tile = GetTileByIndex(j, i);
+			if (tile != nullptr) {
+				temp.push_back(&tiles_[j][i]);
+			}
 		}
 	}
 

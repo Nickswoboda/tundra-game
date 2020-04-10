@@ -69,18 +69,16 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 			key_event->key_ == GLFW_KEY_W ||
 			key_event->key_ == GLFW_KEY_E) {
 				auto mouse_pos = Aegis::Application::GetMousePos();
-				auto tile = tile_map_.GetTilesUnderneath(mouse_pos.x, mouse_pos.y, 1, 1);
+				auto tile = tile_map_.GetTileByPos(mouse_pos.x, mouse_pos.y);
 
-
-				if (tile.size() > 0) {
-					auto single_tile = tile[0];
-					auto index = tile_map_.GetTileIndex(*single_tile);
+				if (tile != nullptr) {
+					auto index = tile_map_.GetTileIndex(*tile);
 
 					switch (key_event->key_)
 					{
-					case GLFW_KEY_Q: tile_map_.tiles_[index.y][index.x] = Wall(index.x * tile_map_.tile_size_, index.y * tile_map_.tile_size_); break;
-					case GLFW_KEY_W: tile_map_.tiles_[index.y][index.x] = Ice(index.x * tile_map_.tile_size_, index.y * tile_map_.tile_size_); break;
-					case GLFW_KEY_E: tile_map_.tiles_[index.y][index.x] = Ground(index.x * tile_map_.tile_size_, index.y * tile_map_.tile_size_); break;
+					case GLFW_KEY_Q: tile_map_.tiles_[index.x][index.y] = Wall(index.y * tile_map_.tile_size_, index.x * tile_map_.tile_size_); break;
+					case GLFW_KEY_W: tile_map_.tiles_[index.x][index.y] = Ice(index.y * tile_map_.tile_size_, index.x * tile_map_.tile_size_); break;
+					case GLFW_KEY_E: tile_map_.tiles_[index.x][index.y] = Ground(index.y * tile_map_.tile_size_, index.x * tile_map_.tile_size_); break;
 					default:
 						break;
 					}
