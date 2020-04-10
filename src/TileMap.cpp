@@ -43,15 +43,7 @@ void TileMap::Render()
 {
 	for (int row = 0; row < tiles_.size(); ++row) {
 		for (int col = 0; col < tiles_[row].size(); ++col) {
-			
-			Aegis::Vec4 tex_coords;
-			tex_coords.x = tiles_[row][col].uv_coords_.x / (float) tile_atlas_.width_;
-			tex_coords.y = tiles_[row][col].uv_coords_.y / (float) tile_atlas_.height_;
-			tex_coords.z = tiles_[row][col].uv_coords_.z / (float) tile_atlas_.width_;
-			tex_coords.w = tiles_[row][col].uv_coords_.w / (float) tile_atlas_.height_;
-
-			//Aegis::DrawQuad(tiles_[row][col].pos_, Aegis::Vec2(tile_size_, tile_size_), tiles_[row][col].color_);
-			Aegis::DrawQuad(tiles_[row][col].pos_, Aegis::Vec2(tile_size_, tile_size_), std::make_unique<Aegis::Texture>(tile_atlas_), { 1.0f, 1.0f, 1.0f, 1.0f }, tex_coords);
+			Aegis::DrawQuad(tiles_[row][col].pos_, Aegis::Vec2(tile_size_, tile_size_), std::make_unique<Aegis::Texture>(tile_atlas_), { 1.0f, 1.0f, 1.0f, 1.0f }, tiles_[row][col].uv_coords_);
 		}
 	}
 
@@ -99,7 +91,7 @@ std::vector<Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h)
 
 std::vector<Tile*> TileMap::GetTilesUnderneath(const GameObject& obj)
 {
-	return GetTilesUnderneath(obj.pos_.x, obj.pos_.y, obj.size_.x, obj.size_.y);
+	return GetTilesUnderneath(obj.rect_.pos.x, obj.rect_.pos.y, obj.rect_.size.x, obj.rect_.size.y);
 }
 
 Aegis::Vec2 TileMap::GetTileIndex(const Tile& tile)

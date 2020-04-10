@@ -2,34 +2,21 @@
 
 #include <fstream>
 GameplayLayer::GameplayLayer()
-	:player_(270, 660), tile_map_("assets/levels/custom.txt", 20)
+	:player_(270, 660), tile_map_("assets/levels/custom.txt", 32)
 {}
-bool GameplayLayer::HasCollided(const GameObject& obj_1, const GameObject& obj_2)
-{
-	if ((int)obj_1.pos_.x < obj_2.pos_.x + obj_2.size_.x &&
-		(int)obj_1.pos_.x + obj_1.size_.x > obj_2.pos_.x &&
-		(int)obj_1.pos_.y < obj_2.pos_.y + obj_2.size_.y &&
-		(int)obj_1.pos_.y + obj_1.size_.y > obj_2.pos_.y) {
-
-		std::cout << "Collision Detected\n";
-		return true;
-	}
-
-	return false;
-}
 void GameplayLayer::ResolveCollision(GameObject& obj_1, const Tile& tile)
 {
 	if (obj_1.vel_.x > 0) {
-		obj_1.pos_.x = tile.pos_.x - obj_1.size_.x;
+		obj_1.rect_.pos.x = tile.pos_.x - obj_1.rect_.size.x;
 	}
 	else if (obj_1.vel_.x < 0) {
-		obj_1.pos_.x = tile.pos_.x + tile_map_.tile_size_;
+		obj_1.rect_.pos.x = tile.pos_.x + tile_map_.tile_size_;
 	}
 	else if (obj_1.vel_.y > 0) {
-		obj_1.pos_.y = tile.pos_.y - obj_1.size_.y;
+		obj_1.rect_.pos.y = tile.pos_.y - obj_1.rect_.size.y;
 	}
 	else if (obj_1.vel_.y < 0) {
-		obj_1.pos_.y = tile.pos_.y + tile_map_.tile_size_;
+		obj_1.rect_.pos.y = tile.pos_.y + tile_map_.tile_size_;
 	}
 	obj_1.vel_.x = 0;
 	obj_1.vel_.y = 0;
@@ -47,13 +34,13 @@ void GameplayLayer::OnUpdate()
 	}
 
 	for (auto i = tile_map_.pellets_.begin(); i != tile_map_.pellets_.end();) {
-		if (HasCollided(player_, *i)) {
+		if (Aegis::AABBHasCollided(player_.rect_, (*i).rect_)) {
 			i = tile_map_.pellets_.erase(i);
 		}
 		else {
 			++i;
 		}
-
+	
 	}
 }
 void GameplayLayer::OnEvent(Aegis::Event& event)

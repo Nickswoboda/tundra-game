@@ -6,15 +6,14 @@ class GameObject
 {
 public:
 	GameObject(float x, float y, float w, float h)
-		: pos_{ x, y }, size_{w, h}
+		:rect_{ x, y, w, h }
 	{}
 		
 	virtual void Update() {};
 	virtual void Render(float delta_time) const = 0;
 				 
 	Aegis::Vec4 color_ = { 1.0, 0.0, 1.0, 1.0 };
-	Aegis::Vec2 pos_;
-	Aegis::Vec2 size_;
+	Aegis::AABB rect_;
 	Aegis::Vec2 vel_;
 
 	float acceleration_ = 0.0f;
@@ -33,7 +32,7 @@ public:
 	}
 	void Render(float delta_time) const override
 	{
-		Aegis::DrawQuad(pos_, size_, { 0.5, 0.8, 0.2, 1.0 });
+		Aegis::DrawQuad(rect_.pos, rect_.size, { 0.5, 0.8, 0.2, 1.0 });
 	}
 };
 

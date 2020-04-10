@@ -23,7 +23,7 @@ struct Wall : public Tile
 {
 	Wall(int x, int y)
 	{
-		uv_coords_ = { 0.0f, 0.0f, 31.0f, 31.0f };
+		uv_coords_ = { 0.0f, 0.0f, 32.0f, 32.0f };
 		type_ = Type::Wall;
 		pos_.x = x;
 		pos_.y = y;
@@ -36,7 +36,7 @@ struct Ground : public Tile
 {
 	Ground(int x, int y)
 	{
-		uv_coords_ = { 32.0f, 0.0f, 63.0f, 31.0f };
+		uv_coords_ = { 32.0f, 0.0f, 64.0f, 32.0f };
 		type_ = Type::Ground;
 		pos_.x = x;
 		pos_.y = y;
@@ -48,7 +48,7 @@ struct Ice : public Tile
 {
 	Ice(int x, int y)
 	{
-		uv_coords_ = { 64.0f, 0.0f, 95.0f, 31.0f };
+		uv_coords_ = { 64.0f, 0.0f, 96.0f, 32.0f };
 		type_ = Type::Ice;
 		pos_.x = x;
 		pos_.y = y;

@@ -2,8 +2,8 @@
 
 void Player::Update()
 {
-	pos_.x += vel_.x;
-	pos_.y += vel_.y;
+	rect_.pos.x += vel_.x;
+	rect_.pos.y += vel_.y;
 }
 
 void Player::OnEvent(Aegis::Event& event)
@@ -24,5 +24,5 @@ void Player::OnEvent(Aegis::Event& event)
 
 void Player::Render(float delta_time) const
 {
-	Aegis::DrawQuad(pos_, size_, color_);
+	Aegis::DrawQuad(rect_.pos, rect_.size, color_);
 }
