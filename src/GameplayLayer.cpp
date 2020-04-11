@@ -1,26 +1,52 @@
 #include "GameplayLayer.h"
 
 #include <fstream>
+#include <iostream>
 GameplayLayer::GameplayLayer()
-	:player_(32, 32), tile_map_("assets/levels/custom.txt", 32)
+	:player_(270, 660), tile_map_("assets/levels/custom.txt", 20)
 {}
 
 void GameplayLayer::ResolveCollision(GameObject& obj_1, const Tile& tile)
 {
-	if (obj_1.vel_.x > 0) {
-		obj_1.rect_.pos.x = tile.pos_.x - obj_1.rect_.size.x;
+	if (tile.is_solid_) {
+		if (obj_1.vel_.x > 0) {
+			obj_1.rect_.pos.x = tile.pos_.x - obj_1.rect_.size.x;
+		}
+		else if (obj_1.vel_.x < 0) {
+			obj_1.rect_.pos.x = tile.pos_.x + tile_map_.tile_size_;
+		}
+		else if (obj_1.vel_.y > 0) {
+			obj_1.rect_.pos.y = tile.pos_.y - obj_1.rect_.size.y;
+		}
+		else if (obj_1.vel_.y < 0) {
+			obj_1.rect_.pos.y = tile.pos_.y + tile_map_.tile_size_;
+		}
+		obj_1.vel_.x = 0;
+		obj_1.vel_.y = 0;
+		player_.tile_index_ = tile_map_.GetGridIndexByPos(player_.rect_.pos.x, player_.rect_.pos.y);
 	}
-	else if (obj_1.vel_.x < 0) {
-		obj_1.rect_.pos.x = tile.pos_.x + tile_map_.tile_size_;
+	else {
+		if (obj_1.vel_.x > 0 && obj_1.rect_.pos.x > tile.pos_.x) {
+			obj_1.rect_.pos.x = tile.pos_.x;
+			obj_1.vel_.x = 0;
+			player_.tile_index_ = tile_map_.GetGridIndexByPos(player_.rect_.pos.x, player_.rect_.pos.y);
+		}
+		else if (obj_1.vel_.x < 0 && obj_1.rect_.pos.x < tile.pos_.x) {
+			obj_1.rect_.pos.x = tile.pos_.x;
+			obj_1.vel_.x = 0;
+			player_.tile_index_ = tile_map_.GetGridIndexByPos(player_.rect_.pos.x, player_.rect_.pos.y);
+		}
+		else if (obj_1.vel_.y > 0 && obj_1.rect_.pos.y > tile.pos_.y) {
+			obj_1.rect_.pos.y = tile.pos_.y;
+			obj_1.vel_.y = 0;
+			player_.tile_index_ = tile_map_.GetGridIndexByPos(player_.rect_.pos.x, player_.rect_.pos.y);
+		}
+		else if (obj_1.vel_.y < 0 && obj_1.rect_.pos.y < tile.pos_.y) {
+			obj_1.rect_.pos.y = tile.pos_.y;
+			obj_1.vel_.y = 0;
+			player_.tile_index_ = tile_map_.GetGridIndexByPos(player_.rect_.pos.x, player_.rect_.pos.y);
+		}
 	}
-	else if (obj_1.vel_.y > 0) {
-		obj_1.rect_.pos.y = tile.pos_.y - obj_1.rect_.size.y;
-	}
-	else if (obj_1.vel_.y < 0) {
-		obj_1.rect_.pos.y = tile.pos_.y + tile_map_.tile_size_;
-	}
-	obj_1.vel_.x = 0;
-	obj_1.vel_.y = 0;
 }
 
 void GameplayLayer::OnUpdate()
@@ -28,9 +54,11 @@ void GameplayLayer::OnUpdate()
 	player_.Update();
 	
 	auto tiles = tile_map_.GetTilesUnderneath(player_.rect_);
-	for (auto tile : tiles) {
-		if (tile->is_solid_) {
-			ResolveCollision(player_, *tile);
+	for (auto& tile : tiles) {
+		if (tile != tile_map_.GetTileByIndex(player_.tile_index_.x, player_.tile_index_.y)) {
+			if (!tile->is_slippery_) {
+				ResolveCollision(player_, *tile);
+			}
 		}
 	}
 

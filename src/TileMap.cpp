@@ -33,7 +33,7 @@ TileMap::TileMap(const std::string& file_path, int tile_size)
 				pellets_.emplace_back(Pellet(col * tile_size + 6, row * tile_size + 6));  ++col; break;
 			}
 			case ' ': {
-				tiles_[col].emplace_back(Ground(row * tile_size, col * tile_size));  ++col; break;
+				tiles_[col].emplace_back(Ground(col * tile_size, row * tile_size));  ++col; break;
 			}
 		}
 	}

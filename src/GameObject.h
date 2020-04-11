@@ -12,9 +12,10 @@ public:
 	virtual void Update() {};
 	virtual void Render(float delta_time) const = 0;
 				 
-	Aegis::Vec4 color_ = { 1.0, 0.0, 1.0, 1.0 };
+	Aegis::Vec4 color_ = { 0.8, 0.2f, 0.2, 1.0 };
 	Aegis::AABB rect_;
 	Aegis::Vec2 vel_;
+	Aegis::Vec2 tile_index_;
 
 	float acceleration_ = 0.0f;
 
@@ -31,7 +32,7 @@ public:
 	}
 	void Render(float delta_time) const override
 	{
-		Aegis::DrawQuad(rect_.pos, rect_.size, { 0.5, 0.8, 0.2, 1.0 });
+		Aegis::DrawQuad(rect_.pos, rect_.size, { 0.5, 0.5, 0.2, 1.0 });
 	}
 };
 
@@ -42,6 +43,7 @@ public:
 		:GameObject(x,y,20,20)
 	{
 		acceleration_ = 10.0f;
+		tile_index_ = { -1, -1 };
 	}
 
 	void Update();
