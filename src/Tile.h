@@ -12,7 +12,6 @@ struct Tile
 	};
 public:
 	Type type_ = Type::None;
-	Aegis::Vec4 color_;
 	Aegis::Vec2 pos_;
 	Aegis::Vec4 uv_coords_;
 	bool is_solid_ = false;
@@ -27,7 +26,6 @@ struct Wall : public Tile
 		type_ = Type::Wall;
 		pos_.x = x;
 		pos_.y = y;
-		color_ = { 0.2f, 0.2f, 0.2f, 1.0f };
 		is_solid_ = true;
 	}
 };
@@ -40,7 +38,6 @@ struct Ground : public Tile
 		type_ = Type::Ground;
 		pos_.x = x;
 		pos_.y = y;
-		color_ = { 0.95f, 0.95f, 0.95f, 1.0f };
 	}
 };
 
@@ -52,7 +49,6 @@ struct Ice : public Tile
 		type_ = Type::Ice;
 		pos_.x = x;
 		pos_.y = y;
-		color_ = { 0.84f, 1.0f, .99f, 1.0f };
 		is_slippery_ = true;
 	}
 };

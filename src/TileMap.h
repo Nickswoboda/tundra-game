@@ -13,7 +13,7 @@ public:
 	Tile* GetTileByIndex(int col, int row);
 	Tile* GetTileByPos(int x_pos, int y_pos);
 	std::vector<Tile*> GetTilesUnderneath(int x, int y, int w, int h);
-	std::vector<Tile*> GetTilesUnderneath(const GameObject& obj);
+	std::vector<Tile*> GetTilesUnderneath(const Aegis::AABB& rect);
 	Aegis::Vec2 GetTileIndex(const Tile& tile);
 	Aegis::Vec2 GetGridIndexByPos(int x, int y);
 	std::vector<std::vector<Tile>> tiles_;

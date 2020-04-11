@@ -2,8 +2,9 @@
 
 #include <fstream>
 GameplayLayer::GameplayLayer()
-	:player_(270, 660), tile_map_("assets/levels/custom.txt", 32)
+	:player_(32, 32), tile_map_("assets/levels/custom.txt", 32)
 {}
+
 void GameplayLayer::ResolveCollision(GameObject& obj_1, const Tile& tile)
 {
 	if (obj_1.vel_.x > 0) {
@@ -21,12 +22,12 @@ void GameplayLayer::ResolveCollision(GameObject& obj_1, const Tile& tile)
 	obj_1.vel_.x = 0;
 	obj_1.vel_.y = 0;
 }
+
 void GameplayLayer::OnUpdate()
 {
 	player_.Update();
 	
-	auto tiles = tile_map_.GetTilesUnderneath(player_);
-	
+	auto tiles = tile_map_.GetTilesUnderneath(player_.rect_);
 	for (auto tile : tiles) {
 		if (tile->is_solid_) {
 			ResolveCollision(player_, *tile);
@@ -63,11 +64,9 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 
 					switch (key_event->key_)
 					{
-					case GLFW_KEY_Q: tile_map_.tiles_[index.x][index.y] = Wall(index.y * tile_map_.tile_size_, index.x * tile_map_.tile_size_); break;
-					case GLFW_KEY_W: tile_map_.tiles_[index.x][index.y] = Ice(index.y * tile_map_.tile_size_, index.x * tile_map_.tile_size_); break;
-					case GLFW_KEY_E: tile_map_.tiles_[index.x][index.y] = Ground(index.y * tile_map_.tile_size_, index.x * tile_map_.tile_size_); break;
-					default:
-						break;
+					case GLFW_KEY_Q: *tile = Wall(index.x * tile_map_.tile_size_, index.y * tile_map_.tile_size_); break;
+					case GLFW_KEY_W: *tile = Ice(index.x * tile_map_.tile_size_, index.y * tile_map_.tile_size_); break;
+					case GLFW_KEY_E: *tile = Ground(index.x * tile_map_.tile_size_, index.y * tile_map_.tile_size_); break;
 					}
 				}
 		}
@@ -90,7 +89,7 @@ void GameplayLayer::SaveLevel()
 	
 	for (int row = 0; row < tile_map_.height_; ++row) {
 		for (int col = 0; col < tile_map_.width_; ++col) {
-			auto type = tile_map_.tiles_[row][col].type_;
+			auto type = tile_map_.tiles_[col][row].type_;
 
 			switch (type)
 			{

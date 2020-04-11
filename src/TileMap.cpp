@@ -11,39 +11,41 @@ TileMap::TileMap(const std::string& file_path, int tile_size)
 	std::stringstream buffer;
 	buffer << file.rdbuf();
 
-	int x = 0;
-	int y = 0;
-	tiles_.push_back(std::vector<Tile>());
-
+	int col = 0;
+	int row = 0;
 
 	for (const auto& ch : buffer.str()) {
+
+
+		if ( ch == '\n'){
+			++row; col = 0;
+		}
+		if (tiles_.size() <= col) {
+			tiles_.push_back(std::vector<Tile>());
+		}
 		switch (ch)
 		{
-			case '\n': {
-				tiles_.push_back(std::vector<Tile>());
-				++y; x = 0; break;
-			}
 			case '0': {
-				tiles_[y].emplace_back(Wall(x * tile_size, y * tile_size)); ++x; break;
+				tiles_[col].emplace_back(Wall(col * tile_size, row * tile_size)); ++col; break;
 			}
 			case '1': {
-				tiles_[y].emplace_back(Ice(x * tile_size, y * tile_size));
-				pellets_.emplace_back(Pellet(x * tile_size + 6, y * tile_size + 6)); ++x; break;
+				tiles_[col].emplace_back(Ice(col * tile_size, row * tile_size));
+				pellets_.emplace_back(Pellet(col * tile_size + 6, row * tile_size + 6));  ++col; break;
 			}
 			case ' ': {
-				tiles_[y].emplace_back(Ground(x * tile_size, y * tile_size)); ++x; break;
+				tiles_[col].emplace_back(Ground(row * tile_size, col * tile_size));  ++col; break;
 			}
 		}
 	}
-	height_ = tiles_.size();
-	width_ = tiles_[height_ - 1].size();
+	width_ = tiles_.size();
+	height_ = tiles_[width_ - 1].size();
 }
 
 void TileMap::Render()
 {
-	for (int row = 0; row < tiles_.size(); ++row) {
-		for (int col = 0; col < tiles_[row].size(); ++col) {
-			Aegis::DrawQuad(tiles_[row][col].pos_, Aegis::Vec2(tile_size_, tile_size_), std::make_unique<Aegis::Texture>(tile_atlas_), { 1.0f, 1.0f, 1.0f, 1.0f }, tiles_[row][col].uv_coords_);
+	for (int col = 0; col < tiles_.size(); ++col) {
+		for (int row = 0; row < tiles_[col].size(); ++row) {
+			Aegis::DrawQuad(tiles_[col][row].pos_, Aegis::Vec2(tile_size_, tile_size_), std::make_unique<Aegis::Texture>(tile_atlas_), { 1.0f, 1.0f, 1.0f, 1.0f }, tiles_[col][row].uv_coords_);
 		}
 	}
 
@@ -55,7 +57,7 @@ void TileMap::Render()
 
 Tile* TileMap::GetTileByIndex(int col, int row)
 {
-	if (col >= height_ || col < 0 || row >= width_ || row < 0) {
+	if (row >= height_ || row < 0 || col >= width_ || col < 0) {
 		return nullptr;
 	}
 
@@ -79,9 +81,9 @@ std::vector<Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h)
 
 	for (int i = left_index; i <= right_index; ++i) {
 		for (int j = top_index; j <= bottom_index; ++j) {
-			Tile* tile = GetTileByIndex(j, i);
+			Tile* tile = GetTileByIndex(i, j);
 			if (tile != nullptr) {
-				temp.push_back(&tiles_[j][i]);
+				temp.push_back(&tiles_[i][j]);
 			}
 		}
 	}
@@ -89,9 +91,9 @@ std::vector<Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h)
 	return temp;
 }
 
-std::vector<Tile*> TileMap::GetTilesUnderneath(const GameObject& obj)
+std::vector<Tile*> TileMap::GetTilesUnderneath(const Aegis::AABB& rect)
 {
-	return GetTilesUnderneath(obj.rect_.pos.x, obj.rect_.pos.y, obj.rect_.size.x, obj.rect_.size.y);
+	return GetTilesUnderneath(rect.pos.x, rect.pos.y, rect.size.x, rect.size.y);
 }
 
 Aegis::Vec2 TileMap::GetTileIndex(const Tile& tile)

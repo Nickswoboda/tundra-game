@@ -18,7 +18,6 @@ public:
 
 	float acceleration_ = 0.0f;
 
-
 	bool destructible_ = false;
 };
 
