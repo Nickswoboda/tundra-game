@@ -4,6 +4,8 @@
 
 #include "src/Aegis.h"
 #include "GameObject.h"
+
+#include <memory>
 class TileMap
 {
 public:
@@ -14,6 +16,7 @@ public:
 	Tile* GetTileByPos(int x_pos, int y_pos);
 	std::vector<Tile*> GetTilesUnderneath(int x, int y, int w, int h);
 	std::vector<Tile*> GetTilesUnderneath(const Aegis::AABB& rect);
+	void SetTextureAtlas(const Aegis::Texture& atlas);
 	Aegis::Vec2 GetTileIndex(const Tile& tile);
 	Aegis::Vec2 GetGridIndexByPos(int x, int y);
 	std::vector<std::vector<Tile>> tiles_;
@@ -22,6 +25,6 @@ public:
 	int height_ = 0;
 
 	std::vector<Pellet> pellets_;
-	Aegis::Texture tile_atlas_;
+	std::unique_ptr<Aegis::Texture> tile_atlas_;
 
 };

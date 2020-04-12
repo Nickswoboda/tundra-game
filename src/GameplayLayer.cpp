@@ -3,8 +3,11 @@
 #include <fstream>
 #include <iostream>
 GameplayLayer::GameplayLayer()
-	:player_(270, 660), tile_map_("assets/levels/custom.txt", 20)
-{}
+	:player_(270, 660), tile_map_("assets/levels/custom.txt", 20), tile_atlas_("assets/textures/tundra-tile-map.png")
+{
+	tile_map_.SetTextureAtlas(tile_atlas_);
+	player_.texture_ = std::make_unique<Aegis::Texture>(tile_atlas_);
+}
 
 void GameplayLayer::ResolveCollision(GameObject& obj_1, const Tile& tile)
 {
@@ -76,14 +79,15 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 {
 	auto key_event = dynamic_cast<Aegis::KeyEvent*>(&event);
 
-	if (key_event && key_event->action_ == GLFW_PRESS) {
-		if (key_event->key_ == GLFW_KEY_J) {
+
+	if (key_event && key_event->action_ == AE_BUTTON_PRESS) {
+		if (key_event->key_ == AE_KEY_J) {
 			SaveLevel();
 		}
 		
-		if (key_event->key_ == GLFW_KEY_Q ||
-			key_event->key_ == GLFW_KEY_W ||
-			key_event->key_ == GLFW_KEY_E) {
+		if (key_event->key_ == AE_KEY_Q ||
+			key_event->key_ == AE_KEY_W ||
+			key_event->key_ == AE_KEY_E) {
 				auto mouse_pos = Aegis::Application::GetMousePos();
 				auto tile = tile_map_.GetTileByPos(mouse_pos.x, mouse_pos.y);
 
@@ -92,9 +96,9 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 
 					switch (key_event->key_)
 					{
-					case GLFW_KEY_Q: *tile = Wall(index.x * tile_map_.tile_size_, index.y * tile_map_.tile_size_); break;
-					case GLFW_KEY_W: *tile = Ice(index.x * tile_map_.tile_size_, index.y * tile_map_.tile_size_); break;
-					case GLFW_KEY_E: *tile = Ground(index.x * tile_map_.tile_size_, index.y * tile_map_.tile_size_); break;
+					case AE_KEY_Q: *tile = Wall(index.x * tile_map_.tile_size_, index.y * tile_map_.tile_size_); break;
+					case AE_KEY_W: *tile = Ice(index.x * tile_map_.tile_size_, index.y * tile_map_.tile_size_); break;
+					case AE_KEY_E: *tile = Ground(index.x * tile_map_.tile_size_, index.y * tile_map_.tile_size_); break;
 					}
 				}
 		}

@@ -12,10 +12,11 @@ public:
 	virtual void Update() {};
 	virtual void Render(float delta_time) const = 0;
 				 
-	Aegis::Vec4 color_ = { 0.8, 0.2f, 0.2, 1.0 };
+	Aegis::Vec4 uv_coords_;
 	Aegis::AABB rect_;
 	Aegis::Vec2 vel_;
 	Aegis::Vec2 tile_index_;
+	std::unique_ptr<Aegis::Texture> texture_;
 
 	float acceleration_ = 0.0f;
 
@@ -44,6 +45,7 @@ public:
 	{
 		acceleration_ = 10.0f;
 		tile_index_ = { -1, -1 };
+		uv_coords_ = { 96.0f, 0.0f, 128.0f, 32.0f };
 	}
 
 	void Update();

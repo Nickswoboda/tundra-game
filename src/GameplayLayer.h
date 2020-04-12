@@ -20,4 +20,6 @@ public:
 
 	Player player_;
 	TileMap tile_map_;
+	Aegis::Texture tile_atlas_;
+	
 };

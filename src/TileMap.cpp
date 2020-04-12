@@ -5,7 +5,7 @@
 
 #include <algorithm>
 TileMap::TileMap(const std::string& file_path, int tile_size)
-	: tile_size_(tile_size), tile_atlas_("assets/textures/tundra-tile-map.png")
+	: tile_size_(tile_size)
 {
 	std::ifstream file(file_path);
 	std::stringstream buffer;
@@ -45,7 +45,7 @@ void TileMap::Render()
 {
 	for (int col = 0; col < tiles_.size(); ++col) {
 		for (int row = 0; row < tiles_[col].size(); ++row) {
-			Aegis::DrawQuad(tiles_[col][row].pos_, Aegis::Vec2(tile_size_, tile_size_), std::make_unique<Aegis::Texture>(tile_atlas_), { 1.0f, 1.0f, 1.0f, 1.0f }, tiles_[col][row].uv_coords_);
+			Aegis::DrawQuad(tiles_[col][row].pos_, Aegis::Vec2(tile_size_, tile_size_), tile_atlas_, { 1.0f, 1.0f, 1.0f, 1.0f }, tiles_[col][row].uv_coords_);
 		}
 	}
 
@@ -94,6 +94,11 @@ std::vector<Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h)
 std::vector<Tile*> TileMap::GetTilesUnderneath(const Aegis::AABB& rect)
 {
 	return GetTilesUnderneath(rect.pos.x, rect.pos.y, rect.size.x, rect.size.y);
+}
+
+void TileMap::SetTextureAtlas(const Aegis::Texture& atlas)
+{
+	tile_atlas_ = std::make_unique<Aegis::Texture>(atlas);
 }
 
 Aegis::Vec2 TileMap::GetTileIndex(const Tile& tile)
