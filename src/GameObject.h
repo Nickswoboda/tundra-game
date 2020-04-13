@@ -47,9 +47,8 @@ public:
 
 	void Update();
 	void Stop() override;
-	void OnEvent(Aegis::Event& event);
 	void Render(float delta_time) const override;
-	
-	std::unique_ptr<Aegis::KeyEvent> queued_event_;
+
 	bool moving_ = false;
+	Aegis::Vec2 target_pos_;
 };

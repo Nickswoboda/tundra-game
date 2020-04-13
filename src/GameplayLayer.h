@@ -15,6 +15,7 @@ public:
 	void ResolveCollision(GameObject& obj_1, const Tile& tile);
 	void OnUpdate() override;
 	void OnEvent(Aegis::Event& event);
+	void HandlePlayerMovement(Aegis::KeyEvent& key_event);
 	void OnRender(float delta_time) override;
 	void SaveLevel();
 

@@ -7,6 +7,7 @@ GameplayLayer::GameplayLayer()
 {
 	tile_map_.SetTextureAtlas(tile_atlas_);
 	player_.texture_ = std::make_unique<Aegis::Texture>(tile_atlas_);
+	player_.tile_index_ = tile_map_.GetGridIndexByPos(270, 660);
 }
 
 void GameplayLayer::ResolveCollision(GameObject& obj_1, const Tile& tile)
@@ -54,16 +55,23 @@ void GameplayLayer::ResolveCollision(GameObject& obj_1, const Tile& tile)
 
 void GameplayLayer::OnUpdate()
 {
-	player_.Update();
-	
-	auto tiles = tile_map_.GetTilesUnderneath(player_.rect_);
-	for (auto& tile : tiles) {
-		if (tile != tile_map_.GetTileByIndex(player_.tile_index_.x, player_.tile_index_.y)) {
-			if (!tile->is_slippery_) {
-				ResolveCollision(player_, *tile);
-			}
+	if (player_.moving_) {
+		player_.Update();
+		if (player_.rect_.pos.x == player_.target_pos_.x && player_.rect_.pos.y == player_.target_pos_.y) {
+			player_.moving_ = false;
+			player_.tile_index_ = tile_map_.GetGridIndexByPos(player_.rect_.pos.x, player_.rect_.pos.y);
+			player_.vel_ = Aegis::Vec2(0, 0);
 		}
 	}
+	
+	//auto tiles = tile_map_.GetTilesUnderneath(player_.rect_);
+	//for (auto& tile : tiles) {
+	//	if (tile != tile_map_.GetTileByIndex(player_.tile_index_.x, player_.tile_index_.y)) {
+	//		if (!tile->is_slippery_) {
+	//			ResolveCollision(player_, *tile);
+	//		}
+	//	}
+	//}
 
 	for (auto i = tile_map_.pellets_.begin(); i != tile_map_.pellets_.end();) {
 		if (Aegis::AABBHasCollided(player_.rect_, (*i).rect_)) {
@@ -78,7 +86,6 @@ void GameplayLayer::OnUpdate()
 void GameplayLayer::OnEvent(Aegis::Event& event)
 {
 	auto key_event = dynamic_cast<Aegis::KeyEvent*>(&event);
-
 
 	if (key_event && key_event->action_ == AE_BUTTON_PRESS) {
 		if (key_event->key_ == AE_KEY_J) {
@@ -102,9 +109,93 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 					}
 				}
 		}
+		if (!player_.moving_) {
+			if (key_event->key_ == AE_KEY_UP ||
+				key_event->key_ == AE_KEY_DOWN ||
+				key_event->key_ == AE_KEY_LEFT ||
+				key_event->key_ == AE_KEY_RIGHT) {
+				HandlePlayerMovement(*key_event);
+			}
+		}
+	}
+}
+
+void GameplayLayer::HandlePlayerMovement(Aegis::KeyEvent& key_event)
+{
+	Aegis::Vec2 target_tile_pos;
+	switch (key_event.key_)
+	{
+		case GLFW_KEY_UP: {
+			for (int y_index = player_.tile_index_.y - 1; y_index >= 0; --y_index) {
+				auto* tile = tile_map_.GetTileByIndex(player_.tile_index_.x, y_index);
+				if (tile->type_ == Tile::Type::Ground) {
+					target_tile_pos = tile->pos_;
+					break;
+				}
+				else if (tile->type_ == Tile::Type::Wall) {
+					target_tile_pos = Aegis::Vec2(tile->pos_.x, tile->pos_.y + tile_map_.tile_size_);
+					break;
+				}
+			}
+			break;
+		}
+		case GLFW_KEY_DOWN: {
+			for (int y_index = player_.tile_index_.y + 1; y_index < tile_map_.height_; ++y_index) {
+				auto* tile = tile_map_.GetTileByIndex(player_.tile_index_.x, y_index);
+				if (tile->type_ == Tile::Type::Ground) {
+					target_tile_pos = tile->pos_;
+					break;
+				}
+				else if (tile->type_ == Tile::Type::Wall) {
+					target_tile_pos = Aegis::Vec2(tile->pos_.x, tile->pos_.y - tile_map_.tile_size_);
+					break;
+				}
+			}
+			break;
+		}
+		case GLFW_KEY_LEFT: {
+			for (int x_index = player_.tile_index_.x - 1; x_index >= 0; --x_index) {
+				auto* tile = tile_map_.GetTileByIndex(x_index, player_.tile_index_.y);
+				if (tile->type_ == Tile::Type::Ground) {
+					target_tile_pos = tile->pos_;
+					break;
+				}
+				else if (tile->type_ == Tile::Type::Wall) {
+					target_tile_pos = Aegis::Vec2(tile->pos_.x + tile_map_.tile_size_, tile->pos_.y);
+					break;
+				}
+			}
+			break;
+		}
+		case GLFW_KEY_RIGHT: {
+			for (int x_index = player_.tile_index_.x + 1; x_index < tile_map_.width_; ++x_index) {
+				auto* tile = tile_map_.GetTileByIndex(x_index, player_.tile_index_.y);
+				if (tile->type_ == Tile::Type::Ground) {
+					target_tile_pos = tile->pos_;
+					break;
+				}
+				else if (tile->type_ == Tile::Type::Wall) {
+					target_tile_pos = Aegis::Vec2(tile->pos_.x - tile_map_.tile_size_, tile->pos_.y);
+					break;
+				}
+			}
+			break;
+		}
 	}
 
-	player_.OnEvent(event);
+	if (player_.rect_.pos.x == target_tile_pos.x && player_.rect_.pos.y == target_tile_pos.y) {
+		return;
+	}
+	
+	player_.target_pos_ = target_tile_pos;
+	player_.moving_ = true;
+	switch (key_event.key_)
+	{
+	case GLFW_KEY_UP: player_.vel_.y = -player_.acceleration_; break;
+	case GLFW_KEY_DOWN: player_.vel_.y = player_.acceleration_; break;
+	case GLFW_KEY_LEFT: player_.vel_.x = -player_.acceleration_; break;
+	case GLFW_KEY_RIGHT: player_.vel_.x = player_.acceleration_; break;
+	}
 }
 
 void GameplayLayer::OnRender(float delta_time)
