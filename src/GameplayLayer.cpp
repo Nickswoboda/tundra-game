@@ -3,75 +3,28 @@
 #include <fstream>
 #include <iostream>
 GameplayLayer::GameplayLayer()
-	:player_(270, 660), tile_map_("assets/levels/custom.txt", 20), tile_atlas_("assets/textures/tundra-tile-map.png")
+	:player_(288, 672), tile_map_("assets/levels/custom.txt", 32), tile_atlas_("assets/textures/tundra-tile-map.png")
 {
 	tile_map_.SetTextureAtlas(tile_atlas_);
 	player_.texture_ = std::make_unique<Aegis::Texture>(tile_atlas_);
-	player_.tile_index_ = tile_map_.GetGridIndexByPos(270, 660);
-}
-
-void GameplayLayer::ResolveCollision(GameObject& obj_1, const Tile& tile)
-{
-	bool resolved = false;
-	if (tile.is_solid_) {
-		if (obj_1.vel_.x > 0) {
-			obj_1.rect_.pos.x = tile.pos_.x - obj_1.rect_.size.x;
-		}
-		else if (obj_1.vel_.x < 0) {
-			obj_1.rect_.pos.x = tile.pos_.x + tile_map_.tile_size_;
-		}
-		else if (obj_1.vel_.y > 0) {
-			obj_1.rect_.pos.y = tile.pos_.y - obj_1.rect_.size.y;
-		}
-		else if (obj_1.vel_.y < 0) {
-			obj_1.rect_.pos.y = tile.pos_.y + tile_map_.tile_size_;
-		}
-		resolved = true;
-	}
-	else {
-		if (obj_1.vel_.x > 0 && obj_1.rect_.pos.x > tile.pos_.x) {
-			obj_1.rect_.pos.x = tile.pos_.x;
-			resolved = true;
-		}
-		else if (obj_1.vel_.x < 0 && obj_1.rect_.pos.x < tile.pos_.x) {
-			obj_1.rect_.pos.x = tile.pos_.x;
-			resolved = true;
-		}
-		else if (obj_1.vel_.y > 0 && obj_1.rect_.pos.y > tile.pos_.y) {
-			obj_1.rect_.pos.y = tile.pos_.y;
-			resolved = true;
-		}
-		else if (obj_1.vel_.y < 0 && obj_1.rect_.pos.y < tile.pos_.y) {
-			obj_1.rect_.pos.y = tile.pos_.y;
-			resolved = true;
-		}
-	}
-
-	if (resolved) {
-		obj_1.Stop();
-		player_.tile_index_ = tile_map_.GetGridIndexByPos(player_.rect_.pos.x, player_.rect_.pos.y);
-	}
+	player_.tile_index_ = tile_map_.GetGridIndexByPos(288, 672);
 }
 
 void GameplayLayer::OnUpdate()
 {
 	if (player_.moving_) {
 		player_.Update();
-		if (player_.rect_.pos.x == player_.target_pos_.x && player_.rect_.pos.y == player_.target_pos_.y) {
+		UpdatePlayerGridPosition();
+		if (player_.tile_index_ == tile_map_.GetGridIndexByPos(player_.target_pos_.x, player_.target_pos_.y)) {
 			player_.moving_ = false;
-			player_.tile_index_ = tile_map_.GetGridIndexByPos(player_.rect_.pos.x, player_.rect_.pos.y);
+			player_.rect_.pos = Aegis::Vec2(player_.tile_index_.x * tile_map_.tile_size_, player_.tile_index_.y * tile_map_.tile_size_);
 			player_.vel_ = Aegis::Vec2(0, 0);
+			if (queued_movement_ != -1) {
+				HandlePlayerMovement(queued_movement_);
+				queued_movement_ = -1;
+			}
 		}
 	}
-	
-	//auto tiles = tile_map_.GetTilesUnderneath(player_.rect_);
-	//for (auto& tile : tiles) {
-	//	if (tile != tile_map_.GetTileByIndex(player_.tile_index_.x, player_.tile_index_.y)) {
-	//		if (!tile->is_slippery_) {
-	//			ResolveCollision(player_, *tile);
-	//		}
-	//	}
-	//}
 
 	for (auto i = tile_map_.pellets_.begin(); i != tile_map_.pellets_.end();) {
 		if (Aegis::AABBHasCollided(player_.rect_, (*i).rect_)) {
@@ -109,21 +62,24 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 					}
 				}
 		}
-		if (!player_.moving_) {
-			if (key_event->key_ == AE_KEY_UP ||
-				key_event->key_ == AE_KEY_DOWN ||
-				key_event->key_ == AE_KEY_LEFT ||
-				key_event->key_ == AE_KEY_RIGHT) {
-				HandlePlayerMovement(*key_event);
+		if (key_event->key_ == AE_KEY_UP ||
+			key_event->key_ == AE_KEY_DOWN ||
+			key_event->key_ == AE_KEY_LEFT ||
+			key_event->key_ == AE_KEY_RIGHT) {
+			if (!player_.moving_) {
+				HandlePlayerMovement(key_event->key_);
+			}
+			else if (queued_movement_ == -1){
+				queued_movement_ = key_event->key_;
 			}
 		}
 	}
 }
 
-void GameplayLayer::HandlePlayerMovement(Aegis::KeyEvent& key_event)
+void GameplayLayer::HandlePlayerMovement(int key_code)
 {
 	Aegis::Vec2 target_tile_pos;
-	switch (key_event.key_)
+	switch (key_code)
 	{
 		case GLFW_KEY_UP: {
 			for (int y_index = player_.tile_index_.y - 1; y_index >= 0; --y_index) {
@@ -133,7 +89,7 @@ void GameplayLayer::HandlePlayerMovement(Aegis::KeyEvent& key_event)
 					break;
 				}
 				else if (tile->type_ == Tile::Type::Wall) {
-					target_tile_pos = Aegis::Vec2(tile->pos_.x, tile->pos_.y + tile_map_.tile_size_);
+					target_tile_pos = tile->pos_ + Aegis::Vec2(0, tile_map_.tile_size_);
 					break;
 				}
 			}
@@ -147,7 +103,7 @@ void GameplayLayer::HandlePlayerMovement(Aegis::KeyEvent& key_event)
 					break;
 				}
 				else if (tile->type_ == Tile::Type::Wall) {
-					target_tile_pos = Aegis::Vec2(tile->pos_.x, tile->pos_.y - tile_map_.tile_size_);
+					target_tile_pos = tile->pos_ - Aegis::Vec2(0, tile_map_.tile_size_);
 					break;
 				}
 			}
@@ -161,7 +117,7 @@ void GameplayLayer::HandlePlayerMovement(Aegis::KeyEvent& key_event)
 					break;
 				}
 				else if (tile->type_ == Tile::Type::Wall) {
-					target_tile_pos = Aegis::Vec2(tile->pos_.x + tile_map_.tile_size_, tile->pos_.y);
+					target_tile_pos = tile->pos_ + Aegis::Vec2(tile_map_.tile_size_, 0);
 					break;
 				}
 			}
@@ -175,7 +131,7 @@ void GameplayLayer::HandlePlayerMovement(Aegis::KeyEvent& key_event)
 					break;
 				}
 				else if (tile->type_ == Tile::Type::Wall) {
-					target_tile_pos = Aegis::Vec2(tile->pos_.x - tile_map_.tile_size_, tile->pos_.y);
+					target_tile_pos = tile->pos_ - Aegis::Vec2(tile_map_.tile_size_, 0);
 					break;
 				}
 			}
@@ -183,18 +139,31 @@ void GameplayLayer::HandlePlayerMovement(Aegis::KeyEvent& key_event)
 		}
 	}
 
-	if (player_.rect_.pos.x == target_tile_pos.x && player_.rect_.pos.y == target_tile_pos.y) {
+	if (player_.rect_.pos == target_tile_pos) {
 		return;
 	}
 	
 	player_.target_pos_ = target_tile_pos;
 	player_.moving_ = true;
-	switch (key_event.key_)
+	switch (key_code)
 	{
 	case GLFW_KEY_UP: player_.vel_.y = -player_.acceleration_; break;
 	case GLFW_KEY_DOWN: player_.vel_.y = player_.acceleration_; break;
 	case GLFW_KEY_LEFT: player_.vel_.x = -player_.acceleration_; break;
 	case GLFW_KEY_RIGHT: player_.vel_.x = player_.acceleration_; break;
+	}
+}
+
+void GameplayLayer::UpdatePlayerGridPosition()
+{
+	if (player_.vel_.x > 0 || player_.vel_.y > 0) {
+		player_.tile_index_ = tile_map_.GetGridIndexByPos(player_.rect_.pos.x, player_.rect_.pos.y);
+	}
+	else if (player_.vel_.x < 0) {
+		player_.tile_index_ = tile_map_.GetGridIndexByPos(player_.rect_.pos.x + tile_map_.tile_size_, player_.rect_.pos.y);
+	}
+	else if (player_.vel_.y < 0) {
+		player_.tile_index_ = tile_map_.GetGridIndexByPos(player_.rect_.pos.x, player_.rect_.pos.y + tile_map_.tile_size_);
 	}
 }
 

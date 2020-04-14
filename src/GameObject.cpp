@@ -2,14 +2,12 @@
 
 void Player::Update()
 {
-	rect_.pos.x += vel_.x;
-	rect_.pos.y += vel_.y;
+	rect_.pos += vel_;
 }
 
 void Player::Stop()
 {
-	vel_.x = 0;
-	vel_.y = 0;
+	vel_ = { 0, 0 };
 
 	moving_ = false;
 }
