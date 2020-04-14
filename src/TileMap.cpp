@@ -29,8 +29,7 @@ TileMap::TileMap(const std::string& file_path, int tile_size)
 				tiles_[col].emplace_back(Wall(col * tile_size, row * tile_size)); ++col; break;
 			}
 			case '1': {
-				tiles_[col].emplace_back(Ice(col * tile_size, row * tile_size));
-				pellets_.emplace_back(Pellet(col * tile_size + 6, row * tile_size + 6));  ++col; break;
+				tiles_[col].emplace_back(Ice(col * tile_size, row * tile_size)); ++col; break;
 			}
 			case ' ': {
 				tiles_[col].emplace_back(Ground(col * tile_size, row * tile_size));  ++col; break;
@@ -47,11 +46,6 @@ void TileMap::Render()
 		for (int row = 0; row < tiles_[col].size(); ++row) {
 			Aegis::DrawQuad(tiles_[col][row].pos_, Aegis::Vec2(tile_size_, tile_size_), tile_atlas_, { 1.0f, 1.0f, 1.0f, 1.0f }, tiles_[col][row].uv_coords_);
 		}
-	}
-
-	for (auto& pellet : pellets_)
-	{
-		pellet.Render(0.0f);
 	}
 }
 

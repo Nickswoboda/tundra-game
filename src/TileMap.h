@@ -24,7 +24,6 @@ public:
 	int width_ = 0;
 	int height_ = 0;
 
-	std::vector<Pellet> pellets_;
 	std::unique_ptr<Aegis::Texture> tile_atlas_;
 
 };

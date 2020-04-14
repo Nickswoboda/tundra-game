@@ -18,11 +18,12 @@ public:
 	void UpdatePlayerGridPosition();
 	void OnRender(float delta_time) override;
 	void SaveLevel();
+	void LoadLevel(const std::string& file_path);
 
 	Player player_;
-	TileMap tile_map_;
+	std::unique_ptr<TileMap> tile_map_;
 	Aegis::Texture tile_atlas_;
 	int queued_movement_ = -1;
-	
+	std::vector<Pellet> pellets_;
 	
 };
