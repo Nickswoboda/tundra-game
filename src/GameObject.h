@@ -38,7 +38,7 @@ class Player : public GameObject
 {
 public:
 	Player(int x, int y)
-		:GameObject(x,y,20,20)
+		:GameObject(x,y,32,32)
 	{
 		acceleration_ = 10.0f;
 		tile_index_ = { -1, -1 };

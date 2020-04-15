@@ -25,5 +25,7 @@ public:
 	Aegis::Texture tile_atlas_;
 	int queued_movement_ = -1;
 	std::vector<Pellet> pellets_;
+	float zoom_ = 1.0f;
+
 	
 };

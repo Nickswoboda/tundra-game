@@ -3,7 +3,7 @@
 project ("Tundra")
 
 add_subdirectory("dependencies/Aegis")
-
+set (CMAKE_CXX_STANDARD 17)
 add_executable (Tundra 
 	"src/main.cpp" 
 	"src/GameplayLayer.h"
