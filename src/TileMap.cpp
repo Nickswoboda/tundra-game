@@ -5,8 +5,10 @@
 
 #include <algorithm>
 TileMap::TileMap(const std::string& file_path, int tile_size)
-	: tile_size_(tile_size)
+	: tile_size_(tile_size, tile_size)
 {
+	tile_atlas_ = Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png");
+
 	std::ifstream file(file_path);
 	std::stringstream buffer;
 	buffer << file.rdbuf();
@@ -25,6 +27,9 @@ TileMap::TileMap(const std::string& file_path, int tile_size)
 		}
 		switch (ch)
 		{
+			case '*': {
+				player_start_pos = Aegis::Vec2( col, row ); break;
+			}
 			case '0': {
 				tiles_[col].emplace_back(Wall(col * tile_size, row * tile_size)); ++col; break;
 			}
@@ -34,24 +39,25 @@ TileMap::TileMap(const std::string& file_path, int tile_size)
 			case ' ': {
 				tiles_[col].emplace_back(Ground(col * tile_size, row * tile_size));  ++col; break;
 			}
+			
 		}
 	}
-	width_ = tiles_.size();
-	height_ = tiles_[width_ - 1].size();
+	grid_size_.x = tiles_.size();
+	grid_size_.y = tiles_[grid_size_.x - 1].size();
 }
 
 void TileMap::Render()
 {
 	for (int col = 0; col < tiles_.size(); ++col) {
 		for (int row = 0; row < tiles_[col].size(); ++row) {
-			Aegis::DrawQuad(tiles_[col][row].pos_, Aegis::Vec2(tile_size_, tile_size_), tile_atlas_, { 1.0f, 1.0f, 1.0f, 1.0f }, tiles_[col][row].uv_coords_);
+			Aegis::DrawQuad(tiles_[col][row].pos_, tile_size_, tile_atlas_, { 1.0f, 1.0f, 1.0f, 1.0f }, tiles_[col][row].uv_coords_);
 		}
 	}
 }
 
 Tile* TileMap::GetTileByIndex(int col, int row)
 {
-	if (row >= height_ || row < 0 || col >= width_ || col < 0) {
+	if (row >= grid_size_.y || row < 0 || col >= grid_size_.x || col < 0) {
 		return nullptr;
 	}
 
@@ -60,17 +66,17 @@ Tile* TileMap::GetTileByIndex(int col, int row)
 
 Tile* TileMap::GetTileByPos(int x_pos, int y_pos)
 {
-	return GetTileByIndex(x_pos / tile_size_, y_pos / tile_size_);
+	return GetTileByIndex(x_pos / tile_size_.x, y_pos / tile_size_.y);
 }
 
 std::vector<Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h)
 {
 	std::vector<Tile*> temp;
 
-	int left_index = std::max(0, x / tile_size_);
-	int right_index = std::min(width_, (x + w - 1) / tile_size_);
-	int top_index = std::max(0, y / tile_size_);
-	int bottom_index = std::min(height_, (y + h - 1) / tile_size_);
+	int left_index = std::max(0.0f, x / tile_size_.x);
+	int right_index = std::min(grid_size_.x, (x + w - 1) / tile_size_.x);
+	int top_index = std::max(0.0f, y / tile_size_.y);
+	int bottom_index = std::min(grid_size_.y, (y + h - 1) / tile_size_.y);
 
 
 	for (int i = left_index; i <= right_index; ++i) {
@@ -97,15 +103,15 @@ void TileMap::SetTextureAtlas(const Aegis::Texture& atlas)
 
 Aegis::Vec2 TileMap::GetTileIndex(const Tile& tile)
 {
-	int col = tile.pos_.x / tile_size_;
-	int row = tile.pos_.y / tile_size_;
+	int col = tile.pos_.x / tile_size_.x;
+	int row = tile.pos_.y / tile_size_.y;
 
 	return Aegis::Vec2(col, row);
 }
 
 Aegis::Vec2 TileMap::GetGridIndexByPos(int x, int y)
 {
-	int col = x / tile_size_;
-	int row = y / tile_size_;
+	int col = x / tile_size_.x;
+	int row = y / tile_size_.y;
 	return Aegis::Vec2(col, row);
 }

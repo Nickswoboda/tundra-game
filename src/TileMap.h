@@ -11,19 +11,24 @@ class TileMap
 public:
 	TileMap(const std::string& file_path, int tile_size);
 
+	void SetTextureAtlas(const Aegis::Texture& atlas);
 	void Render();
+
 	Tile* GetTileByIndex(int col, int row);
 	Tile* GetTileByPos(int x_pos, int y_pos);
+
 	std::vector<Tile*> GetTilesUnderneath(int x, int y, int w, int h);
 	std::vector<Tile*> GetTilesUnderneath(const Aegis::AABB& rect);
-	void SetTextureAtlas(const Aegis::Texture& atlas);
+
 	Aegis::Vec2 GetTileIndex(const Tile& tile);
 	Aegis::Vec2 GetGridIndexByPos(int x, int y);
-	std::vector<std::vector<Tile>> tiles_;
-	int tile_size_ = 0;
-	int width_ = 0;
-	int height_ = 0;
 
-	std::unique_ptr<Aegis::Texture> tile_atlas_;
+	std::vector<std::vector<Tile>> tiles_;
+	std::shared_ptr<Aegis::Texture> tile_atlas_;
+	Aegis::Vec2 player_start_pos;
+	Aegis::Vec2 tile_size_;
+	Aegis::Vec2 grid_size_;
+
+
 
 };

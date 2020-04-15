@@ -10,14 +10,13 @@ public:
 	{}
 		
 	virtual void Update() {};
-	virtual void Stop() {};
 	virtual void Render(float delta_time) const = 0;
 				 
+	std::shared_ptr<Aegis::Texture> texture_;
 	Aegis::Vec4 uv_coords_;
 	Aegis::AABB rect_;
 	Aegis::Vec2 vel_;
 	Aegis::Vec2 tile_index_;
-	std::unique_ptr<Aegis::Texture> texture_;
 
 	float acceleration_ = 0.0f;
 };
@@ -40,13 +39,12 @@ public:
 	Player(int x, int y)
 		:GameObject(x,y,32,32)
 	{
+		texture_ = Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png");
 		acceleration_ = 10.0f;
-		tile_index_ = { -1, -1 };
 		uv_coords_ = { 96.0f, 0.0f, 128.0f, 32.0f };
 	}
 
 	void Update();
-	void Stop() override;
 	void Render(float delta_time) const override;
 
 	bool moving_ = false;
