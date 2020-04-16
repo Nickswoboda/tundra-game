@@ -4,7 +4,7 @@
 #include <iostream>
 #include <filesystem>
 GameplayLayer::GameplayLayer()
-	:player_(0, 0)
+	:player_(0, 0), enemy_(0, 0)
 {
 
 	auto& texmgr = Aegis::TextureManager::Instance();
@@ -16,7 +16,7 @@ void GameplayLayer::OnUpdate()
 {
 	if (player_.moving_) {
 		player_.Update();
-		UpdatePlayerGridPosition();
+		UpdateGridPosition(player_);
 		if (player_.tile_index_ == tile_map_->GetGridIndexByPos(player_.target_pos_.x, player_.target_pos_.y)) {
 			player_.moving_ = false;
 			player_.rect_.pos = Aegis::Vec2(player_.tile_index_.x * tile_map_->tile_size_.x, player_.tile_index_.y * tile_map_->tile_size_.y);
@@ -26,6 +26,24 @@ void GameplayLayer::OnUpdate()
 				queued_movement_ = -1;
 			}
 		}
+	}
+	if (enemy_.moving_) {
+		UpdateGridPosition(enemy_);
+
+		if (enemy_.tile_index_ == tile_map_->GetGridIndexByPos(enemy_.target_pos_.x, enemy_.target_pos_.y)) {
+			enemy_.moving_ = false;
+			enemy_.rect_.pos = Aegis::Vec2(enemy_.tile_index_.x * tile_map_->tile_size_.x, enemy_.tile_index_.y * tile_map_->tile_size_.y);
+			enemy_.vel_ = Aegis::Vec2(0, 0);
+			enemy_.target_pos_ = GetEnemyTargetPos();
+		}
+	}
+	enemy_.Update();
+
+	if (Aegis::AABBHasCollided(player_.rect_, enemy_.rect_)) {
+		SetPosOnGrid(player_, tile_map_->player_start_pos_);
+		player_.moving_ = false;
+		player_.vel_ = Aegis::Vec2(0, 0);
+		queued_movement_ = -1;
 	}
 
 	for (auto i = pellets_.begin(); i != pellets_.end();) {
@@ -100,66 +118,17 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 
 void GameplayLayer::HandlePlayerMovement(int key_code)
 {
-	Aegis::Vec2 target_tile_pos;
+	Direction dir;
 	switch (key_code)
 	{
-		case GLFW_KEY_UP: {
-			for (int y_index = player_.tile_index_.y - 1; y_index >= 0; --y_index) {
-				auto* tile = tile_map_->GetTileByIndex(player_.tile_index_.x, y_index);
-				if (tile->type_ == Tile::Type::Ground) {
-					target_tile_pos = tile->pos_;
-					break;
-				}
-				else if (tile->type_ == Tile::Type::Wall) {
-					target_tile_pos = tile->pos_ + Aegis::Vec2(0, tile_map_->tile_size_.x);
-					break;
-				}
-			}
-			break;
-		}
-		case GLFW_KEY_DOWN: {
-			for (int y_index = player_.tile_index_.y + 1; y_index < tile_map_->grid_size_.y; ++y_index) {
-				auto* tile = tile_map_->GetTileByIndex(player_.tile_index_.x, y_index);
-				if (tile->type_ == Tile::Type::Ground) {
-					target_tile_pos = tile->pos_;
-					break;
-				}
-				else if (tile->type_ == Tile::Type::Wall) {
-					target_tile_pos = tile->pos_ - Aegis::Vec2(0, tile_map_->tile_size_.y);
-					break;
-				}
-			}
-			break;
-		}
-		case GLFW_KEY_LEFT: {
-			for (int x_index = player_.tile_index_.x - 1; x_index >= 0; --x_index) {
-				auto* tile = tile_map_->GetTileByIndex(x_index, player_.tile_index_.y);
-				if (tile->type_ == Tile::Type::Ground) {
-					target_tile_pos = tile->pos_;
-					break;
-				}
-				else if (tile->type_ == Tile::Type::Wall) {
-					target_tile_pos = tile->pos_ + Aegis::Vec2(tile_map_->tile_size_.x, 0);
-					break;
-				}
-			}
-			break;
-		}
-		case GLFW_KEY_RIGHT: {
-			for (int x_index = player_.tile_index_.x + 1; x_index < tile_map_->grid_size_.x; ++x_index) {
-				auto* tile = tile_map_->GetTileByIndex(x_index, player_.tile_index_.y);
-				if (tile->type_ == Tile::Type::Ground) {
-					target_tile_pos = tile->pos_;
-					break;
-				}
-				else if (tile->type_ == Tile::Type::Wall) {
-					target_tile_pos = tile->pos_ - Aegis::Vec2(tile_map_->tile_size_.x, 0);
-					break;
-				}
-			}
-			break;
-		}
+	case GLFW_KEY_UP: dir = Direction::Up;  break;
+	case GLFW_KEY_DOWN: dir = Direction::Down;  break;
+	case GLFW_KEY_LEFT: dir = Direction::Left;  break;
+	case GLFW_KEY_RIGHT: dir = Direction::Right;  break;
 	}
+
+	Aegis::Vec2 target_tile_pos = GetTargetTile(player_, dir);
+	
 
 	if (player_.rect_.pos == target_tile_pos) {
 		return;
@@ -169,23 +138,23 @@ void GameplayLayer::HandlePlayerMovement(int key_code)
 	player_.moving_ = true;
 	switch (key_code)
 	{
-	case GLFW_KEY_UP: player_.vel_.y = -player_.acceleration_; break;
-	case GLFW_KEY_DOWN: player_.vel_.y = player_.acceleration_; break;
-	case GLFW_KEY_LEFT: player_.vel_.x = -player_.acceleration_; break;
-	case GLFW_KEY_RIGHT: player_.vel_.x = player_.acceleration_; break;
+	case GLFW_KEY_UP: player_.vel_.y = -player_.acceleration_;  break;
+	case GLFW_KEY_DOWN: player_.vel_.y = player_.acceleration_;  break;
+	case GLFW_KEY_LEFT: player_.vel_.x = -player_.acceleration_;  break;
+	case GLFW_KEY_RIGHT: player_.vel_.x = player_.acceleration_;  break;
 	}
 }
 
-void GameplayLayer::UpdatePlayerGridPosition()
+void GameplayLayer::UpdateGridPosition(GameObject& obj)
 {
-	if (player_.vel_.x > 0 || player_.vel_.y > 0) {
-		player_.tile_index_ = tile_map_->GetGridIndexByPos(player_.rect_.pos.x, player_.rect_.pos.y);
+	if (obj.vel_.x > 0 || obj.vel_.y > 0) {
+		obj.tile_index_ = tile_map_->GetGridIndexByPos(obj.rect_.pos.x, obj.rect_.pos.y);
 	}
-	else if (player_.vel_.x < 0) {
-		player_.tile_index_ = tile_map_->GetGridIndexByPos(player_.rect_.pos.x + tile_map_->tile_size_.x, player_.rect_.pos.y);
+	else if (obj.vel_.x < 0) {
+		obj.tile_index_ = tile_map_->GetGridIndexByPos(obj.rect_.pos.x + tile_map_->tile_size_.x, obj.rect_.pos.y);
 	}
-	else if (player_.vel_.y < 0) {
-		player_.tile_index_ = tile_map_->GetGridIndexByPos(player_.rect_.pos.x, player_.rect_.pos.y + tile_map_->tile_size_.y);
+	else if (obj.vel_.y < 0) {
+		obj.tile_index_ = tile_map_->GetGridIndexByPos(obj.rect_.pos.x, obj.rect_.pos.y + tile_map_->tile_size_.y);
 	}
 }
 
@@ -194,6 +163,7 @@ void GameplayLayer::OnRender(float delta_time)
 	Aegis::RendererClear();
 	tile_map_->Render();
 	player_.Render(delta_time);
+	enemy_.Render(delta_time);
 	Aegis::DrawText(std::to_string(Aegis::Application::GetFrameTime()), { 0, 0 }, { 1.0f, 1.0f, 1.0f, 1.0f });
 	for (auto& pellet : pellets_)
 	{
@@ -248,7 +218,147 @@ void GameplayLayer::LoadLevel(const std::string& file_path)
 {
 	tile_map_ = std::make_unique<TileMap>(file_path, 32);
 
-	player_.tile_index_ = tile_map_->player_start_pos;
-	player_.rect_.pos = Aegis::Vec2(player_.tile_index_.x * tile_map_->tile_size_.x, player_.tile_index_.y * tile_map_->tile_size_.y);
+	SetPosOnGrid(player_, tile_map_->player_start_pos_);
+	SetPosOnGrid(enemy_, tile_map_->enemy_start_pos_);
+	enemy_.target_pos_ = GetEnemyTargetPos();
+
 	SpawnPellets();
+}
+
+void GameplayLayer::SetPosOnGrid(GameObject& obj, const Aegis::Vec2& pos)
+{
+	obj.tile_index_ = pos;
+	obj.rect_.pos = Aegis::Vec2(obj.tile_index_.x * tile_map_->tile_size_.x, obj.tile_index_.y * tile_map_->tile_size_.y);
+
+}
+
+Aegis::Vec2 GameplayLayer::GetTargetTile(const GameObject& obj, Direction dir)
+{
+	Aegis::Vec2 target_tile;
+
+	switch (dir)
+	{
+		case Direction::Up: {
+			for (int y_index = obj.tile_index_.y - 1; y_index >= 0; --y_index) {
+				auto* tile = tile_map_->GetTileByIndex(obj.tile_index_.x, y_index);
+				if (tile->type_ == Tile::Type::Ground) {
+					target_tile = tile->pos_;
+					break;
+				}
+				else if (tile->type_ == Tile::Type::Wall) {
+					target_tile = tile->pos_ + Aegis::Vec2(0, tile_map_->tile_size_.x);
+					break;
+				}
+			}
+			break;
+		}
+		case Direction::Down: {
+			for (int y_index = obj.tile_index_.y + 1; y_index < tile_map_->grid_size_.y; ++y_index) {
+				auto* tile = tile_map_->GetTileByIndex(obj.tile_index_.x, y_index);
+				if (tile->type_ == Tile::Type::Ground) {
+					target_tile = tile->pos_;
+					break;
+				}
+				else if (tile->type_ == Tile::Type::Wall) {
+					target_tile = tile->pos_ - Aegis::Vec2(0, tile_map_->tile_size_.y);
+					break;
+				}
+			}
+			break;
+		}
+		case Direction::Left: {
+			for (int x_index = obj.tile_index_.x - 1; x_index >= 0; --x_index) {
+				auto* tile = tile_map_->GetTileByIndex(x_index, obj.tile_index_.y);
+				if (tile->type_ == Tile::Type::Ground) {
+					target_tile = tile->pos_;
+					break;
+				}
+				else if (tile->type_ == Tile::Type::Wall) {
+					target_tile = tile->pos_ + Aegis::Vec2(tile_map_->tile_size_.x, 0);
+					break;
+				}
+			}
+			break;
+		}
+		case Direction::Right: {
+			for (int x_index = obj.tile_index_.x + 1; x_index < tile_map_->grid_size_.x; ++x_index) {
+				auto* tile = tile_map_->GetTileByIndex(x_index, obj.tile_index_.y);
+				if (tile->type_ == Tile::Type::Ground) {
+					target_tile = tile->pos_;
+					break;
+				}
+				else if (tile->type_ == Tile::Type::Wall) {
+					target_tile = tile->pos_ - Aegis::Vec2(tile_map_->tile_size_.x, 0);
+					break;
+				}
+			}
+			break;
+		}
+	}
+
+	return target_tile;
+}
+
+Aegis::Vec2 GameplayLayer::GetEnemyTargetPos()
+{
+	Aegis::Vec2 target_pos;
+
+	Aegis::Vec2 dir_vec = player_.rect_.pos - enemy_.rect_.pos;
+	float length = sqrt((dir_vec.x * dir_vec.x) + (dir_vec.y * dir_vec.y));
+	dir_vec.x /= length;
+	dir_vec.y /= length;
+
+	if (abs(dir_vec.x) >= abs(dir_vec.y)) {
+		dir_vec.y = 0;
+	}
+	else
+	{
+		dir_vec.x = 0;
+	}
+	
+	Direction dir;
+	if (dir_vec.y < 0) {
+		dir = Direction::Up;
+	}
+	else if (dir_vec.y > 0) {
+		dir = Direction::Down;
+	}
+	if (dir_vec.x < 0) {
+		dir = Direction::Left;
+	}
+	else if (dir_vec.x > 0) {
+		dir = Direction::Right;
+	}
+
+	enemy_.moving_ = true;
+
+	target_pos = GetTargetTile(enemy_, dir);
+	if (enemy_.rect_.pos == target_pos) {
+		if (dir_vec.x == 0) {
+			dir = Direction::Left;
+			target_pos = GetTargetTile(enemy_, dir);
+			if (enemy_.rect_.pos == target_pos) {
+				dir = Direction::Right;
+				target_pos = GetTargetTile(enemy_, dir);
+			}
+		}
+		if (dir_vec.y == 0) {
+			target_pos = GetTargetTile(enemy_, dir);
+			dir = Direction::Down;
+			if (enemy_.rect_.pos == target_pos) {
+				dir = Direction::Up;
+				target_pos = GetTargetTile(enemy_, dir);    
+			}
+		}
+	}
+
+	switch (dir)
+	{
+	case Direction::Up: enemy_.vel_.y = -enemy_.acceleration_;  break;
+	case Direction::Down: enemy_.vel_.y = enemy_.acceleration_;  break;
+	case Direction::Left: enemy_.vel_.x = -enemy_.acceleration_;  break;
+	case Direction::Right: enemy_.vel_.x = enemy_.acceleration_;  break;
+	}
+
+	return target_pos;
 }

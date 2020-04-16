@@ -50,3 +50,21 @@ public:
 	bool moving_ = false;
 	Aegis::Vec2 target_pos_;
 };
+
+class Enemy : public GameObject
+{
+public:
+	Enemy(int x, int y)
+		:GameObject(x, y, 32, 32)
+	{
+		texture_ = Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png");
+		acceleration_ = 1.0f;
+		uv_coords_ = { 128.0f, 0.0f, 160.0f, 32.0f };
+	}
+
+	void Update();
+	void Render(float delta_time) const override;
+
+	bool moving_ = false;
+	Aegis::Vec2 target_pos_;
+};
