@@ -2,21 +2,29 @@
 
 void Player::Update()
 {
-	rect_.pos += vel_;
+	rect_.pos += vel_ * acceleration_;
+	sprite_.pos_ = rect_.pos;
 }
 
 void Player::Render(float delta_time) const
 {
-	Aegis::DrawQuad(rect_.pos, rect_.size, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, uv_coords_);
+	Aegis::RenderSprite(sprite_);
 }
 
 void Enemy::Update()
 {
 	rect_.pos += vel_;
+	sprite_.pos_ = rect_.pos;
 }
 
 void Enemy::Render(float delta_time) const
 {
-	Aegis::DrawQuad(rect_.pos, rect_.size, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, uv_coords_);
+	Aegis::RenderSprite(sprite_);
 	Aegis::DrawQuad(target_pos_, rect_.size, { 1.0f, 0.0f, 0.0f, 0.5f });
+}
+
+void GameObject::SetPosition(Aegis::Vec2 pos)
+{
+	rect_.pos = pos;
+	sprite_.pos_ = pos;
 }

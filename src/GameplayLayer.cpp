@@ -4,9 +4,8 @@
 #include <iostream>
 #include <filesystem>
 GameplayLayer::GameplayLayer()
-	:player_(0, 0), enemy_(0, 0)
+	:player_(0, 0), enemy_(0, 0), camera_(0, 1280, 720, 0)
 {
-
 	auto& texmgr = Aegis::TextureManager::Instance();
 	texmgr.Load("assets/textures/tundra-tile-map.png");
 	LoadLevel("assets/levels/level2.txt");
@@ -19,7 +18,7 @@ void GameplayLayer::OnUpdate()
 		UpdateGridPosition(player_);
 		if (player_.tile_index_ == tile_map_->GetGridIndexByPos(player_.target_pos_.x, player_.target_pos_.y)) {
 			player_.moving_ = false;
-			player_.rect_.pos = player_.tile_index_ * tile_map_->tile_size_;
+			player_.SetPosition(player_.tile_index_ * tile_map_->tile_size_);
 			player_.vel_ = Aegis::Vec2(0, 0);
 			if (queued_movement_ != -1) {
 				HandlePlayerMovement(queued_movement_);
@@ -32,7 +31,7 @@ void GameplayLayer::OnUpdate()
 
 		if (enemy_.tile_index_ == tile_map_->GetGridIndexByPos(enemy_.target_pos_.x, enemy_.target_pos_.y)) {
 			enemy_.moving_ = false;
-			enemy_.rect_.pos = enemy_.tile_index_ * tile_map_->tile_size_;
+			enemy_.SetPosition(enemy_.tile_index_ * tile_map_->tile_size_);
 			enemy_.vel_ = Aegis::Vec2(0, 0);
 			enemy_.target_pos_ = GetEnemyTargetPos();
 		}
@@ -40,7 +39,7 @@ void GameplayLayer::OnUpdate()
 	enemy_.Update();
 
 	if (Aegis::AABBHasCollided(player_.rect_, enemy_.rect_)) {
-		SetPosOnGrid(player_, tile_map_->player_start_pos_);
+		SetObjectOnGrid(player_, tile_map_->player_start_pos_);
 		player_.moving_ = false;
 		player_.vel_ = Aegis::Vec2(0, 0);
 		queued_movement_ = -1;
@@ -65,15 +64,6 @@ void GameplayLayer::OnUpdate()
 }
 void GameplayLayer::OnEvent(Aegis::Event& event)
 {
-
-	static float width = 1280;
-	static float height = 720;
-	auto scroll_event = dynamic_cast<Aegis::MouseScrollEvent*>(&event);
-	if (scroll_event) {
-
-	zoom_ -= scroll_event->y_offset_ * .05;
-	Aegis::Renderer2D::SetProjection(width * zoom_, height*zoom_);
-	}
 	auto key_event = dynamic_cast<Aegis::KeyEvent*>(&event);
 
 	if (key_event && (key_event->action_ == AE_BUTTON_PRESS || key_event->action_ == AE_BUTTON_REPEAT)) {
@@ -84,9 +74,25 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 			ResetLevel();
 		}
 
-		if (key_event->key_ == AE_KEY_Q ||
-			key_event->key_ == AE_KEY_W ||
-			key_event->key_ == AE_KEY_E) {
+		static float x = 0;
+		static float y = 0;
+		if (key_event->key_ == AE_KEY_W) {
+			--y;
+		}
+		if (key_event->key_ == AE_KEY_S) {
+			++y;
+		}
+		if (key_event->key_ == AE_KEY_A) {
+			--x;
+		}
+		if (key_event->key_ == AE_KEY_D) {
+			++x;
+		}
+		camera_.SetPosition({ x, y, 1.0 });
+
+		if (key_event->key_ == AE_KEY_R ||
+			key_event->key_ == AE_KEY_T ||
+			key_event->key_ == AE_KEY_Y) {
 				auto mouse_pos = Aegis::Application::GetMousePos();
 				auto tile = tile_map_->GetTileByPos(mouse_pos.x, mouse_pos.y);
 		
@@ -136,13 +142,7 @@ void GameplayLayer::HandlePlayerMovement(int key_code)
 	
 	player_.target_pos_ = target_tile_pos;
 	player_.moving_ = true;
-	switch (key_code)
-	{
-	case GLFW_KEY_UP: player_.vel_.y = -player_.acceleration_;  break;
-	case GLFW_KEY_DOWN: player_.vel_.y = player_.acceleration_;  break;
-	case GLFW_KEY_LEFT: player_.vel_.x = -player_.acceleration_;  break;
-	case GLFW_KEY_RIGHT: player_.vel_.x = player_.acceleration_;  break;
-	}
+	player_.vel_ = (target_tile_pos - player_.rect_.pos).Normalized();
 }
 
 void GameplayLayer::UpdateGridPosition(GameObject& obj)
@@ -160,6 +160,8 @@ void GameplayLayer::UpdateGridPosition(GameObject& obj)
 
 void GameplayLayer::OnRender(float delta_time)
 {
+	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
+
 	Aegis::RendererClear();
 	tile_map_->Render();
 	player_.Render(delta_time);
@@ -222,8 +224,8 @@ void GameplayLayer::LoadLevel(const std::string& file_path)
 {
 	tile_map_ = std::make_unique<TileMap>(file_path, 32);
 
-	SetPosOnGrid(player_, tile_map_->player_start_pos_);
-	SetPosOnGrid(enemy_, tile_map_->enemy_start_pos_);
+	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
+	SetObjectOnGrid(enemy_, tile_map_->enemy_start_pos_);
 	enemy_.target_pos_ = GetEnemyTargetPos();
 
 	SpawnPellets();
@@ -238,17 +240,17 @@ void GameplayLayer::ResetLevel()
 	enemy_.moving_ = false;
 	enemy_.vel_ = Aegis::Vec2(0, 0);
 
-	SetPosOnGrid(player_, tile_map_->player_start_pos_);
-	SetPosOnGrid(enemy_, tile_map_->enemy_start_pos_);
+	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
+	SetObjectOnGrid(enemy_, tile_map_->enemy_start_pos_);
 	enemy_.target_pos_ = GetEnemyTargetPos();
 
 	SpawnPellets();
 }
 
-void GameplayLayer::SetPosOnGrid(GameObject& obj, const Aegis::Vec2& pos)
+void GameplayLayer::SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos)
 {
 	obj.tile_index_ = pos;
-	obj.rect_.pos = pos * tile_map_->tile_size_;
+	obj.SetPosition(pos * tile_map_->tile_size_);
 }
 
 Aegis::Vec2 GameplayLayer::GetTargetTile(const GameObject& obj, Direction dir)
@@ -333,7 +335,7 @@ Aegis::Vec2 GameplayLayer::GetEnemyTargetPos()
 		dir_vec.x = 0;
 	}
 	
-	Direction dir;
+	Direction dir = Direction::None;
 	if (dir_vec.y < 0) {
 		dir = Direction::Up;
 	}
@@ -368,6 +370,7 @@ Aegis::Vec2 GameplayLayer::GetEnemyTargetPos()
 			}
 		}
 	}
+
 
 	switch (dir)
 	{

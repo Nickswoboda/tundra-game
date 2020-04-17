@@ -7,13 +7,15 @@ class GameObject
 public:
 	GameObject(float x, float y, float w, float h)
 		:rect_{ x, y, w, h }
-	{}
+	{
+		sprite_.pos_ = rect_.pos;
+	}
 		
 	virtual void Update() {};
 	virtual void Render(float delta_time) const = 0;
-				 
-	std::shared_ptr<Aegis::Texture> texture_;
-	Aegis::Vec4 uv_coords_;
+	virtual void SetPosition(Aegis::Vec2 pos);
+	
+	Aegis::Sprite sprite_;
 	Aegis::AABB rect_;
 	Aegis::Vec2 vel_;
 	Aegis::Vec2 tile_index_;
@@ -39,16 +41,18 @@ public:
 	Player(int x, int y)
 		:GameObject(x,y,32,32)
 	{
-		texture_ = Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png");
+		sprite_.texture_ = Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png");
+		sprite_.size_ = { 32, 32 };
+		sprite_.tex_coords_ = { 96.0f, 0.0f, 128.0f, 32.0f };
+		sprite_.color_ = { 1.0f, 1.0f, 1.0f, 1.0f };
 		acceleration_ = 10.0f;
-		uv_coords_ = { 96.0f, 0.0f, 128.0f, 32.0f };
 	}
-
 	void Update();
 	void Render(float delta_time) const override;
 
 	bool moving_ = false;
 	Aegis::Vec2 target_pos_;
+	Aegis::Vec2 dir_;
 };
 
 class Enemy : public GameObject
@@ -57,9 +61,11 @@ public:
 	Enemy(int x, int y)
 		:GameObject(x, y, 32, 32)
 	{
-		texture_ = Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png");
+		sprite_.texture_ = Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png");
+		sprite_.size_ = { 32, 32 };
+		sprite_.tex_coords_ = { 128.0f, 0.0f, 160.0f, 32.0f };
+		sprite_.color_ = { 1.0f, 1.0f, 1.0f, 1.0f };
 		acceleration_ = 1.0f;
-		uv_coords_ = { 128.0f, 0.0f, 160.0f, 32.0f };
 	}
 
 	void Update();
