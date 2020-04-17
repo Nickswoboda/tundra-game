@@ -27,6 +27,7 @@ public:
 	void SaveLevel();
 	void SpawnPellets();
 	void LoadLevel(const std::string& file_path);
+	void ResetLevel();
 	void SetPosOnGrid(GameObject& obj, const Aegis::Vec2& pos);
 	Aegis::Vec2 GetTargetTile(const GameObject& obj, Direction dir);
 	Aegis::Vec2 GetEnemyTargetPos();

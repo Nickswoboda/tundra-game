@@ -19,7 +19,7 @@ void GameplayLayer::OnUpdate()
 		UpdateGridPosition(player_);
 		if (player_.tile_index_ == tile_map_->GetGridIndexByPos(player_.target_pos_.x, player_.target_pos_.y)) {
 			player_.moving_ = false;
-			player_.rect_.pos = Aegis::Vec2(player_.tile_index_.x * tile_map_->tile_size_.x, player_.tile_index_.y * tile_map_->tile_size_.y);
+			player_.rect_.pos = player_.tile_index_ * tile_map_->tile_size_;
 			player_.vel_ = Aegis::Vec2(0, 0);
 			if (queued_movement_ != -1) {
 				HandlePlayerMovement(queued_movement_);
@@ -32,7 +32,7 @@ void GameplayLayer::OnUpdate()
 
 		if (enemy_.tile_index_ == tile_map_->GetGridIndexByPos(enemy_.target_pos_.x, enemy_.target_pos_.y)) {
 			enemy_.moving_ = false;
-			enemy_.rect_.pos = Aegis::Vec2(enemy_.tile_index_.x * tile_map_->tile_size_.x, enemy_.tile_index_.y * tile_map_->tile_size_.y);
+			enemy_.rect_.pos = enemy_.tile_index_ * tile_map_->tile_size_;
 			enemy_.vel_ = Aegis::Vec2(0, 0);
 			enemy_.target_pos_ = GetEnemyTargetPos();
 		}
@@ -81,7 +81,7 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 			SaveLevel();
 		}
 		if (key_event->key_ == AE_KEY_K) {
-			SpawnPellets();
+			ResetLevel();
 		}
 
 		if (key_event->key_ == AE_KEY_Q ||
@@ -93,7 +93,7 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 				if (tile != nullptr) {
 					auto index = tile_map_->GetTileIndex(*tile);
 					
-					Aegis::Vec2 tile_spawn_pos(index.x * tile_map_->tile_size_.x, index.y * tile_map_->tile_size_.y);
+					Aegis::Vec2 tile_spawn_pos = index * tile_map_->tile_size_;
 					switch (key_event->key_)
 					{
 					case AE_KEY_Q: *tile = Wall(tile_spawn_pos.x, tile_spawn_pos.y); break;
@@ -118,7 +118,7 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 
 void GameplayLayer::HandlePlayerMovement(int key_code)
 {
-	Direction dir;
+	Direction dir = Direction::Up;
 	switch (key_code)
 	{
 	case GLFW_KEY_UP: dir = Direction::Up;  break;
@@ -205,6 +205,10 @@ void GameplayLayer::SaveLevel()
 
 void GameplayLayer::SpawnPellets()
 {
+	if (!pellets_.empty()) {
+		pellets_.clear();
+	}
+
 	for (const auto& col : tile_map_->tiles_) {
 		for (const auto& tile : col) {
 			if (tile.type_ == Tile::Type::Ice) {
@@ -225,11 +229,26 @@ void GameplayLayer::LoadLevel(const std::string& file_path)
 	SpawnPellets();
 }
 
+void GameplayLayer::ResetLevel()
+{
+	player_.moving_ = false;
+	player_.vel_ = Aegis::Vec2(0, 0);
+	queued_movement_ = -1;
+
+	enemy_.moving_ = false;
+	enemy_.vel_ = Aegis::Vec2(0, 0);
+
+	SetPosOnGrid(player_, tile_map_->player_start_pos_);
+	SetPosOnGrid(enemy_, tile_map_->enemy_start_pos_);
+	enemy_.target_pos_ = GetEnemyTargetPos();
+
+	SpawnPellets();
+}
+
 void GameplayLayer::SetPosOnGrid(GameObject& obj, const Aegis::Vec2& pos)
 {
 	obj.tile_index_ = pos;
-	obj.rect_.pos = Aegis::Vec2(obj.tile_index_.x * tile_map_->tile_size_.x, obj.tile_index_.y * tile_map_->tile_size_.y);
-
+	obj.rect_.pos = pos * tile_map_->tile_size_;
 }
 
 Aegis::Vec2 GameplayLayer::GetTargetTile(const GameObject& obj, Direction dir)
@@ -304,9 +323,7 @@ Aegis::Vec2 GameplayLayer::GetEnemyTargetPos()
 	Aegis::Vec2 target_pos;
 
 	Aegis::Vec2 dir_vec = player_.rect_.pos - enemy_.rect_.pos;
-	float length = sqrt((dir_vec.x * dir_vec.x) + (dir_vec.y * dir_vec.y));
-	dir_vec.x /= length;
-	dir_vec.y /= length;
+	dir_vec.Normalize();
 
 	if (abs(dir_vec.x) >= abs(dir_vec.y)) {
 		dir_vec.y = 0;
