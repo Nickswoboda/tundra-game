@@ -18,6 +18,12 @@ Aegis::Vec2	EaseInEaseOutQuad(float percentage, float elapsed, const Aegis::Vec2
 	Aegis::Vec2 temp = a * (1.0f - t) + b * t;
 	return temp;
 }
+Aegis::Vec2	EaseInEaseOutQuart(float percentage,const Aegis::Vec2& a, const Aegis::Vec2& b)
+{
+	float t = percentage < 0.5 ? 8 * percentage * percentage * percentage * percentage : 1 - pow(-2 * percentage + 2, 4) / 2;
+	Aegis::Vec2 temp = a * (1.0f - t) + b * t;
+	return temp;
+}
 
 
 void Player::Update()
@@ -29,7 +35,8 @@ void Player::Update()
 	Aegis::Vec2 lerp = LERP(start_point_, grid_coord_ * 32, percentage);
 	Aegis::Vec2 ease_in_q = EaseInQuad(percentage, anim_timer_.elapsed_time_, start_point_, grid_coord_ * 32, total_anim_time_);
 	Aegis::Vec2 ease_in_out_q = EaseInEaseOutQuad(percentage, anim_timer_.elapsed_time_, start_point_, grid_coord_ * 32, total_anim_time_);
-	rect_.pos = ease_in_out_q;
+	Aegis::Vec2 ease_in_out_qrt = EaseInEaseOutQuart(percentage, start_point_, grid_coord_ * 32);
+	rect_.pos = lerp;
 	sprite_.pos_ = rect_.pos;
 
 	if (percentage >= 1.0f){
@@ -47,7 +54,7 @@ void Player::Render(float delta_time) const
 	Aegis::DrawQuad(grid_coord_ * 32, rect_.size, { 0.0f, 1.0f, 0.0f, 0.5f });
 }
 
-void Player::StartMoving()
+void GameObject::StartMoving()
 {
 	moving_ = true;
 
@@ -61,14 +68,29 @@ void Player::StartMoving()
 
 void Enemy::Update()
 {
-	rect_.pos += vel_;
+	anim_timer_.Update();
+	float timer_sec = anim_timer_.GetElapsedInSeconds();
+	float percentage = timer_sec / total_anim_time_;
+
+	Aegis::Vec2 lerp = LERP(start_point_, grid_coord_ * 32, percentage);
+	Aegis::Vec2 ease_in_q = EaseInQuad(percentage, anim_timer_.elapsed_time_, start_point_, grid_coord_ * 32, total_anim_time_);
+	Aegis::Vec2 ease_in_out_q = EaseInEaseOutQuad(percentage, anim_timer_.elapsed_time_, start_point_, grid_coord_ * 32, total_anim_time_);
+	Aegis::Vec2 ease_in_out_qrt = EaseInEaseOutQuart(percentage, start_point_, grid_coord_ * 32);
+	rect_.pos = lerp;
 	sprite_.pos_ = rect_.pos;
+
+	if (percentage >= 1.0f) {
+		rect_.pos = grid_coord_ * 32;
+		sprite_.pos_ = rect_.pos;
+		moving_ = false;
+		anim_timer_.Stop();
+	}
 }
 
 void Enemy::Render(float delta_time) const
 {
 	Aegis::RenderSprite(sprite_);
-	Aegis::DrawQuad(target_pos_, rect_.size, { 1.0f, 0.0f, 0.0f, 0.5f });
+	Aegis::DrawQuad(grid_coord_ * 32, rect_.size, { 1.0f, 0.0f, 0.0f, 0.5f });
 }
 
 void GameObject::SetPosition(Aegis::Vec2 pos)

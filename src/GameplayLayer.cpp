@@ -20,17 +20,15 @@ void GameplayLayer::OnUpdate()
 		HandlePlayerMovement(queued_movement_);
 		queued_movement_ = -1;
 	}
-	//if (enemy_.moving_) {
-	//		enemy_.moving_ = false;
-	//		SetObjectOnGrid(enemy_, GetEnemyTargetPos());
-	//		enemy_.vel_ = Aegis::Vec2(0, 0);
-	//}
+	if (enemy_.moving_) {
+		enemy_.Update();
+	}
+	else {
+		GetEnemyTargetPos();
+	}
 
 	if (Aegis::AABBHasCollided(player_.rect_, enemy_.rect_)) {
-		SetObjectOnGrid(player_, tile_map_->player_start_pos_);
-		player_.moving_ = false;
-		player_.vel_ = Aegis::Vec2(0, 0);
-		queued_movement_ = -1;
+		ResetLevel();
 	}
 
 	for (auto i = pellets_.begin(); i != pellets_.end();) {
@@ -60,6 +58,7 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 		}
 		if (key_event->key_ == AE_KEY_K) {
 			ResetLevel();
+			SpawnPellets();
 		}
 
 		static float x = 0;
@@ -90,9 +89,9 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 					Aegis::Vec2 tile_spawn_pos = index * tile_map_->tile_size_;
 					switch (key_event->key_)
 					{
-					case AE_KEY_Q: *tile = Wall(tile_spawn_pos.x, tile_spawn_pos.y); break;
-					case AE_KEY_W: *tile = Ice(tile_spawn_pos.x, tile_spawn_pos.y); break;
-					case AE_KEY_E: *tile = Ground(tile_spawn_pos.x, tile_spawn_pos.y); break;
+					case AE_KEY_R: *tile = Wall(tile_spawn_pos.x, tile_spawn_pos.y); break;
+					case AE_KEY_T: *tile = Ice(tile_spawn_pos.x, tile_spawn_pos.y); break;
+					case AE_KEY_Y: *tile = Ground(tile_spawn_pos.x, tile_spawn_pos.y); break;
 					}
 				}
 		}
@@ -143,11 +142,11 @@ void GameplayLayer::OnRender(float delta_time)
 	tile_map_->Render();
 	player_.Render(delta_time);
 	enemy_.Render(delta_time);
-	Aegis::DrawText(std::to_string(Aegis::Application::GetFrameTime()), { 0, 0 }, { 1.0f, 1.0f, 1.0f, 1.0f });
 	for (auto& pellet : pellets_)
 	{
 		pellet.Render(0.0f);
 	}
+	Aegis::DrawText(std::to_string(Aegis::Application::GetFrameTime()), { 0, 0 }, { 1.0f, 1.0f, 1.0f, 1.0f });
 }
 
 void GameplayLayer::SaveLevel()
@@ -203,7 +202,7 @@ void GameplayLayer::LoadLevel(const std::string& file_path)
 
 	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
 	SetObjectOnGrid(enemy_, tile_map_->enemy_start_pos_);
-	enemy_.target_pos_ = GetEnemyTargetPos();
+	GetEnemyTargetPos();
 
 	SpawnPellets();
 }
@@ -211,16 +210,14 @@ void GameplayLayer::LoadLevel(const std::string& file_path)
 void GameplayLayer::ResetLevel()
 {
 	player_.moving_ = false;
-	player_.vel_ = Aegis::Vec2(0, 0);
 	queued_movement_ = -1;
+	player_.anim_timer_.Stop();
 
 	enemy_.moving_ = false;
-	enemy_.vel_ = Aegis::Vec2(0, 0);
+	enemy_.anim_timer_.Stop();
 
 	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
 	SetObjectOnGrid(enemy_, tile_map_->enemy_start_pos_);
-
-	SpawnPellets();
 }
 
 void GameplayLayer::SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos)
@@ -298,7 +295,6 @@ Aegis::Vec2 GameplayLayer::GetTargetTileCoord(const GameObject& obj, Direction d
 
 Aegis::Vec2 GameplayLayer::GetEnemyTargetPos()
 {
-
 	Aegis::Vec2 dir_vec = player_.rect_.pos - enemy_.rect_.pos;
 	dir_vec.Normalize();
 
@@ -346,6 +342,14 @@ Aegis::Vec2 GameplayLayer::GetEnemyTargetPos()
 			}
 		}
 	}
-
+	if (enemy_.grid_coord_ == target_pos || dir == Direction::None) {
+		return target_pos;
+	}
+	else {
+		enemy_.grid_coord_ = target_pos;
+		enemy_.StartMoving();
+		//player_.move_animation.Play();
+		//lerp rect.pos to pos of new grid coords
+	}
 	return target_pos;
 }
