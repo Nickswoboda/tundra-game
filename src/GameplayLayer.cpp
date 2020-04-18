@@ -15,28 +15,16 @@ void GameplayLayer::OnUpdate()
 {
 	if (player_.moving_) {
 		player_.Update();
-		UpdateGridPosition(player_);
-		if (player_.tile_index_ == tile_map_->GetGridIndexByPos(player_.target_pos_.x, player_.target_pos_.y)) {
-			player_.moving_ = false;
-			player_.SetPosition(player_.tile_index_ * tile_map_->tile_size_);
-			player_.vel_ = Aegis::Vec2(0, 0);
-			if (queued_movement_ != -1) {
-				HandlePlayerMovement(queued_movement_);
-				queued_movement_ = -1;
-			}
-		}
 	}
-	if (enemy_.moving_) {
-		UpdateGridPosition(enemy_);
-
-		if (enemy_.tile_index_ == tile_map_->GetGridIndexByPos(enemy_.target_pos_.x, enemy_.target_pos_.y)) {
-			enemy_.moving_ = false;
-			enemy_.SetPosition(enemy_.tile_index_ * tile_map_->tile_size_);
-			enemy_.vel_ = Aegis::Vec2(0, 0);
-			enemy_.target_pos_ = GetEnemyTargetPos();
-		}
+	else if (queued_movement_ != -1) {
+		HandlePlayerMovement(queued_movement_);
+		queued_movement_ = -1;
 	}
-	enemy_.Update();
+	//if (enemy_.moving_) {
+	//		enemy_.moving_ = false;
+	//		SetObjectOnGrid(enemy_, GetEnemyTargetPos());
+	//		enemy_.vel_ = Aegis::Vec2(0, 0);
+	//}
 
 	if (Aegis::AABBHasCollided(player_.rect_, enemy_.rect_)) {
 		SetObjectOnGrid(player_, tile_map_->player_start_pos_);
@@ -115,7 +103,7 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 			if (!player_.moving_) {
 				HandlePlayerMovement(key_event->key_);
 			}
-			else if (queued_movement_ == -1){
+			else {
 				queued_movement_ = key_event->key_;
 			}
 		}
@@ -133,28 +121,17 @@ void GameplayLayer::HandlePlayerMovement(int key_code)
 	case GLFW_KEY_RIGHT: dir = Direction::Right;  break;
 	}
 
-	Aegis::Vec2 target_tile_pos = GetTargetTile(player_, dir);
+	Aegis::Vec2 target_grid_coord = GetTargetTileCoord(player_, dir);
 	
 
-	if (player_.rect_.pos == target_tile_pos) {
+	if (player_.grid_coord_ == target_grid_coord) {
 		return;
 	}
-	
-	player_.target_pos_ = target_tile_pos;
-	player_.moving_ = true;
-	player_.vel_ = (target_tile_pos - player_.rect_.pos).Normalized();
-}
-
-void GameplayLayer::UpdateGridPosition(GameObject& obj)
-{
-	if (obj.vel_.x > 0 || obj.vel_.y > 0) {
-		obj.tile_index_ = tile_map_->GetGridIndexByPos(obj.rect_.pos.x, obj.rect_.pos.y);
-	}
-	else if (obj.vel_.x < 0) {
-		obj.tile_index_ = tile_map_->GetGridIndexByPos(obj.rect_.pos.x + tile_map_->tile_size_.x, obj.rect_.pos.y);
-	}
-	else if (obj.vel_.y < 0) {
-		obj.tile_index_ = tile_map_->GetGridIndexByPos(obj.rect_.pos.x, obj.rect_.pos.y + tile_map_->tile_size_.y);
+	else {
+		player_.grid_coord_ = target_grid_coord;
+		player_.StartMoving();
+		//player_.move_animation.Play();
+		//lerp rect.pos to pos of new grid coords
 	}
 }
 
@@ -242,74 +219,73 @@ void GameplayLayer::ResetLevel()
 
 	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
 	SetObjectOnGrid(enemy_, tile_map_->enemy_start_pos_);
-	enemy_.target_pos_ = GetEnemyTargetPos();
 
 	SpawnPellets();
 }
 
 void GameplayLayer::SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos)
 {
-	obj.tile_index_ = pos;
+	obj.grid_coord_ = pos;
 	obj.SetPosition(pos * tile_map_->tile_size_);
 }
 
-Aegis::Vec2 GameplayLayer::GetTargetTile(const GameObject& obj, Direction dir)
+Aegis::Vec2 GameplayLayer::GetTargetTileCoord(const GameObject& obj, Direction dir)
 {
-	Aegis::Vec2 target_tile;
+	Aegis::Vec2 grid_coord;
 
 	switch (dir)
 	{
 		case Direction::Up: {
-			for (int y_index = obj.tile_index_.y - 1; y_index >= 0; --y_index) {
-				auto* tile = tile_map_->GetTileByIndex(obj.tile_index_.x, y_index);
+			for (int y_index = obj.grid_coord_.y - 1; y_index >= 0; --y_index) {
+				auto* tile = tile_map_->GetTileByIndex(obj.grid_coord_.x, y_index);
 				if (tile->type_ == Tile::Type::Ground) {
-					target_tile = tile->pos_;
+					grid_coord = Aegis::Vec2(obj.grid_coord_.x, y_index);
 					break;
 				}
 				else if (tile->type_ == Tile::Type::Wall) {
-					target_tile = tile->pos_ + Aegis::Vec2(0, tile_map_->tile_size_.x);
+					grid_coord = Aegis::Vec2(obj.grid_coord_.x, y_index + 1);
 					break;
 				}
 			}
 			break;
 		}
 		case Direction::Down: {
-			for (int y_index = obj.tile_index_.y + 1; y_index < tile_map_->grid_size_.y; ++y_index) {
-				auto* tile = tile_map_->GetTileByIndex(obj.tile_index_.x, y_index);
+			for (int y_index = obj.grid_coord_.y + 1; y_index < tile_map_->grid_size_.y; ++y_index) {
+				auto* tile = tile_map_->GetTileByIndex(obj.grid_coord_.x, y_index);
 				if (tile->type_ == Tile::Type::Ground) {
-					target_tile = tile->pos_;
+					grid_coord = Aegis::Vec2(obj.grid_coord_.x, y_index);
 					break;
 				}
 				else if (tile->type_ == Tile::Type::Wall) {
-					target_tile = tile->pos_ - Aegis::Vec2(0, tile_map_->tile_size_.y);
+					grid_coord = Aegis::Vec2(obj.grid_coord_.x, y_index - 1);
 					break;
 				}
 			}
 			break;
 		}
 		case Direction::Left: {
-			for (int x_index = obj.tile_index_.x - 1; x_index >= 0; --x_index) {
-				auto* tile = tile_map_->GetTileByIndex(x_index, obj.tile_index_.y);
+			for (int x_index = obj.grid_coord_.x - 1; x_index >= 0; --x_index) {
+				auto* tile = tile_map_->GetTileByIndex(x_index, obj.grid_coord_.y);
 				if (tile->type_ == Tile::Type::Ground) {
-					target_tile = tile->pos_;
+					grid_coord = Aegis::Vec2(x_index, obj.grid_coord_.y);
 					break;
 				}
 				else if (tile->type_ == Tile::Type::Wall) {
-					target_tile = tile->pos_ + Aegis::Vec2(tile_map_->tile_size_.x, 0);
+					grid_coord = Aegis::Vec2(x_index + 1, obj.grid_coord_.y);
 					break;
 				}
 			}
 			break;
 		}
 		case Direction::Right: {
-			for (int x_index = obj.tile_index_.x + 1; x_index < tile_map_->grid_size_.x; ++x_index) {
-				auto* tile = tile_map_->GetTileByIndex(x_index, obj.tile_index_.y);
+			for (int x_index = obj.grid_coord_.x + 1; x_index < tile_map_->grid_size_.x; ++x_index) {
+				auto* tile = tile_map_->GetTileByIndex(x_index, obj.grid_coord_.y);
 				if (tile->type_ == Tile::Type::Ground) {
-					target_tile = tile->pos_;
+					grid_coord = Aegis::Vec2(x_index, obj.grid_coord_.y);
 					break;
 				}
 				else if (tile->type_ == Tile::Type::Wall) {
-					target_tile = tile->pos_ - Aegis::Vec2(tile_map_->tile_size_.x, 0);
+					grid_coord = Aegis::Vec2(x_index - 1, obj.grid_coord_.y);
 					break;
 				}
 			}
@@ -317,12 +293,11 @@ Aegis::Vec2 GameplayLayer::GetTargetTile(const GameObject& obj, Direction dir)
 		}
 	}
 
-	return target_tile;
+	return grid_coord;
 }
 
 Aegis::Vec2 GameplayLayer::GetEnemyTargetPos()
 {
-	Aegis::Vec2 target_pos;
 
 	Aegis::Vec2 dir_vec = player_.rect_.pos - enemy_.rect_.pos;
 	dir_vec.Normalize();
@@ -351,33 +326,25 @@ Aegis::Vec2 GameplayLayer::GetEnemyTargetPos()
 
 	enemy_.moving_ = true;
 
-	target_pos = GetTargetTile(enemy_, dir);
-	if (enemy_.rect_.pos == target_pos) {
+	Aegis::Vec2 target_pos;
+	target_pos = GetTargetTileCoord(enemy_, dir);
+	if (enemy_.grid_coord_ == target_pos) {
 		if (dir_vec.x == 0) {
 			dir = Direction::Left;
-			target_pos = GetTargetTile(enemy_, dir);
-			if (enemy_.rect_.pos == target_pos) {
+			target_pos = GetTargetTileCoord(enemy_, dir);
+			if (enemy_.grid_coord_ == target_pos) {
 				dir = Direction::Right;
-				target_pos = GetTargetTile(enemy_, dir);
+				target_pos = GetTargetTileCoord(enemy_, dir);
 			}
 		}
 		if (dir_vec.y == 0) {
-			target_pos = GetTargetTile(enemy_, dir);
+			target_pos = GetTargetTileCoord(enemy_, dir);
 			dir = Direction::Down;
-			if (enemy_.rect_.pos == target_pos) {
+			if (enemy_.grid_coord_ == target_pos) {
 				dir = Direction::Up;
-				target_pos = GetTargetTile(enemy_, dir);    
+				target_pos = GetTargetTileCoord(enemy_, dir);
 			}
 		}
-	}
-
-
-	switch (dir)
-	{
-	case Direction::Up: enemy_.vel_.y = -enemy_.acceleration_;  break;
-	case Direction::Down: enemy_.vel_.y = enemy_.acceleration_;  break;
-	case Direction::Left: enemy_.vel_.x = -enemy_.acceleration_;  break;
-	case Direction::Right: enemy_.vel_.x = enemy_.acceleration_;  break;
 	}
 
 	return target_pos;

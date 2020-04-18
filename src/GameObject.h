@@ -18,7 +18,7 @@ public:
 	Aegis::Sprite sprite_;
 	Aegis::AABB rect_;
 	Aegis::Vec2 vel_;
-	Aegis::Vec2 tile_index_;
+	Aegis::Vec2 grid_coord_;
 
 	float acceleration_ = 0.0f;
 };
@@ -46,13 +46,19 @@ public:
 		sprite_.tex_coords_ = { 96.0f, 0.0f, 128.0f, 32.0f };
 		sprite_.color_ = { 1.0f, 1.0f, 1.0f, 1.0f };
 		acceleration_ = 10.0f;
+		anim_timer_.Stop();
 	}
 	void Update();
 	void Render(float delta_time) const override;
+	void StartMoving();
 
+	float anim_time_per_tile_ = 0.15f;
+	float total_anim_time_ = 0.0f;
 	bool moving_ = false;
 	Aegis::Vec2 target_pos_;
 	Aegis::Vec2 dir_;
+	Aegis::Timer anim_timer_;
+	Aegis::Vec2 start_point_;
 };
 
 class Enemy : public GameObject
@@ -71,6 +77,6 @@ public:
 	void Update();
 	void Render(float delta_time) const override;
 
-	bool moving_ = false;
+	bool moving_ = true;
 	Aegis::Vec2 target_pos_;
 };

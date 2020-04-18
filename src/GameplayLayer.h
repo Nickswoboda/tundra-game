@@ -30,9 +30,8 @@ public:
 	void SpawnPellets();
 
 	void HandlePlayerMovement(int key_code);
-	void UpdateGridPosition(GameObject& obj);
 	void SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos);
-	Aegis::Vec2 GetTargetTile(const GameObject& obj, Direction dir);
+	Aegis::Vec2 GetTargetTileCoord(const GameObject& obj, Direction dir);
 	Aegis::Vec2 GetEnemyTargetPos();
 
 	Aegis::Camera camera_;

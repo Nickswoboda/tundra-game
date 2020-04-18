@@ -106,15 +106,10 @@ void TileMap::SetTextureAtlas(const Aegis::Texture& atlas)
 
 Aegis::Vec2 TileMap::GetTileIndex(const Tile& tile)
 {
-	int col = tile.pos_.x / tile_size_.x;
-	int row = tile.pos_.y / tile_size_.y;
-
-	return Aegis::Vec2(col, row);
+	return tile.pos_ / tile_size_;
 }
 
-Aegis::Vec2 TileMap::GetGridIndexByPos(int x, int y)
+Aegis::Vec2 TileMap::GetGridIndexByPos(const Aegis::Vec2& pos)
 {
-	int col = x / tile_size_.x;
-	int row = y / tile_size_.y;
-	return Aegis::Vec2(col, row);
+	return pos / tile_size_;
 }

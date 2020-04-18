@@ -21,7 +21,7 @@ public:
 	std::vector<Tile*> GetTilesUnderneath(const Aegis::AABB& rect);
 
 	Aegis::Vec2 GetTileIndex(const Tile& tile);
-	Aegis::Vec2 GetGridIndexByPos(int x, int y);
+	Aegis::Vec2 GetGridIndexByPos(const Aegis::Vec2& pos);
 
 	std::vector<std::vector<Tile>> tiles_;
 	std::shared_ptr<Aegis::Texture> tile_atlas_;
