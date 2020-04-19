@@ -15,7 +15,7 @@ GameplayLayer::GameplayLayer()
 
 void GameplayLayer::OnUpdate()
 {
-	if (player_.moving_) {
+	if (player_.animation_.playing_) {
 		player_.Update();
 	}
 	else if (queued_movement_ != -1) {
@@ -23,7 +23,7 @@ void GameplayLayer::OnUpdate()
 		queued_movement_ = -1;
 	}
 
-	if (enemy_.moving_) {
+	if (enemy_.animation_.playing_) {
 		enemy_.Update();
 	}
 	else {
@@ -38,7 +38,7 @@ void GameplayLayer::OnUpdate()
 		if (Aegis::AABBHasCollided(player_.rect_, (*i).rect_)) {
 			i = pellets_.erase(i);
 			if (pellets_.size() == 0) {
-				player_.moving_ = false;
+				player_.animation_.playing_ = false;
 				queued_movement_ = -1;
 				LoadLevel("assets/levels/level1.txt");
 				return;
@@ -81,7 +81,7 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 			}
 		}
 		if (key == AE_KEY_UP || key == AE_KEY_DOWN || key == AE_KEY_LEFT || key == AE_KEY_RIGHT) {
-			if (!player_.moving_) {
+			if (!player_.animation_.playing_) {
 				HandlePlayerMovement(key);
 			}
 			else {
@@ -264,12 +264,12 @@ void GameplayLayer::LoadLevel(const std::string& file_path)
 
 void GameplayLayer::ResetLevel()
 {
-	player_.moving_ = false;
+	player_.animation_.playing_ = false;
 	queued_movement_ = -1;
-	player_.anim_timer_.Stop();
+	player_.animation_.timer_.Stop();
 
-	enemy_.moving_ = false;
-	enemy_.anim_timer_.Stop();
+	enemy_.animation_.playing_ = false;
+	enemy_.animation_.timer_.Stop();
 
 	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
 	SetObjectOnGrid(enemy_, tile_map_->enemy_start_pos_);

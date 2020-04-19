@@ -1,6 +1,15 @@
 #pragma once
 
 #include "src/Aegis.h"
+class Animation
+{
+public:
+	Aegis::Vec2 start_point_;
+	Aegis::Timer timer_;
+	float duration_ = 0.0f;
+	bool playing_ = false;
+
+};
 
 class GameObject
 {
@@ -11,24 +20,18 @@ public:
 		sprite_.pos_ = rect_.pos;
 	}
 		
-	virtual void Update() {};
+	virtual void Update();
 	virtual void Render(float delta_time) const = 0;
 	virtual void SetPosition(Aegis::Vec2 pos);
 	virtual void StartMoving();
 	
+	Animation animation_;
 	Aegis::Sprite sprite_;
 	Aegis::AABB rect_;
-	Aegis::Vec2 vel_;
 	Aegis::Vec2 grid_coord_;
+	//time to move 1 tile
+	float speed_ = 0.15f;
 
-	float anim_time_per_tile_ = 0.15f;
-	float total_anim_time_ = 0.0f;
-	bool moving_ = false;
-	Aegis::Vec2 target_pos_;
-	Aegis::Vec2 dir_;
-	Aegis::Timer anim_timer_;
-	Aegis::Vec2 start_point_;
-	float acceleration_ = 0.0f;
 };
 
 class Pellet : public GameObject
@@ -53,10 +56,7 @@ public:
 		sprite_.size_ = { 32, 32 };
 		sprite_.tex_coords_ = { 96.0f, 0.0f, 128.0f, 32.0f };
 		sprite_.color_ = { 1.0f, 1.0f, 1.0f, 1.0f };
-		acceleration_ = 10.0f;
-		anim_timer_.Stop();
 	}
-	void Update();
 	void Render(float delta_time) const override;
 };
 
@@ -70,11 +70,9 @@ public:
 		sprite_.size_ = { 32, 32 };
 		sprite_.tex_coords_ = { 128.0f, 0.0f, 160.0f, 32.0f };
 		sprite_.color_ = { 1.0f, 1.0f, 1.0f, 1.0f };
-		acceleration_ = 1.0f;
-		anim_timer_.Stop();
-	}
+		speed_ = .10f;
 
-	void Update();
+	}
 	void Render(float delta_time) const override;
 
 	Aegis::Vec2 target_pos_;
