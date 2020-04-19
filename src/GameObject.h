@@ -4,7 +4,12 @@
 class Animation
 {
 public:
-	Aegis::Vec2 start_point_;
+	void Start(Aegis::Vec2 start, Aegis::Vec2 end, float duration);
+	void Update();
+	void Stop();
+	Aegis::Vec2 start_value_;
+	Aegis::Vec2 current_value_;
+	Aegis::Vec2 end_value_;
 	Aegis::Timer timer_;
 	float duration_ = 0.0f;
 	bool playing_ = false;
@@ -70,7 +75,7 @@ public:
 		sprite_.size_ = { 32, 32 };
 		sprite_.tex_coords_ = { 128.0f, 0.0f, 160.0f, 32.0f };
 		sprite_.color_ = { 1.0f, 1.0f, 1.0f, 1.0f };
-		speed_ = .10f;
+		speed_ = .20f;
 
 	}
 	void Render(float delta_time) const override;
