@@ -77,6 +77,5 @@ public:
 	void Update();
 	void Render(float delta_time) const override;
 
-	bool moving_ = true;
 	Aegis::Vec2 target_pos_;
 };
