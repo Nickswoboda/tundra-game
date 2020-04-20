@@ -233,7 +233,7 @@ Aegis::Vec2 GameplayLayer::GetTargetTileCoordBFS(const Aegis::Vec2& start, const
 	}
 	
 	Aegis::Vec2 path_start = end;
-	while (!(parent[ToString(path_start)] == start)) {
+	while (parent[ToString(path_start)] != start) {
 		path_start = parent[ToString(path_start)];
 	}
 	
