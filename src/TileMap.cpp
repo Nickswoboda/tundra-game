@@ -52,7 +52,7 @@ TileMap::TileMap(const std::string& file_path, int tile_size)
 	grid_size_.y = tiles_[grid_size_.x - 1].size();
 }
 
-void TileMap::Render()
+void TileMap::Render() const
 {
 	for (int col = 0; col < tiles_.size(); ++col) {
 		for (int row = 0; row < tiles_[col].size(); ++row) {
@@ -107,12 +107,12 @@ void TileMap::SetTextureAtlas(const Aegis::Texture& atlas)
 	tile_atlas_ = std::make_unique<Aegis::Texture>(atlas);
 }
 
-Aegis::Vec2 TileMap::GetTileIndex(const Tile& tile)
+Aegis::Vec2 TileMap::GetTileIndex(const Tile& tile) const
 {
 	return tile.pos_ / tile_size_;
 }
 
-Aegis::Vec2 TileMap::GetGridIndexByPos(const Aegis::Vec2& pos)
+Aegis::Vec2 TileMap::GetGridIndexByPos(const Aegis::Vec2& pos) const
 {
 	return pos / tile_size_;
 }

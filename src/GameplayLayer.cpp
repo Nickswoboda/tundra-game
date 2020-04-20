@@ -4,13 +4,12 @@
 #include <iostream>
 #include <filesystem>
 GameplayLayer::GameplayLayer()
-	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), camera_(0, 1280, 720, 0)
+	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), world_camera_(0, 1280, 720, 0), ui_camera_(0, 1280, 720, 0)
 {
 	auto& texmgr = Aegis::TextureManager::Instance();
 	texmgr.Load("assets/textures/tundra-tile-map.png");
 	LoadLevel("assets/levels/level2.txt");
-	camera_.SetPosition({ -144, -24, 0 });
-	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
+	world_camera_.SetPosition({ -144, -24, 0 });
 }
 
 void GameplayLayer::OnUpdate()
@@ -70,7 +69,6 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 			ResetLevel();
 			SpawnPellets();
 		}
-
 		if (key == AE_KEY_R || key == AE_KEY_T || key == AE_KEY_Y) {
 			auto mouse_pos = Aegis::Application::GetMousePos();
 			auto tile = tile_map_->GetTileByPos(mouse_pos.x, mouse_pos.y);
@@ -100,6 +98,7 @@ void GameplayLayer::OnEvent(Aegis::Event& event)
 
 void GameplayLayer::OnRender(float delta_time)
 {
+	Aegis::Renderer2D::BeginScene(world_camera_.view_projection_matrix_);
 	Aegis::RendererClear();
 
 	tile_map_->Render();
@@ -110,7 +109,11 @@ void GameplayLayer::OnRender(float delta_time)
 	{
 		pellet.Render(0.0f);
 	}
+	Aegis::Renderer2D::EndScene();
+
+	Aegis::Renderer2D::BeginScene(ui_camera_.view_projection_matrix_);
 	Aegis::DrawText(std::to_string(Aegis::Application::GetFrameTime()), { 0, 0 }, { 1.0f, 1.0f, 1.0f, 1.0f });
+	Aegis::Renderer2D::EndScene();
 }
 
 void GameplayLayer::HandlePlayerMovement(int key_code)
@@ -145,7 +148,7 @@ void GameplayLayer::GetBjorneTargetPos()
 	bjorne_.StartMoving();
 }
 
-Aegis::Vec2 GameplayLayer::GetTargetTileCoord(const Aegis::Vec2& start, Direction dir)
+Aegis::Vec2 GameplayLayer::GetTargetTileCoord(const Aegis::Vec2& start, Direction dir) const
 {
 	int x_index = start.x;
 	int y_index = start.y;
@@ -202,7 +205,7 @@ std::string ToString(const Aegis::Vec2 val) {
 	return std::to_string(val.x) + std::to_string(val.y);
 }
 
-Aegis::Vec2 GameplayLayer::GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding)
+Aegis::Vec2 GameplayLayer::GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding) const
 {
 	std::vector<Aegis::Vec2> frontier;
 	frontier.push_back(start);
@@ -246,7 +249,7 @@ void GameplayLayer::SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos)
 	obj.SetPosition(pos * tile_map_->tile_size_);
 }
 
-std::vector<Aegis::Vec2> GameplayLayer::GetNeighborTilesSliding(const Aegis::Vec2& tile)
+std::vector<Aegis::Vec2> GameplayLayer::GetNeighborTilesSliding(const Aegis::Vec2& tile) const
 {
 	std::vector<Aegis::Vec2> neighbors;
 	neighbors.push_back(GetTargetTileCoord(tile, Direction::Up));
@@ -257,7 +260,7 @@ std::vector<Aegis::Vec2> GameplayLayer::GetNeighborTilesSliding(const Aegis::Vec
 	return neighbors;
 }
 
-std::vector<Aegis::Vec2> GameplayLayer::GetNeighborTilesMoving(const Aegis::Vec2& tile)
+std::vector<Aegis::Vec2> GameplayLayer::GetNeighborTilesMoving(const Aegis::Vec2& tile) const
 {
 	std::vector<Aegis::Vec2> neighbors;
 	Aegis::Vec2 up = tile + Aegis::Vec2(0, -1);
@@ -326,7 +329,7 @@ void GameplayLayer::ResetLevel()
 	SetObjectOnGrid(bjorne_, tile_map_->bjorne_start_pos_);
 }
 
-void GameplayLayer::SaveLevel()
+void GameplayLayer::SaveLevel() const
 {
 	int level = 1;
 	std::string new_file_path = "C:/dev/tundra/assets/levels/level" + std::to_string(level) + ".txt";

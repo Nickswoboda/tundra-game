@@ -27,19 +27,20 @@ public:
 	void HandlePlayerMovement(int key_code);
 	void GetBrutusTargetPos();
 	void GetBjorneTargetPos();
-	Aegis::Vec2 GetTargetTileCoord(const Aegis::Vec2& start, Direction dir);
-	Aegis::Vec2 GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding);
+	Aegis::Vec2 GetTargetTileCoord(const Aegis::Vec2& start, Direction dir) const;
+	Aegis::Vec2 GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding) const;
 	void SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos);
 
-	std::vector<Aegis::Vec2> GetNeighborTilesMoving(const Aegis::Vec2& tile);
-	std::vector<Aegis::Vec2> GetNeighborTilesSliding(const Aegis::Vec2& tile);
+	std::vector<Aegis::Vec2> GetNeighborTilesMoving(const Aegis::Vec2& tile) const;
+	std::vector<Aegis::Vec2> GetNeighborTilesSliding(const Aegis::Vec2& tile) const;
 
 	void SpawnPellets();
 	void LoadLevel(const std::string& file_path);
 	void ResetLevel();
-	void SaveLevel();
+	void SaveLevel() const;
 
-	Aegis::Camera camera_;
+	Aegis::Camera world_camera_;
+	Aegis::Camera ui_camera_;
 	Player player_;
 	Brutus brutus_;
 	Bjorne bjorne_;

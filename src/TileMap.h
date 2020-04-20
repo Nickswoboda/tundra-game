@@ -12,7 +12,7 @@ public:
 	TileMap(const std::string& file_path, int tile_size);
 
 	void SetTextureAtlas(const Aegis::Texture& atlas);
-	void Render();
+	void Render() const;
 
 	Tile* GetTileByIndex(int col, int row);
 	Tile* GetTileByPos(int x_pos, int y_pos);
@@ -20,8 +20,8 @@ public:
 	std::vector<Tile*> GetTilesUnderneath(int x, int y, int w, int h);
 	std::vector<Tile*> GetTilesUnderneath(const Aegis::AABB& rect);
 
-	Aegis::Vec2 GetTileIndex(const Tile& tile);
-	Aegis::Vec2 GetGridIndexByPos(const Aegis::Vec2& pos);
+	Aegis::Vec2 GetTileIndex(const Tile& tile) const;
+	Aegis::Vec2 GetGridIndexByPos(const Aegis::Vec2& pos) const;
 
 	std::vector<std::vector<Tile>> tiles_;
 	std::shared_ptr<Aegis::Texture> tile_atlas_;
