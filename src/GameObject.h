@@ -10,8 +10,9 @@ public:
 	Aegis::Vec2 start_value_;
 	Aegis::Vec2 current_value_;
 	Aegis::Vec2 end_value_;
-	Aegis::Timer timer_;
-	float duration_ = 0.0f;
+	
+	float current_frame = 0;
+	float total_frames = 0;
 	bool playing_ = false;
 
 };

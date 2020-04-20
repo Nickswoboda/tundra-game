@@ -311,15 +311,15 @@ void GameplayLayer::LoadLevel(const std::string& file_path)
 
 void GameplayLayer::ResetLevel()
 {
-	player_.animation_.playing_ = false;
+	player_.animation_.Stop();
 	queued_movement_ = -1;
-	player_.animation_.timer_.Stop();
+	player_.animation_.current_frame = 0;
 
 	brutus_.animation_.playing_ = false;
-	brutus_.animation_.timer_.Stop();
+	brutus_.animation_.Stop();
 
 	bjorne_.animation_.playing_ = false;
-	bjorne_.animation_.timer_.Stop();
+	bjorne_.animation_.Stop();
 
 	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
 	SetObjectOnGrid(brutus_, tile_map_->brutus_start_pos_);
