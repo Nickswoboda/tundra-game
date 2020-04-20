@@ -26,7 +26,8 @@ public:
 	std::vector<std::vector<Tile>> tiles_;
 	std::shared_ptr<Aegis::Texture> tile_atlas_;
 	Aegis::Vec2 player_start_pos_;
-	Aegis::Vec2 enemy_start_pos_;
+	Aegis::Vec2 bjorne_start_pos_;
+	Aegis::Vec2 brutus_start_pos_;
 	Aegis::Vec2 tile_size_;
 	Aegis::Vec2 grid_size_;
 

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <filesystem>
 GameplayLayer::GameplayLayer()
-	:player_(0, 0), enemy_(0, 0), camera_(0, 1280, 720, 0)
+	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), camera_(0, 1280, 720, 0)
 {
 	auto& texmgr = Aegis::TextureManager::Instance();
 	texmgr.Load("assets/textures/tundra-tile-map.png");
@@ -23,14 +23,21 @@ void GameplayLayer::OnUpdate()
 		queued_movement_ = -1;
 	}
 
-	if (enemy_.animation_.playing_) {
-		enemy_.Update();
+	if (brutus_.animation_.playing_) {
+		brutus_.Update();
 	}
 	else {
-		GetEnemyTargetPos();
+		GetBrutusTargetPos();
 	}
 
-	if (Aegis::AABBHasCollided(player_.rect_, enemy_.rect_)) {
+	if (bjorne_.animation_.playing_) {
+		bjorne_.Update();
+	}
+	else {
+		GetBjorneTargetPos();
+	}
+
+	if (Aegis::AABBHasCollided(player_.rect_, brutus_.rect_) || Aegis::AABBHasCollided(player_.rect_, bjorne_.rect_)) {
 		ResetLevel();
 	}
 
@@ -97,7 +104,8 @@ void GameplayLayer::OnRender(float delta_time)
 
 	tile_map_->Render();
 	player_.Render(delta_time);
-	enemy_.Render(delta_time);
+	brutus_.Render(delta_time);
+	bjorne_.Render(delta_time);
 	for (auto& pellet : pellets_)
 	{
 		pellet.Render(0.0f);
@@ -116,111 +124,71 @@ void GameplayLayer::HandlePlayerMovement(int key_code)
 	case GLFW_KEY_RIGHT: dir = Direction::Right;  break;
 	}
 
-	if (player_.grid_coord_ == GetTargetTileCoord(player_, dir)) {
+	if (player_.grid_coord_ == GetTargetTileCoord(player_.grid_coord_, dir)) {
 		return;
 	}
 	else {
-		player_.grid_coord_ = GetTargetTileCoord(player_, dir);
+		player_.grid_coord_ = GetTargetTileCoord(player_.grid_coord_, dir);
 		player_.StartMoving();
-		//player_.move_animation.Play();
-		//lerp rect.pos to pos of new grid coords
 	}
 }
 
-void GameplayLayer::GetEnemyTargetPos()
+void GameplayLayer::GetBrutusTargetPos()
 {
-	Aegis::Vec2 dir_vec = player_.rect_.pos - enemy_.rect_.pos;
-
-	//go in the direction with largest magnitude
-	if (abs(dir_vec.x) >= abs(dir_vec.y)) {
-		dir_vec.y = 0;
-	}
-	else
-	{
-		dir_vec.x = 0;
-	}
-	
-	Direction dir = Direction::None;
-	if (dir_vec.y < 0) {
-		dir = Direction::Up;
-	}
-	else if (dir_vec.y > 0) {
-		dir = Direction::Down;
-	}
-	if (dir_vec.x < 0) {
-		dir = Direction::Left;
-	}
-	else if (dir_vec.x > 0) {
-		dir = Direction::Right;
-	}
-
-	while (enemy_.grid_coord_ == GetTargetTileCoord(enemy_, dir)) {
-		//if already moving up or down, try left and right
-		if (dir_vec.x == 0) {
-			dir = Direction::Left;
-			if (enemy_.grid_coord_ == GetTargetTileCoord(enemy_, dir)) {
-				dir = Direction::Right;
-			}
-		}
-		//if already moving left or right, try up and down
-		if (dir_vec.y == 0) {
-			dir = Direction::Up;
-			if (enemy_.grid_coord_ == GetTargetTileCoord(enemy_, dir)) {
-				dir = Direction::Down;
-			}
-		}
-	}
-
-	enemy_.grid_coord_ = GetTargetTileCoord(enemy_, dir);;
-	enemy_.StartMoving();
-	//player_.move_animation.Play();
-	//lerp rect.pos to pos of new grid coords
+	brutus_.grid_coord_ = GetTargetTileCoordBFS(brutus_.grid_coord_, player_.grid_coord_, false);
+	brutus_.StartMoving();
 }
 
-Aegis::Vec2 GameplayLayer::GetTargetTileCoord(const GameObject& obj, Direction dir)
+void GameplayLayer::GetBjorneTargetPos()
 {
-	int x_index = obj.grid_coord_.x;
-	int y_index = obj.grid_coord_.y;
+	bjorne_.grid_coord_ = GetTargetTileCoordBFS(bjorne_.grid_coord_, player_.grid_coord_, true);
+	bjorne_.StartMoving();
+}
+
+Aegis::Vec2 GameplayLayer::GetTargetTileCoord(const Aegis::Vec2& start, Direction dir)
+{
+	int x_index = start.x;
+	int y_index = start.y;
 
 	switch (dir)
 	{
 		case Direction::Up: {
 			//Move past ice, move back against wall, stand on ground
 			--y_index;
-			while (tile_map_->GetTileByIndex(obj.grid_coord_.x, y_index)->type_ == Tile::Type::Ice) {
+			while (tile_map_->GetTileByIndex(start.x, y_index)->type_ == Tile::Type::Ice) {
 				--y_index;
 			}
-			if (tile_map_->GetTileByIndex(obj.grid_coord_.x, y_index)->type_ == Tile::Type::Wall) {
+			if (tile_map_->GetTileByIndex(start.x, y_index)->type_ == Tile::Type::Wall) {
 				++y_index;
 			}
 			break;
 		}
 		case Direction::Down: {
 			++y_index;
-			while (tile_map_->GetTileByIndex(obj.grid_coord_.x, y_index)->type_ == Tile::Type::Ice) {
+			while (tile_map_->GetTileByIndex(start.x, y_index)->type_ == Tile::Type::Ice) {
 				++y_index;
 			}
-			if (tile_map_->GetTileByIndex(obj.grid_coord_.x, y_index)->type_ == Tile::Type::Wall) {
+			if (tile_map_->GetTileByIndex(start.x, y_index)->type_ == Tile::Type::Wall) {
 				--y_index;
 			}
 			break;
 		}
 		case Direction::Left: {
 			--x_index;
-			while (tile_map_->GetTileByIndex(x_index, obj.grid_coord_.y)->type_ == Tile::Type::Ice) {
+			while (tile_map_->GetTileByIndex(x_index, start.y)->type_ == Tile::Type::Ice) {
 				--x_index;
 			}
-			if (tile_map_->GetTileByIndex(x_index, obj.grid_coord_.y)->type_ == Tile::Type::Wall) {
+			if (tile_map_->GetTileByIndex(x_index, start.y)->type_ == Tile::Type::Wall) {
 				++x_index;
 			}
 			break;
 		}
 		case Direction::Right: {
 			++x_index;
-			while (tile_map_->GetTileByIndex(x_index, obj.grid_coord_.y)->type_ == Tile::Type::Ice) {
+			while (tile_map_->GetTileByIndex(x_index, start.y)->type_ == Tile::Type::Ice) {
 				++x_index;
 			}
-			if (tile_map_->GetTileByIndex(x_index, obj.grid_coord_.y)->type_ == Tile::Type::Wall) {
+			if (tile_map_->GetTileByIndex(x_index, start.y)->type_ == Tile::Type::Wall) {
 				--x_index;
 			}
 			break;
@@ -230,10 +198,87 @@ Aegis::Vec2 GameplayLayer::GetTargetTileCoord(const GameObject& obj, Direction d
 	return Aegis::Vec2(x_index, y_index);
 }
 
+std::string ToString(const Aegis::Vec2 val) {
+	return std::to_string(val.x) + std::to_string(val.y);
+}
+
+Aegis::Vec2 GameplayLayer::GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding)
+{
+	std::vector<Aegis::Vec2> frontier;
+	frontier.push_back(start);
+	std::unordered_map<std::string, Aegis::Vec2> parent;
+
+	parent[ToString(start)] = start;
+
+	while (!frontier.empty()) {
+		auto current = frontier[0];
+		frontier.erase(frontier.begin());
+
+		if (current == end) {
+			break;
+		}
+		std::vector<Aegis::Vec2> neighbors;
+		if (sliding) {
+			neighbors = GetNeighborTilesSliding(current);
+		}
+		else {
+			neighbors = GetNeighborTilesMoving(current);
+		}
+		for (auto& neighbor : neighbors) {
+			if (parent.find(ToString(neighbor)) == parent.end()) {
+				frontier.push_back(neighbor);
+				parent[ToString(neighbor)] = current;
+			}
+		}
+	}
+	
+	Aegis::Vec2 path_start = end;
+	while (!(parent[ToString(path_start)] == start)) {
+		path_start = parent[ToString(path_start)];
+	}
+	
+	return path_start;
+}
+
 void GameplayLayer::SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos)
 {
 	obj.grid_coord_ = pos;
 	obj.SetPosition(pos * tile_map_->tile_size_);
+}
+
+std::vector<Aegis::Vec2> GameplayLayer::GetNeighborTilesSliding(const Aegis::Vec2& tile)
+{
+	std::vector<Aegis::Vec2> neighbors;
+	neighbors.push_back(GetTargetTileCoord(tile, Direction::Up));
+	neighbors.push_back(GetTargetTileCoord(tile, Direction::Down));
+	neighbors.push_back(GetTargetTileCoord(tile, Direction::Left));
+	neighbors.push_back(GetTargetTileCoord(tile, Direction::Right));
+
+	return neighbors;
+}
+
+std::vector<Aegis::Vec2> GameplayLayer::GetNeighborTilesMoving(const Aegis::Vec2& tile)
+{
+	std::vector<Aegis::Vec2> neighbors;
+	Aegis::Vec2 up = tile + Aegis::Vec2(0, -1);
+	Aegis::Vec2 down = tile + Aegis::Vec2(0, 1);
+	Aegis::Vec2 left = tile + Aegis::Vec2(-1, 0);
+	Aegis::Vec2 right = tile + Aegis::Vec2(1, 0);
+	
+	if (tile_map_->GetTileByIndex(up.x, up.y)->type_ != Tile::Type::Wall) {
+		neighbors.push_back(up);
+	}
+	if (tile_map_->GetTileByIndex(down.x, down.y)->type_ != Tile::Type::Wall) {
+		neighbors.push_back(down);
+	}
+	if (tile_map_->GetTileByIndex(left.x, left.y)->type_ != Tile::Type::Wall) {
+		neighbors.push_back(left);
+	}
+	if (tile_map_->GetTileByIndex(right.x, right.y)->type_ != Tile::Type::Wall) {
+		neighbors.push_back(right);
+	}
+
+	return neighbors;
 }
 
 void GameplayLayer::SpawnPellets()
@@ -256,8 +301,10 @@ void GameplayLayer::LoadLevel(const std::string& file_path)
 	tile_map_ = std::make_unique<TileMap>(file_path, 32);
 
 	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
-	SetObjectOnGrid(enemy_, tile_map_->enemy_start_pos_);
-	GetEnemyTargetPos();
+	SetObjectOnGrid(brutus_, tile_map_->brutus_start_pos_);
+	SetObjectOnGrid(bjorne_, tile_map_->bjorne_start_pos_);
+	GetBrutusTargetPos();
+	GetBjorneTargetPos();
 
 	SpawnPellets();
 }
@@ -268,11 +315,15 @@ void GameplayLayer::ResetLevel()
 	queued_movement_ = -1;
 	player_.animation_.timer_.Stop();
 
-	enemy_.animation_.playing_ = false;
-	enemy_.animation_.timer_.Stop();
+	brutus_.animation_.playing_ = false;
+	brutus_.animation_.timer_.Stop();
+
+	bjorne_.animation_.playing_ = false;
+	bjorne_.animation_.timer_.Stop();
 
 	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
-	SetObjectOnGrid(enemy_, tile_map_->enemy_start_pos_);
+	SetObjectOnGrid(brutus_, tile_map_->brutus_start_pos_);
+	SetObjectOnGrid(bjorne_, tile_map_->bjorne_start_pos_);
 }
 
 void GameplayLayer::SaveLevel()

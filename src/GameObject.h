@@ -23,6 +23,9 @@ public:
 		:rect_{ x, y, w, h }
 	{
 		sprite_.pos_ = rect_.pos;
+		sprite_.texture_ = Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png");
+		sprite_.size_ = { 32, 32 };
+		sprite_.color_ = { 1.0f, 1.0f, 1.0f, 1.0f };
 	}
 		
 	virtual void Update();
@@ -57,28 +60,35 @@ public:
 	Player(int x, int y)
 		:GameObject(x,y,32,32)
 	{
-		sprite_.texture_ = Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png");
-		sprite_.size_ = { 32, 32 };
 		sprite_.tex_coords_ = { 96.0f, 0.0f, 128.0f, 32.0f };
-		sprite_.color_ = { 1.0f, 1.0f, 1.0f, 1.0f };
 	}
 	void Render(float delta_time) const override;
 };
 
-class Enemy : public GameObject
+class Brutus : public GameObject
 {
 public:
-	Enemy(int x, int y)
+	Brutus(int x, int y)
 		:GameObject(x, y, 32, 32)
 	{
-		sprite_.texture_ = Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png");
-		sprite_.size_ = { 32, 32 };
 		sprite_.tex_coords_ = { 128.0f, 0.0f, 160.0f, 32.0f };
-		sprite_.color_ = { 1.0f, 1.0f, 1.0f, 1.0f };
 		speed_ = .20f;
 
 	}
 	void Render(float delta_time) const override;
 
-	Aegis::Vec2 target_pos_;
+};
+
+class Bjorne : public GameObject
+{
+public:
+	Bjorne(int x, int y)
+		:GameObject(x, y, 32, 32)
+	{
+		sprite_.tex_coords_ = { 160.0f, 0.0f, 192.0f, 32.0f };
+		speed_ = .25f;
+
+	}
+	void Render(float delta_time) const override;
+
 };

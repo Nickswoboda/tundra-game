@@ -16,7 +16,7 @@ void GameObject::StartMoving()
 }
 
 
-void Enemy::Render(float delta_time) const
+void Brutus::Render(float delta_time) const
 {
 	Aegis::RenderSprite(sprite_);
 	Aegis::DrawQuad(grid_coord_ * 32, rect_.size, { 1.0f, 0.0f, 0.0f, 0.5f });
@@ -59,4 +59,10 @@ void Animation::Stop()
 {
 	playing_ = false;
 	timer_.Stop();
+}
+
+void Bjorne::Render(float delta_time) const
+{
+	Aegis::RenderSprite(sprite_);
+	Aegis::DrawQuad(grid_coord_ * 32, rect_.size, { 1.0f, 1.0f, 0.0f, 0.5f });
 }

@@ -30,8 +30,11 @@ TileMap::TileMap(const std::string& file_path, int tile_size)
 			case 'P': {
 				player_start_pos_ = Aegis::Vec2( col, row ); break;
 			}
-			case 'E': {
-				enemy_start_pos_ = Aegis::Vec2(col, row); break;
+			case 'B': {
+				bjorne_start_pos_ = Aegis::Vec2(col, row); break;
+			}
+			case 'C': {
+				brutus_start_pos_ = Aegis::Vec2(col, row); break;
 			}
 			case '0': {
 				tiles_[col].emplace_back(Wall(col * tile_size, row * tile_size)); ++col; break;

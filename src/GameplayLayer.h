@@ -25,9 +25,14 @@ public:
 	void OnRender(float delta_time) override;
 
 	void HandlePlayerMovement(int key_code);
-	void GetEnemyTargetPos();
-	Aegis::Vec2 GetTargetTileCoord(const GameObject& obj, Direction dir);
+	void GetBrutusTargetPos();
+	void GetBjorneTargetPos();
+	Aegis::Vec2 GetTargetTileCoord(const Aegis::Vec2& start, Direction dir);
+	Aegis::Vec2 GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding);
 	void SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos);
+
+	std::vector<Aegis::Vec2> GetNeighborTilesMoving(const Aegis::Vec2& tile);
+	std::vector<Aegis::Vec2> GetNeighborTilesSliding(const Aegis::Vec2& tile);
 
 	void SpawnPellets();
 	void LoadLevel(const std::string& file_path);
@@ -36,7 +41,8 @@ public:
 
 	Aegis::Camera camera_;
 	Player player_;
-	Enemy enemy_;
+	Brutus brutus_;
+	Bjorne bjorne_;
 	std::unique_ptr<TileMap> tile_map_;
 	int queued_movement_ = -1;
 	std::vector<Pellet> pellets_;
