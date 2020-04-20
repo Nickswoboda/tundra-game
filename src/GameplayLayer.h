@@ -25,9 +25,8 @@ public:
 	void OnRender(float delta_time) override;
 
 	void HandlePlayerMovement(int key_code);
-	void GetBrutusTargetPos();
-	void GetBjorneTargetPos();
-	Aegis::Vec2 GetTargetTileCoord(const Aegis::Vec2& start, Direction dir) const;
+	void GetEnemyTargetPos(GameObject& obj);
+	Aegis::Vec2 GetSlidingTargetTile(const Aegis::Vec2& start, Direction dir) const;
 	Aegis::Vec2 GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding) const;
 	void SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos);
 

@@ -26,14 +26,14 @@ void GameplayLayer::OnUpdate()
 		brutus_.Update();
 	}
 	else {
-		GetBrutusTargetPos();
+		GetEnemyTargetPos(brutus_);
 	}
 
 	if (bjorne_.animation_.playing_) {
 		bjorne_.Update();
 	}
 	else {
-		GetBjorneTargetPos();
+		GetEnemyTargetPos(bjorne_);
 	}
 
 	if (Aegis::AABBHasCollided(player_.rect_, brutus_.rect_) || Aegis::AABBHasCollided(player_.rect_, bjorne_.rect_)) {
@@ -127,28 +127,22 @@ void GameplayLayer::HandlePlayerMovement(int key_code)
 	case GLFW_KEY_RIGHT: dir = Direction::Right;  break;
 	}
 
-	if (player_.grid_coord_ == GetTargetTileCoord(player_.grid_coord_, dir)) {
+	if (player_.grid_coord_ == GetSlidingTargetTile(player_.grid_coord_, dir)) {
 		return;
 	}
 	else {
-		player_.grid_coord_ = GetTargetTileCoord(player_.grid_coord_, dir);
+		player_.grid_coord_ = GetSlidingTargetTile(player_.grid_coord_, dir);
 		player_.StartMoving();
 	}
 }
 
-void GameplayLayer::GetBrutusTargetPos()
+void GameplayLayer::GetEnemyTargetPos(GameObject& obj)
 {
-	brutus_.grid_coord_ = GetTargetTileCoordBFS(brutus_.grid_coord_, player_.grid_coord_, false);
-	brutus_.StartMoving();
+	obj.grid_coord_ = GetTargetTileCoordBFS(obj.grid_coord_, player_.grid_coord_, obj.slides_on_ice_);
+	obj.StartMoving();
 }
 
-void GameplayLayer::GetBjorneTargetPos()
-{
-	bjorne_.grid_coord_ = GetTargetTileCoordBFS(bjorne_.grid_coord_, player_.grid_coord_, true);
-	bjorne_.StartMoving();
-}
-
-Aegis::Vec2 GameplayLayer::GetTargetTileCoord(const Aegis::Vec2& start, Direction dir) const
+Aegis::Vec2 GameplayLayer::GetSlidingTargetTile(const Aegis::Vec2& start, Direction dir) const
 {
 	int x_index = start.x;
 	int y_index = start.y;
@@ -205,13 +199,11 @@ std::string ToString(const Aegis::Vec2 val) {
 	return std::to_string(val.x) + std::to_string(val.y);
 }
 
-Aegis::Vec2 GameplayLayer::GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding) const
+Aegis::Vec2 GameplayLayer::GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool slides) const
 {
 	std::vector<Aegis::Vec2> frontier;
 	frontier.push_back(start);
 	std::unordered_map<std::string, Aegis::Vec2> parent;
-
-	parent[ToString(start)] = start;
 
 	while (!frontier.empty()) {
 		auto current = frontier[0];
@@ -221,12 +213,13 @@ Aegis::Vec2 GameplayLayer::GetTargetTileCoordBFS(const Aegis::Vec2& start, const
 			break;
 		}
 		std::vector<Aegis::Vec2> neighbors;
-		if (sliding) {
+		if (slides) {
 			neighbors = GetNeighborTilesSliding(current);
 		}
 		else {
 			neighbors = GetNeighborTilesMoving(current);
 		}
+
 		for (auto& neighbor : neighbors) {
 			if (parent.find(ToString(neighbor)) == parent.end()) {
 				frontier.push_back(neighbor);
@@ -252,10 +245,10 @@ void GameplayLayer::SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos)
 std::vector<Aegis::Vec2> GameplayLayer::GetNeighborTilesSliding(const Aegis::Vec2& tile) const
 {
 	std::vector<Aegis::Vec2> neighbors;
-	neighbors.push_back(GetTargetTileCoord(tile, Direction::Up));
-	neighbors.push_back(GetTargetTileCoord(tile, Direction::Down));
-	neighbors.push_back(GetTargetTileCoord(tile, Direction::Left));
-	neighbors.push_back(GetTargetTileCoord(tile, Direction::Right));
+	neighbors.push_back(GetSlidingTargetTile(tile, Direction::Up));
+	neighbors.push_back(GetSlidingTargetTile(tile, Direction::Down));
+	neighbors.push_back(GetSlidingTargetTile(tile, Direction::Left));
+	neighbors.push_back(GetSlidingTargetTile(tile, Direction::Right));
 
 	return neighbors;
 }
@@ -306,22 +299,18 @@ void GameplayLayer::LoadLevel(const std::string& file_path)
 	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
 	SetObjectOnGrid(brutus_, tile_map_->brutus_start_pos_);
 	SetObjectOnGrid(bjorne_, tile_map_->bjorne_start_pos_);
-	GetBrutusTargetPos();
-	GetBjorneTargetPos();
+	GetEnemyTargetPos(brutus_);
+	GetEnemyTargetPos(bjorne_);
 
 	SpawnPellets();
 }
 
 void GameplayLayer::ResetLevel()
 {
-	player_.animation_.Stop();
 	queued_movement_ = -1;
-	player_.animation_.current_frame = 0;
 
-	brutus_.animation_.playing_ = false;
+	player_.animation_.Stop();
 	brutus_.animation_.Stop();
-
-	bjorne_.animation_.playing_ = false;
 	bjorne_.animation_.Stop();
 
 	SetObjectOnGrid(player_, tile_map_->player_start_pos_);

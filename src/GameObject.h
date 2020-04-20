@@ -40,6 +40,7 @@ public:
 	Aegis::Vec2 grid_coord_;
 	//time to move 1 tile
 	float speed_ = 0.15f;
+	bool slides_on_ice_ = true;
 
 };
 
@@ -74,7 +75,7 @@ public:
 	{
 		sprite_.tex_coords_ = { 128.0f, 0.0f, 160.0f, 32.0f };
 		speed_ = .25f;
-
+		slides_on_ice_ = false;
 	}
 	void Render(float delta_time) const override;
 
