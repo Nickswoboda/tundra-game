@@ -1,5 +1,5 @@
 #include "GameplayScene.h"
-#include "MenuScene.h"
+
 #include <fstream>
 #include <iostream>
 #include <filesystem>
@@ -39,7 +39,6 @@ void GameplayScene::Update()
 	if (Aegis::AABBHasCollided(player_.rect_, brutus_.rect_) || Aegis::AABBHasCollided(player_.rect_, bjorne_.rect_)) {
 		--num_lives_;
 		if (num_lives_ == 0) {
-			manager_->PushScene(std::unique_ptr<Aegis::Scene>(new MenuScene()));
 			ResetLevel();
 			SpawnPellets();
 			num_lives_ = 3;
