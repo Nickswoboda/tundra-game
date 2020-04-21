@@ -1,10 +1,10 @@
-#include "GameplayState.h"
-#include "MenuState.h"
+#include "GameplayScene.h"
+#include "MenuScene.h"
 #include <fstream>
 #include <iostream>
 #include <filesystem>
-GameplayState::GameplayState(std::stack<std::unique_ptr<GameState>>& states)
-	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), world_camera_(0, 1280, 720, 0), ui_camera_(0, 1280, 720, 0), states_(states)
+GameplayScene::GameplayScene()
+	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), world_camera_(0, 1280, 720, 0), ui_camera_(0, 1280, 720, 0)
 {
 	auto& texmgr = Aegis::TextureManager::Instance();
 	texmgr.Load("assets/textures/tundra-tile-map.png");
@@ -12,7 +12,7 @@ GameplayState::GameplayState(std::stack<std::unique_ptr<GameState>>& states)
 	world_camera_.SetPosition({ -144, -24, 0 });
 }
 
-void GameplayState::Update()
+void GameplayScene::Update()
 {
 	if (player_.animation_.playing_) {
 		player_.Update();
@@ -39,8 +39,7 @@ void GameplayState::Update()
 	if (Aegis::AABBHasCollided(player_.rect_, brutus_.rect_) || Aegis::AABBHasCollided(player_.rect_, bjorne_.rect_)) {
 		--num_lives_;
 		if (num_lives_ == 0) {
-			std::cout << "You lose\n";
-			states_.emplace(std::make_unique<MenuState>(states_));
+			manager_->PushScene(std::unique_ptr<Aegis::Scene>(new MenuScene()));
 			ResetLevel();
 			SpawnPellets();
 			num_lives_ = 3;
@@ -67,7 +66,7 @@ void GameplayState::Update()
 
 	}
 }
-void GameplayState::OnEvent(Aegis::Event& event)
+void GameplayScene::OnEvent(Aegis::Event& event)
 {
 	auto key_event = dynamic_cast<Aegis::KeyEvent*>(&event);
 
@@ -107,7 +106,7 @@ void GameplayState::OnEvent(Aegis::Event& event)
 	}
 }
 
-void GameplayState::Render(float delta_time)
+void GameplayScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::BeginScene(world_camera_.view_projection_matrix_);
 	Aegis::RendererClear();
@@ -131,7 +130,7 @@ void GameplayState::Render(float delta_time)
 	Aegis::Renderer2D::EndScene();
 }
 
-void GameplayState::HandlePlayerMovement(int key_code)
+void GameplayScene::HandlePlayerMovement(int key_code)
 {
 	Direction dir = Direction::None;
 	switch (key_code)
@@ -151,13 +150,13 @@ void GameplayState::HandlePlayerMovement(int key_code)
 	}
 }
 
-void GameplayState::GetEnemyTargetPos(GameObject& obj)
+void GameplayScene::GetEnemyTargetPos(GameObject& obj)
 {
 	obj.grid_coord_ = GetTargetTileCoordBFS(obj.grid_coord_, player_.grid_coord_, obj.slides_on_ice_);
 	obj.StartMoving();
 }
 
-Aegis::Vec2 GameplayState::GetSlidingTargetTile(const Aegis::Vec2& start, Direction dir) const
+Aegis::Vec2 GameplayScene::GetSlidingTargetTile(const Aegis::Vec2& start, Direction dir) const
 {
 	int x_index = start.x;
 	int y_index = start.y;
@@ -214,7 +213,7 @@ std::string ToString(const Aegis::Vec2 val) {
 	return std::to_string(val.x) + std::to_string(val.y);
 }
 
-Aegis::Vec2 GameplayState::GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool slides) const
+Aegis::Vec2 GameplayScene::GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool slides) const
 {
 	std::vector<Aegis::Vec2> frontier;
 	frontier.push_back(start);
@@ -251,13 +250,13 @@ Aegis::Vec2 GameplayState::GetTargetTileCoordBFS(const Aegis::Vec2& start, const
 	return path_start;
 }
 
-void GameplayState::SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos)
+void GameplayScene::SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos)
 {
 	obj.grid_coord_ = pos;
 	obj.SetPosition(pos * tile_map_->tile_size_);
 }
 
-std::vector<Aegis::Vec2> GameplayState::GetNeighborTilesSliding(const Aegis::Vec2& tile) const
+std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesSliding(const Aegis::Vec2& tile) const
 {
 	std::vector<Aegis::Vec2> neighbors;
 	neighbors.push_back(GetSlidingTargetTile(tile, Direction::Up));
@@ -268,7 +267,7 @@ std::vector<Aegis::Vec2> GameplayState::GetNeighborTilesSliding(const Aegis::Vec
 	return neighbors;
 }
 
-std::vector<Aegis::Vec2> GameplayState::GetNeighborTilesMoving(const Aegis::Vec2& tile) const
+std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesMoving(const Aegis::Vec2& tile) const
 {
 	std::vector<Aegis::Vec2> neighbors;
 	Aegis::Vec2 up = tile + Aegis::Vec2(0, -1);
@@ -292,7 +291,7 @@ std::vector<Aegis::Vec2> GameplayState::GetNeighborTilesMoving(const Aegis::Vec2
 	return neighbors;
 }
 
-void GameplayState::SpawnPellets()
+void GameplayScene::SpawnPellets()
 {
 	if (!pellets_.empty()) {
 		pellets_.clear();
@@ -307,7 +306,7 @@ void GameplayState::SpawnPellets()
 	}
 }
 
-void GameplayState::LoadLevel(const std::string& file_path)
+void GameplayScene::LoadLevel(const std::string& file_path)
 {
 	tile_map_ = std::make_unique<TileMap>(file_path, 32);
 
@@ -320,7 +319,7 @@ void GameplayState::LoadLevel(const std::string& file_path)
 	SpawnPellets();
 }
 
-void GameplayState::ResetLevel()
+void GameplayScene::ResetLevel()
 {
 	queued_movement_ = -1;
 
@@ -333,7 +332,7 @@ void GameplayState::ResetLevel()
 	SetObjectOnGrid(bjorne_, tile_map_->bjorne_start_pos_);
 }
 
-void GameplayState::SaveLevel() const
+void GameplayScene::SaveLevel() const
 {
 	int level = 1;
 	std::string new_file_path = "C:/dev/tundra/assets/levels/level" + std::to_string(level) + ".txt";

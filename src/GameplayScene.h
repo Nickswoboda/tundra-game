@@ -1,5 +1,3 @@
-#include "GameState.h"
-
 #include "GameObject.h"
 #include "TileMap.h"
 #include <stack>
@@ -12,11 +10,11 @@ enum class Direction {
 	Right
 };
 
-class GameplayState : public GameState
+class GameplayScene : public Aegis::Scene
 {
 public:
 
-	GameplayState(std::stack<std::unique_ptr<GameState>>& states);
+	GameplayScene();
 
 	void Update() override;
 	void Render(float delta_time) override;
@@ -45,5 +43,4 @@ public:
 	int queued_movement_ = -1;
 	std::vector<Pellet> pellets_;
 	int num_lives_ = 3;
-	std::stack<std::unique_ptr<GameState>>& states_;
 };
