@@ -1,11 +1,6 @@
 #include "GameObject.h"
 
 static const int TILE_SIZE = 32;
-void Player::Render(float delta_time) const
-{
-	Aegis::RenderSprite(sprite_);
-	Aegis::DrawQuad(grid_coord_ * TILE_SIZE, rect_.size, { 0.0f, 1.0f, 0.0f, 0.5f });
-}
 
 void GameObject::StartMoving()
 {
@@ -16,11 +11,22 @@ void GameObject::StartMoving()
 	animation_.Start(rect_.pos, grid_coord_ * TILE_SIZE, speed_ * num_tiles);
 }
 
+void Player::Render(float delta_time) const
+{
+	Aegis::RenderSprite(sprite_);
+	//Aegis::DrawQuad(grid_coord_ * TILE_SIZE, rect_.size, { 0.0f, 1.0f, 0.0f, 0.5f });
+}
 
 void Brutus::Render(float delta_time) const
 {
 	Aegis::RenderSprite(sprite_);
-	Aegis::DrawQuad(grid_coord_ * TILE_SIZE, rect_.size, { 1.0f, 0.0f, 0.0f, 0.5f });
+	//Aegis::DrawQuad(grid_coord_ * TILE_SIZE, rect_.size, { 1.0f, 0.0f, 0.0f, 0.5f });
+}
+
+void Bjorne::Render(float delta_time) const
+{
+	Aegis::RenderSprite(sprite_);
+	//Aegis::DrawQuad(grid_coord_ * TILE_SIZE, rect_.size, { 1.0f, 1.0f, 0.0f, 0.5f });
 }
 
 void GameObject::Update()
@@ -61,8 +67,3 @@ void Animation::Stop()
 	current_frame = 0;
 }
 
-void Bjorne::Render(float delta_time) const
-{
-	Aegis::RenderSprite(sprite_);
-	Aegis::DrawQuad(grid_coord_ * TILE_SIZE, rect_.size, { 1.0f, 1.0f, 0.0f, 0.5f });
-}

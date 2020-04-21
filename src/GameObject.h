@@ -74,7 +74,7 @@ public:
 		:GameObject(x, y, 32, 32)
 	{
 		sprite_.tex_coords_ = { 128.0f, 0.0f, 160.0f, 32.0f };
-		speed_ = .25f;
+		speed_ = .30f;
 		slides_on_ice_ = false;
 	}
 	void Render(float delta_time) const override;
@@ -88,7 +88,7 @@ public:
 		:GameObject(x, y, 32, 32)
 	{
 		sprite_.tex_coords_ = { 160.0f, 0.0f, 192.0f, 32.0f };
-		speed_ = .20f;
+		speed_ = .25f;
 
 	}
 	void Render(float delta_time) const override;
