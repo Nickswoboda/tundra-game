@@ -12,7 +12,7 @@ add_executable (Tundra
 	"src/GameObject.h"
 	"src/TileMap.h"
 	"src/TileMap.cpp"
-	"src/Tile.h")
+	"src/Tile.h" "src/GameplayState.cpp" "src/MenuState.cpp")
 
 target_link_libraries(Tundra Aegis)
 
