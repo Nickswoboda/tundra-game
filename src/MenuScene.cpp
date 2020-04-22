@@ -50,12 +50,11 @@ void MenuScene::OnEvent(Aegis::Event& event)
 	if (mouse_event && mouse_event->action_ == AE_BUTTON_PRESS) {
 		Aegis::Vec2 mouse_pos = Aegis::Application::GetMousePos();
 
-		Aegis::AABB rect = { mouse_pos.x, mouse_pos.y, 1, 1 };
-		if (Aegis::AABBHasCollided(rect, new_game_button_->rect_)) {
+		if (Aegis::PointInAABB(mouse_pos, new_game_button_->rect_)) {
 			new_game_button_->callback_();
 		}
 
-		if (Aegis::AABBHasCollided(rect, exit_button_->rect_)) {
+		if (Aegis::PointInAABB(mouse_pos, exit_button_->rect_)) {
 			exit_button_->callback_();
 		}
 
