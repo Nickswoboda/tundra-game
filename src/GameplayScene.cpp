@@ -42,6 +42,7 @@ void GameplayScene::Update()
 			ResetLevel();
 			SpawnPellets();
 			num_lives_ = 3;
+			manager_->PopScene();
 			return;
 		}
 		else {

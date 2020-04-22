@@ -10,9 +10,11 @@ MenuScene::MenuScene()
 	button_font_ = FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
 	new_game_button_ = new Button({ 580, 150, 200, 32 }, "-New Game", button_font_);
+	new_game_button_->callback_ = std::bind([&] {manager_->PushScene(std::unique_ptr<Aegis::Scene>(new GameplayScene())); });
 	level_select_button_ = new Button({ 580, 190, 200, 32 }, "-Level Select", button_font_);
 	options_button_ = new Button({ 580, 230, 200, 32 }, "-Options", button_font_);
 	exit_button_ = new Button({ 580, 270, 200, 32 }, "-Quit", button_font_);
+	exit_button_->callback_ = std::bind([] { Aegis::Application::Quit(); });
 }
 
 void MenuScene::Update()
@@ -42,4 +44,23 @@ void MenuScene::OnEvent(Aegis::Event& event)
 			manager_->PushScene(std::unique_ptr<Aegis::Scene>(new GameplayScene()));
 		}
 	}
+
+	auto mouse_event = dynamic_cast<Aegis::MouseClickEvent*>(&event);
+
+	if (mouse_event && mouse_event->action_ == AE_BUTTON_PRESS) {
+		Aegis::Vec2 mouse_pos = Aegis::Application::GetMousePos();
+
+		Aegis::AABB rect = { mouse_pos.x, mouse_pos.y, 1, 1 };
+		if (Aegis::AABBHasCollided(rect, new_game_button_->rect_)) {
+			std::cout << "button press\n";
+			new_game_button_->callback_();
+		}
+
+		if (Aegis::AABBHasCollided(rect, exit_button_->rect_)) {
+			std::cout << "button press\n";
+			exit_button_->callback_();
+		}
+
+	}
+
 }
