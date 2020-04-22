@@ -52,12 +52,10 @@ void MenuScene::OnEvent(Aegis::Event& event)
 
 		Aegis::AABB rect = { mouse_pos.x, mouse_pos.y, 1, 1 };
 		if (Aegis::AABBHasCollided(rect, new_game_button_->rect_)) {
-			std::cout << "button press\n";
 			new_game_button_->callback_();
 		}
 
 		if (Aegis::AABBHasCollided(rect, exit_button_->rect_)) {
-			std::cout << "button press\n";
 			exit_button_->callback_();
 		}
 

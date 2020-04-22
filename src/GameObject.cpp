@@ -58,7 +58,7 @@ void Animation::Update()
 {
 	++current_frame;
 	float percentage = current_frame / (float)total_frames;
-	current_value_ = Aegis::EaseInQuad(start_value_, end_value_, percentage);
+	current_value_ = Aegis::LERP(start_value_, end_value_, percentage);
 }
 
 void Animation::Stop()
