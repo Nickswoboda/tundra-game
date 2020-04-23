@@ -10,6 +10,20 @@ Button::Button(Aegis::AABB rect, std::string text, std::shared_ptr<Aegis::Font> 
 {
 }
 
+bool Button::IsPressed(int action)
+{
+	if (Aegis::PointInAABB(Aegis::Application::GetMousePos(), rect_)) {
+		if (action == AE_BUTTON_PRESS) {
+			pressed_ = true;
+		}
+		else if (action == AE_BUTTON_RELEASE) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void Button::Render()
 {
 	Aegis::Renderer2D::SetDefaultFont(font_);

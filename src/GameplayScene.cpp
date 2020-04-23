@@ -39,9 +39,6 @@ void GameplayScene::Update()
 	if (Aegis::AABBHasCollided(player_.rect_, brutus_.rect_) || Aegis::AABBHasCollided(player_.rect_, bjorne_.rect_)) {
 		--num_lives_;
 		if (num_lives_ == 0) {
-			ResetLevel();
-			SpawnPellets();
-			num_lives_ = 3;
 			manager_->PopScene();
 			return;
 		}
