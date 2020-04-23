@@ -3,12 +3,13 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
-GameplayScene::GameplayScene()
+GameplayScene::GameplayScene(int level)
 	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), world_camera_(0, 1280, 720, 0), ui_camera_(0, 1280, 720, 0)
 {
 	auto& texmgr = Aegis::TextureManager::Instance();
 	texmgr.Load("assets/textures/tundra-tile-map.png");
-	LoadLevel("assets/levels/level2.txt");
+	if (level > 1) level = 1;
+	LoadLevel("assets/levels/level" + std::to_string(level + 1) + ".txt");
 	world_camera_.SetPosition({ -144, -24, 0 });
 }
 
@@ -53,7 +54,6 @@ void GameplayScene::Update()
 			if (pellets_.size() == 0) {
 				player_.animation_.playing_ = false;
 				queued_movement_ = -1;
-				LoadLevel("assets/levels/level1.txt");
 				return;
 			}
 		}
@@ -77,7 +77,8 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 			SpawnPellets();
 		}
 		if (key == AE_KEY_R || key == AE_KEY_T || key == AE_KEY_Y) {
-			auto mouse_pos = Aegis::Application::GetMousePos();
+			//adjust for camera movement
+			auto mouse_pos = Aegis::Application::GetMousePos() - Aegis::Vec2(144, 24);
 			auto tile = tile_map_->GetTileByPos(mouse_pos.x, mouse_pos.y);
 
 			if (tile != nullptr) {

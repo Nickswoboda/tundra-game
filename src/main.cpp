@@ -1,4 +1,4 @@
-#include "MenuScene.h"
+#include "Scenes/MenuScene.h"
 
 int main()
 {

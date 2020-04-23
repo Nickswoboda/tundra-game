@@ -1,5 +1,5 @@
-#include "GameObject.h"
-#include "TileMap.h"
+#include "../GameObject.h"
+#include "../TileMap.h"
 #include <stack>
 #include <memory>
 enum class Direction {
@@ -14,7 +14,7 @@ class GameplayScene : public Aegis::Scene
 {
 public:
 
-	GameplayScene();
+	GameplayScene(int level);
 
 	void Update() override;
 	void Render(float delta_time) override;

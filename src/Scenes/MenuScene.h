@@ -2,12 +2,13 @@
 
 #include "src/Aegis.h"
 
-#include "Button.h"
+#include "../Button.h"
 
 class MenuScene : public Aegis::Scene
 {
 public:
 	MenuScene();
+	~MenuScene();
 
 	void Update() override;
 	void Render(float delta_time) override;

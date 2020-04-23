@@ -1,7 +1,8 @@
 #include "MenuScene.h"
 
-#include "FontManager.h"
+#include "../FontManager.h"
 #include "GameplayScene.h"
+#include "LevelSelectScene.h"
 
 MenuScene::MenuScene() 
 	:camera_(0, 1280, 720, 0)
@@ -13,6 +14,14 @@ MenuScene::MenuScene()
 	level_select_button_ = new Button({ 580, 190, 200, 32 }, "-Level Select", button_font_);
 	options_button_ = new Button({ 580, 230, 200, 32 }, "-Options", button_font_);
 	exit_button_ = new Button({ 580, 270, 200, 32 }, "-Quit", button_font_);
+}
+
+MenuScene::~MenuScene()
+{
+	delete new_game_button_;
+	delete level_select_button_;
+	delete options_button_;
+	delete exit_button_;
 }
 
 void MenuScene::Update()
@@ -37,22 +46,19 @@ void MenuScene::Render(float delta_time)
 
 void MenuScene::OnEvent(Aegis::Event& event)
 {
-	auto key_event = dynamic_cast<Aegis::KeyEvent*>(&event);
-	if (key_event) {
-		if (key_event->key_ == AE_KEY_ENTER && key_event->action_ == AE_BUTTON_PRESS) {
-			manager_->PushScene(std::unique_ptr<Aegis::Scene>(new GameplayScene()));
-		}
-	}
+	auto click_event = dynamic_cast<Aegis::MouseClickEvent*>(&event);
 
-	auto mouse_event = dynamic_cast<Aegis::MouseClickEvent*>(&event);
+	if (click_event) {
 
-	if (mouse_event) {
-
-		if (new_game_button_->IsPressed(mouse_event->action_)) {
-			manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene()));
+		if (new_game_button_->IsPressed(click_event->action_)) {
+			manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(0)));
 		}
 
-		if (exit_button_->IsPressed(mouse_event->action_)) {
+		if (level_select_button_->IsPressed(click_event->action_)) {
+			manager_->PushScene(std::unique_ptr<Scene>(new LevelSelectScene()));
+		}
+
+		if (exit_button_->IsPressed(click_event->action_)) {
 			Aegis::Application::Quit();
 		}
 	}

@@ -10,8 +10,8 @@ add_executable (Tundra
 	"src/GameObject.h"
 	"src/TileMap.h"
 	"src/TileMap.cpp"
-	"src/Tile.h" "src/GameplayScene.cpp" "src/MenuScene.cpp"
-	"src/FontManager.h" "src/Button.cpp")
+	"src/Tile.h" "src/Scenes/GameplayScene.cpp" "src/Scenes/MenuScene.cpp"
+	"src/FontManager.h" "src/Button.cpp" "src/Scenes/LevelSelectScene.cpp")
 
 target_link_libraries(Tundra Aegis)
 
