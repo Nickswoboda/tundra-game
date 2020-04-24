@@ -34,7 +34,6 @@ public:
 	void ResetLevel();
 	void SaveLevel() const;
 
-	Aegis::Camera world_camera_;
 	Aegis::Camera ui_camera_;
 	Player player_;
 	Brutus brutus_;

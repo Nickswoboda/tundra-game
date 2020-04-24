@@ -2,7 +2,6 @@
 
 #include "src/Aegis.h"
 
-#include "../Button.h"
 #include <memory>
 class LevelSelectScene : public Aegis::Scene
 {
@@ -17,12 +16,9 @@ public:
 	std::shared_ptr<Aegis::Font> title_font_;
 	std::shared_ptr<Aegis::Font> button_font_;
 
-	std::vector<Button*> level_buttons_;
-	Button* back_button_;
-	Button* select_button_;
-
-
+	std::vector<Aegis::Button*> level_buttons_;
+	Aegis::Button* back_button_;
+	Aegis::Button* select_button_;
 
 	int selected_level_ = -1;
-	Aegis::Camera camera_;
 };

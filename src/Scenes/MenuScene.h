@@ -2,8 +2,6 @@
 
 #include "src/Aegis.h"
 
-#include "../Button.h"
-
 class MenuScene : public Aegis::Scene
 {
 public:
@@ -17,11 +15,8 @@ public:
 	std::shared_ptr<Aegis::Font> title_font_;
 	std::shared_ptr<Aegis::Font> button_font_;
 
-	Button* new_game_button_;
-	Button* level_select_button_;
-	Button* options_button_;
-	Button* exit_button_;
-
-	Aegis::Camera camera_;
-
+	Aegis::Button* new_game_button_;
+	Aegis::Button* level_select_button_;
+	Aegis::Button* options_button_;
+	Aegis::Button* exit_button_;
 };

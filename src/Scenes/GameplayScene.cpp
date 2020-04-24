@@ -4,13 +4,13 @@
 #include <iostream>
 #include <filesystem>
 GameplayScene::GameplayScene(int level)
-	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), world_camera_(0, 1280, 720, 0), ui_camera_(0, 1280, 720, 0)
+	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), ui_camera_(0, 1280, 720, 0)
 {
 	auto& texmgr = Aegis::TextureManager::Instance();
 	texmgr.Load("assets/textures/tundra-tile-map.png");
 	if (level > 1) level = 1;
 	LoadLevel("assets/levels/level" + std::to_string(level + 1) + ".txt");
-	world_camera_.SetPosition({ -144, -24, 0 });
+	camera_.SetPosition({ -144, -24, 0 });
 }
 
 void GameplayScene::Update()
@@ -106,9 +106,8 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 
 void GameplayScene::Render(float delta_time)
 {
-	Aegis::Renderer2D::BeginScene(world_camera_.view_projection_matrix_);
+	Aegis::Renderer2D::BeginScene(camera_.view_projection_matrix_);
 	Aegis::RendererClear();
-
 	tile_map_->Render();
 	player_.Render(delta_time);
 	brutus_.Render(delta_time);
@@ -120,7 +119,7 @@ void GameplayScene::Render(float delta_time)
 	Aegis::Renderer2D::EndScene();
 
 	Aegis::Renderer2D::BeginScene(ui_camera_.view_projection_matrix_);
-
+	
 	for (int i = 0; i < num_lives_; ++i) {
 		Aegis::DrawQuad({ 20 + (float) i * 22, 675 }, { 20, 20 }, { 1.0f, 0.1f, 0.1f, 1.0f });
 	}
@@ -237,6 +236,11 @@ Aegis::Vec2 GameplayScene::GetTargetTileCoordBFS(const Aegis::Vec2& start, const
 				parent[ToString(neighbor)] = current;
 			}
 		}
+	}
+	//if no path available
+	if (parent[ToString(end)] == Aegis::Vec2(0, 0)) {
+		std::cout << "Unable to find path BFS";
+		return start;
 	}
 
 	Aegis::Vec2 path_start = end;
