@@ -3,6 +3,7 @@
 #include "../FontManager.h"
 #include "GameplayScene.h"
 #include "LevelSelectScene.h"
+#include "OptionsScene.h"
 
 MenuScene::MenuScene() 
 {
@@ -55,6 +56,10 @@ void MenuScene::OnEvent(Aegis::Event& event)
 
 		if (level_select_button_->IsPressed(click_event->action_)) {
 			manager_->PushScene(std::unique_ptr<Scene>(new LevelSelectScene()));
+		}
+
+		if (options_button_->IsPressed(click_event->action_)) {
+			manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene()));
 		}
 
 		if (exit_button_->IsPressed(click_event->action_)) {
