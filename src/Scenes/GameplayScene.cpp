@@ -4,7 +4,7 @@
 #include <iostream>
 #include <filesystem>
 GameplayScene::GameplayScene(int level)
-	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), ui_camera_(0, 1280, 720, 0)
+	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), ui_camera_(0, 1600, 900, 0)
 {
 	auto& texmgr = Aegis::TextureManager::Instance();
 	texmgr.Load("assets/textures/tundra-tile-map.png");
