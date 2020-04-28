@@ -2,6 +2,8 @@
 
 #include "src/Aegis.h"
 
+#include "../Dropdown.h"
+
 class OptionsScene : public Aegis::Scene
 {
 public:
@@ -27,6 +29,7 @@ public:
 	Aegis::Button* res1600_900;
 	Aegis::Button* res1920_1080;
 
+	Dropdown* screen_mode_dropdown_;
 
 	bool vsync_ = false;
 };
