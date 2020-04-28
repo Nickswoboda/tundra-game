@@ -19,17 +19,11 @@ public:
 	std::shared_ptr<Aegis::Font> title_font_;
 	std::shared_ptr<Aegis::Font> button_font_;
 
-	Aegis::Button* windowed_button_;
-	Aegis::Button* fullscreen_button_;
-	Aegis::Button* fullscreen_windowed_button_;
 	Aegis::Button* toggle_vsync_button_;
 	Aegis::Button* back_button_;
 
-	Aegis::Button* res1280_720;
-	Aegis::Button* res1600_900;
-	Aegis::Button* res1920_1080;
-
 	Dropdown* screen_mode_dropdown_;
+	Dropdown* resolution_dropdown_;
 
 	bool vsync_ = false;
 };

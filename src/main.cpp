@@ -3,8 +3,8 @@
 
 int main()
 {
-	Aegis::Application app(1600, 900);
+	Aegis::Application app(1280, 720);
 	app.ShowFrameTime(true);
-	app.PushScene(std::unique_ptr<Aegis::Scene>(new OptionsScene()));
+	app.PushScene(std::unique_ptr<Aegis::Scene>(new MenuScene()));
 	app.Run();
 }
