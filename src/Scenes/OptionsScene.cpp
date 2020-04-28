@@ -7,17 +7,17 @@ OptionsScene::OptionsScene()
 	title_font_ = FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 64);
 	button_font_ = FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
-	screen_mode_dropdown_ = new Dropdown({ 820, 150, 200, 32 });
+	screen_mode_dropdown_ = new Dropdown("Screen Mode", { 580, 150, 200, 32 });
 	screen_mode_dropdown_->AddItem("Windowed", []() {Aegis::Application::SetFullscreen(Aegis::ScreenMode::Windowed); });
 	screen_mode_dropdown_->AddItem("Fullscreen", []() {Aegis::Application::SetFullscreen(Aegis::ScreenMode::Fullscreen); });
 	screen_mode_dropdown_->AddItem("Fullscreen Windowed", []() {Aegis::Application::SetFullscreen(Aegis::ScreenMode::FullscreenWindow); });
 
-	resolution_dropdown_ = new Dropdown({ { 780, 260, 200, 32 } });
+	resolution_dropdown_ = new Dropdown("Resolution", { 580, 260, 200, 32 });
 	resolution_dropdown_->AddItem("1280x720", [&]() {SetResolution(1280, 720); });
 	resolution_dropdown_->AddItem("1600x900", [&]() {SetResolution(1600, 900); });
 	resolution_dropdown_->AddItem("1920x1080", [&]() {SetResolution(1920, 1080); });
 
-	toggle_vsync_button_ = new Aegis::Button({ 780, 400, 200, 32 }, "On", button_font_);
+	toggle_vsync_button_ = new Aegis::Button({ 780, 400, 200, 32 }, "Off", button_font_);
 	vsync_ = Aegis::Application::IsVsync();
 
 	back_button_ = new Aegis::Button({ 580, 600, 200, 32 }, "Back", button_font_);
@@ -43,11 +43,8 @@ void OptionsScene::Render(float delta_time)
 	Aegis::DrawText("Options", { 500, 20 }, { 1.0f, 1.0f, 1.0f, 1.0f });
 
 	Aegis::Renderer2D::SetFont(button_font_);
-
-	Aegis::DrawText("Screen Mode: ", { 580, screen_mode_dropdown_->pos_.y }, { 1.0f, 1.0f, 1.0f, 1.0f });
 	screen_mode_dropdown_->Render();
 
-	Aegis::DrawText("Resolution: ", { 580, resolution_dropdown_->pos_.y }, { 1.0f, 1.0f, 1.0f, 1.0f });
 	resolution_dropdown_->Render();
 
 	Aegis::DrawText("Vsync: ", { 580, toggle_vsync_button_->rect_.pos.y }, { 1.0f, 1.0f, 1.0f, 1.0f });

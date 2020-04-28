@@ -9,7 +9,7 @@
 class Dropdown
 {
 public:
-	Dropdown(Aegis::AABB rect);
+	Dropdown(const std::string& label, Aegis::AABB rect);
 	~Dropdown();
 
 	void Render();
@@ -24,5 +24,7 @@ public:
 	Aegis::Vec2 pos_;
 	Aegis::Vec2 size_;
 	int current_item_index = 0;
+	std::string label_;
 	bool collapsed_ = true;
+	int button_pos_offset_;
 };
