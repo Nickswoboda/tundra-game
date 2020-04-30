@@ -78,7 +78,7 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 		}
 		if (key == AE_KEY_R || key == AE_KEY_T || key == AE_KEY_Y) {
 			//adjust for camera movement
-			auto mouse_pos = Aegis::Application::GetMousePos() - Aegis::Vec2(144, 24);
+			auto mouse_pos = Aegis::Application::GetWindow().GetMousePos() - Aegis::Vec2(144, 24);
 			auto tile = tile_map_->GetTileByPos(mouse_pos.x, mouse_pos.y);
 
 			if (tile != nullptr) {

@@ -8,22 +8,19 @@ OptionsScene::OptionsScene()
 	button_font_ = FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
 	screen_mode_dropdown_ = new Dropdown("Screen Mode", { 580, 150, 200, 32 });
-	screen_mode_dropdown_->AddItem("Windowed", []() {Aegis::Application::SetFullscreen(Aegis::ScreenMode::Windowed); });
-	screen_mode_dropdown_->AddItem("Fullscreen", []() {Aegis::Application::SetFullscreen(Aegis::ScreenMode::Fullscreen); });
-	screen_mode_dropdown_->AddItem("Fullscreen Windowed", []() {Aegis::Application::SetFullscreen(Aegis::ScreenMode::FullscreenWindow); });
+	screen_mode_dropdown_->AddItem("Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Windowed); });
+	screen_mode_dropdown_->AddItem("Fullscreen", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Fullscreen); });
+	screen_mode_dropdown_->AddItem("Fullscreen Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::FullscreenWindow); });
 
 	resolution_dropdown_ = new Dropdown("Resolution", { 580, 260, 200, 32 });
 	resolution_dropdown_->AddItem("1280x720", [&]() {SetResolution(1280, 720); });
 	resolution_dropdown_->AddItem("1600x900", [&]() {SetResolution(1600, 900); });
 	resolution_dropdown_->AddItem("1920x1080", [&]() {SetResolution(1920, 1080); });
 
-	toggle_vsync_button_ = new Aegis::Button({ 780, 400, 200, 32 }, "Off", button_font_);
-	vsync_ = Aegis::Application::IsVsync();
+	vsync_ = Aegis::Application::GetWindow().IsVsync();
+	toggle_vsync_button_ = new Aegis::Button({ 780, 400, 200, 32 }, vsync_ ? "On" : "Off", button_font_);
 
 	back_button_ = new Aegis::Button({ 580, 600, 200, 32 }, "Back", button_font_);
-
-
-
 }
 
 OptionsScene::~OptionsScene()
@@ -60,12 +57,12 @@ void OptionsScene::OnEvent(Aegis::Event& event)
 	if (click_event) {
 		if (toggle_vsync_button_->IsPressed(click_event->action_)) {
 			if (vsync_) {
-				Aegis::Application::SetVsync(false);
+				Aegis::Application::GetWindow().SetVsync(false);
 				toggle_vsync_button_->text_ = "Off";
 				vsync_ = false;
 			}
 			else{
-				Aegis::Application::SetVsync(true);
+				Aegis::Application::GetWindow().SetVsync(true);
 				toggle_vsync_button_->text_ = "On";
 				vsync_ = true;
 			}
@@ -84,6 +81,9 @@ void OptionsScene::OnEvent(Aegis::Event& event)
 
 void OptionsScene::SetResolution(int x, int y)
 {
-	Aegis::Application::SetResolution(x, y);
+	Aegis::Application::GetWindow().SetResolution(x, y);
+	Aegis::Application::GetWindow().SetSize(x, y);
+	Aegis::Application::GetWindow().CenterWindowOnScreen();
 	camera_.SetProjection(0, x, y, 0);
+
 }
