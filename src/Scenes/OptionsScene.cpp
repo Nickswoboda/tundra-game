@@ -84,6 +84,6 @@ void OptionsScene::SetResolution(int x, int y)
 	Aegis::Application::GetWindow().SetResolution(x, y);
 	Aegis::Application::GetWindow().SetSize(x, y);
 	Aegis::Application::GetWindow().CenterWindowOnScreen();
-	camera_.SetProjection(0, x, y, 0);
+	manager_->UpdateAllCameraProjections(0, x, y, 0);
 
 }

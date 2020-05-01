@@ -4,7 +4,7 @@
 
 Dropdown::Dropdown(const std::string& label, Aegis::AABB rect)
 {
-	button_pos_offset_ = label.length() * 20;
+	button_pos_offset_ = FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32)->GetStringPixelWidth(label) + 15;
 	dropdown_button_ = new Aegis::Button({ rect.pos.x + button_pos_offset_, rect.pos.y, rect.size.x, rect.size.y });
 	pos_ = rect.pos;
 	size_ = rect.size;
