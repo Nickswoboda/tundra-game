@@ -3,8 +3,8 @@
 
 int main()
 {
-	Aegis::Application app(1280, 720);
-	app.ShowFrameTime(true);
-	app.PushScene(std::unique_ptr<Aegis::Scene>(new MenuScene()));
-	app.Run();
+	Aegis::Application::CreateWindow("Tundra", 1280, 720);
+	Aegis::Application::ShowFrameTime(true);
+	Aegis::Application::PushScene(std::unique_ptr<Aegis::Scene>(new MenuScene()));
+	Aegis::Application::Run();
 }
