@@ -10,7 +10,7 @@ OptionsScene::OptionsScene()
 	screen_mode_dropdown_->AddItem("Fullscreen", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Fullscreen); });
 	screen_mode_dropdown_->AddItem("Fullscreen Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::FullscreenWindow); });
 
-	resolution_dropdown_ = new Aegis::Dropdown("Resolution", { 580, 260, 200, 32 });
+	resolution_dropdown_ = new Aegis::Dropdown("Resolution", { 580, 210, 200, 32 });
 	resolution_dropdown_->AddItem("1280x720", [&]() {SetResolution(1280, 720); });
 	resolution_dropdown_->AddItem("1600x900", [&]() {SetResolution(1600, 900); });
 	resolution_dropdown_->AddItem("1920x1080", [&]() {SetResolution(1920, 1080); });
@@ -37,10 +37,17 @@ void OptionsScene::Render(float delta_time)
 	Aegis::Renderer2D::SetFont(title_font_);
 	Aegis::DrawText("Options", { 500, 20 }, { 1.0f, 1.0f, 1.0f, 1.0f });
 
-	Aegis::Renderer2D::SetFont(button_font_);
-	screen_mode_dropdown_->Render();
 
-	resolution_dropdown_->Render();
+	Aegis::Renderer2D::SetFont(button_font_);
+
+	if (!screen_mode_dropdown_->collapsed_) {
+		resolution_dropdown_->Render();
+		screen_mode_dropdown_->Render();
+	}
+	else{
+		screen_mode_dropdown_->Render();
+		resolution_dropdown_->Render();
+	}
 
 	Aegis::DrawText("Vsync: ", { 580, toggle_vsync_button_->rect_.pos.y }, { 1.0f, 1.0f, 1.0f, 1.0f });
 	toggle_vsync_button_->Render();
