@@ -1,12 +1,11 @@
 #include "LevelSelectScene.h"
 
-#include "../FontManager.h"
 #include "GameplayScene.h"
 
 LevelSelectScene::LevelSelectScene()
 {
-	title_font_ = FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 64);
-	button_font_ = FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
+	title_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 64);
+	button_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
 	back_button_ = new Aegis::Button({500, 650, 120, 30}, "Back", button_font_);
 	select_button_ = new Aegis::Button({ 640, 650, 120, 30 }, "Select", button_font_);

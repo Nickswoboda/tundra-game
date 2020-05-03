@@ -2,8 +2,6 @@
 
 #include "src/Aegis.h"
 
-#include "../Dropdown.h"
-
 class OptionsScene : public Aegis::Scene
 {
 public:
@@ -22,8 +20,8 @@ public:
 	Aegis::Button* toggle_vsync_button_;
 	Aegis::Button* back_button_;
 
-	Dropdown* screen_mode_dropdown_;
-	Dropdown* resolution_dropdown_;
+	Aegis::Dropdown* screen_mode_dropdown_;
+	Aegis::Dropdown* resolution_dropdown_;
 
 	bool vsync_ = false;
 };

@@ -1,18 +1,16 @@
 #include "OptionsScene.h"
 
-#include "../FontManager.h"
-
 OptionsScene::OptionsScene()
 {
-	title_font_ = FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 64);
-	button_font_ = FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
+	title_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 64);
+	button_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
-	screen_mode_dropdown_ = new Dropdown("Screen Mode", { 580, 150, 200, 32 });
+	screen_mode_dropdown_ = new Aegis::Dropdown("Screen Mode", { 580, 150, 200, 32 });
 	screen_mode_dropdown_->AddItem("Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Windowed); });
 	screen_mode_dropdown_->AddItem("Fullscreen", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Fullscreen); });
 	screen_mode_dropdown_->AddItem("Fullscreen Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::FullscreenWindow); });
 
-	resolution_dropdown_ = new Dropdown("Resolution", { 580, 260, 200, 32 });
+	resolution_dropdown_ = new Aegis::Dropdown("Resolution", { 580, 260, 200, 32 });
 	resolution_dropdown_->AddItem("1280x720", [&]() {SetResolution(1280, 720); });
 	resolution_dropdown_->AddItem("1600x900", [&]() {SetResolution(1600, 900); });
 	resolution_dropdown_->AddItem("1920x1080", [&]() {SetResolution(1920, 1080); });
@@ -83,7 +81,7 @@ void OptionsScene::SetResolution(int x, int y)
 {
 	Aegis::Application::GetWindow().SetResolution(x, y);
 	Aegis::Application::GetWindow().SetSize(x, y);
-	Aegis::Application::GetWindow().CenterWindowOnScreen();
+	Aegis::Application::GetWindow().CenterOnScreen();
 	manager_->UpdateAllCameraProjections(0, x, y, 0);
 
 }

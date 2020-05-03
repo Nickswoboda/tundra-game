@@ -1,14 +1,13 @@
 #include "MenuScene.h"
 
-#include "../FontManager.h"
 #include "GameplayScene.h"
 #include "LevelSelectScene.h"
 #include "OptionsScene.h"
 
 MenuScene::MenuScene() 
 {
-	title_font_ = FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 64);
-	button_font_ = FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
+	title_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 64);
+	button_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
 	new_game_button_ = new Aegis::Button({ 580, 150, 200, 32 }, "-New Game", button_font_);
 	level_select_button_ = new Aegis::Button({ 580, 190, 200, 32 }, "-Level Select", button_font_);
