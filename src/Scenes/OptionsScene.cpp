@@ -6,19 +6,31 @@ OptionsScene::OptionsScene()
 	button_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
 	screen_mode_dropdown_ = new Aegis::Dropdown("Screen Mode", { 580, 150, 200, 32 });
-	screen_mode_dropdown_->AddItem("Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Windowed); });
 	screen_mode_dropdown_->AddItem("Fullscreen", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Fullscreen); });
+	screen_mode_dropdown_->AddItem("Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Windowed); });
 	screen_mode_dropdown_->AddItem("Fullscreen Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::FullscreenWindow); });
+	screen_mode_dropdown_->SetCurrentIndex((int)Aegis::Application::GetWindow().GetScreenMode());
 
 	resolution_dropdown_ = new Aegis::Dropdown("Resolution", { 580, 210, 200, 32 });
 	resolution_dropdown_->AddItem("1280x720", [&]() {SetResolution(1280, 720); });
 	resolution_dropdown_->AddItem("1600x900", [&]() {SetResolution(1600, 900); });
 	resolution_dropdown_->AddItem("1920x1080", [&]() {SetResolution(1920, 1080); });
 
+
+	//quick way of determinning which item is shown first in dropdown. Will be removed when I get to implementing a true UI system
+	if (Aegis::Application::GetWindow().GetResolution().x == 1600){
+		resolution_dropdown_->SetCurrentIndex(1);
+	}
+	else if (Aegis::Application::GetWindow().GetResolution().x == 1920) {
+		resolution_dropdown_->SetCurrentIndex(2);
+	}
+
 	vsync_ = Aegis::Application::GetWindow().IsVsync();
 	toggle_vsync_button_ = new Aegis::Button({ 780, 400, 200, 32 }, vsync_ ? "On" : "Off", button_font_);
 
 	back_button_ = new Aegis::Button({ 580, 600, 200, 32 }, "Back", button_font_);
+
+
 }
 
 OptionsScene::~OptionsScene()
