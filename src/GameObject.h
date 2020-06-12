@@ -62,7 +62,7 @@ public:
 	Player(int x, int y)
 		:GameObject(x,y,32,32)
 	{
-		sprite_.tex_coords_ = { 96.0f, 0.0f, 128.0f, 32.0f };
+		sprite_.tex_coords_ = { 96.0f / 192.0f, 0.0f, 128.0f / 192.0f, 1.0f };
 	}
 	void Render(float delta_time) const override;
 };
@@ -73,7 +73,7 @@ public:
 	Brutus(int x, int y)
 		:GameObject(x, y, 32, 32)
 	{
-		sprite_.tex_coords_ = { 128.0f, 0.0f, 160.0f, 32.0f };
+		sprite_.tex_coords_ = { 128.0f / 192.0f, 0.0f, 160.0f / 192.0f, 1.0f };
 		speed_ = .30f;
 		slides_on_ice_ = false;
 	}
@@ -87,7 +87,7 @@ public:
 	Bjorne(int x, int y)
 		:GameObject(x, y, 32, 32)
 	{
-		sprite_.tex_coords_ = { 160.0f, 0.0f, 192.0f, 32.0f };
+		sprite_.tex_coords_ = { 160.0f / 192.0f, 0.0f, 1.0f, 1.0f };
 		speed_ = .25f;
 
 	}

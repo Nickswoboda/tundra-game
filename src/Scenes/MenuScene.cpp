@@ -33,7 +33,8 @@ void MenuScene::Render(float delta_time)
 	Aegis::RendererClear();
 
 	Aegis::Renderer2D::SetFont(title_font_);
-	Aegis::DrawText("TUNDRA", { 540, 70 }, { 1.0, 0.0, 0.0, 1.0f });
+
+	Aegis::DrawText("TUNDRA", { 540, 70 + (10 * 1) }, { 1.0, 1.0, 1.0, 1.0f });
 
 	new_game_button_->Render();
 	level_select_button_->Render();
