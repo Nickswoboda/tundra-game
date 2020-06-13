@@ -1,2 +1,5 @@
 .vs/
 out/
+
+.clangd/
+compile_commands.json
