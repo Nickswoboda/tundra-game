@@ -29,7 +29,7 @@ void MenuScene::Update()
 
 void MenuScene::Render(float delta_time)
 {
-	Aegis::Renderer2D::BeginScene(camera_.view_projection_matrix_);
+	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
 	Aegis::RendererClear();
 
 	Aegis::Renderer2D::SetFont(title_font_);
@@ -40,8 +40,6 @@ void MenuScene::Render(float delta_time)
 	level_select_button_->Render();
 	options_button_->Render();
 	exit_button_->Render();
-
-	Aegis::Renderer2D::EndScene();
 }	
 
 void MenuScene::OnEvent(Aegis::Event& event)

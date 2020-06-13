@@ -43,7 +43,7 @@ void OptionsScene::Update()
 
 void OptionsScene::Render(float delta_time)
 {
-	Aegis::Renderer2D::BeginScene(camera_.view_projection_matrix_);
+	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
 	Aegis::RendererClear();
 
 	Aegis::Renderer2D::SetFont(title_font_);
@@ -63,8 +63,6 @@ void OptionsScene::Render(float delta_time)
 	Aegis::DrawText("Vsync: ", { 580, toggle_vsync_button_->rect_.pos.y }, { 1.0f, 1.0f, 1.0f, 1.0f });
 	toggle_vsync_button_->Render();
 	back_button_->Render();
-
-	Aegis::Renderer2D::EndScene();
 }
 
 void OptionsScene::OnEvent(Aegis::Event& event)

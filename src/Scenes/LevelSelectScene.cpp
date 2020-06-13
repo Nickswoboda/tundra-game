@@ -33,7 +33,7 @@ void LevelSelectScene::Update()
 
 void LevelSelectScene::Render(float delta_time)
 {
-	Aegis::Renderer2D::BeginScene(camera_.view_projection_matrix_);
+	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
 	Aegis::RendererClear();
 
 	Aegis::Renderer2D::SetFont(title_font_);
@@ -51,9 +51,6 @@ void LevelSelectScene::Render(float delta_time)
 		auto size = level_buttons_[selected_level_]->rect_.size;
 		Aegis::DrawQuad(pos, size, { 1.0f, 1.0f, 1.0f, 0.4 });
 	}
-
-
-	Aegis::Renderer2D::EndScene();
 }
 
 void LevelSelectScene::OnEvent(Aegis::Event& event)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "src/Aegis.h"
+
 class Animation
 {
 public:
@@ -20,13 +21,9 @@ public:
 class GameObject
 {
 public:
-	GameObject(float x, float y, float w, float h)
-		:rect_{ x, y, w, h }
+	GameObject(float x, float y, float w, float h, Aegis::Vec2 subtex_pos = {0.0f, 0.0f})
+		:rect_{ x, y, w, h }, sprite_(rect_.pos, {w, h}, Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png"), subtex_pos)
 	{
-		sprite_.pos_ = rect_.pos;
-		sprite_.texture_ = Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png");
-		sprite_.size_ = { 32, 32 };
-		sprite_.color_ = { 1.0f, 1.0f, 1.0f, 1.0f };
 	}
 		
 	virtual void Update();
@@ -34,6 +31,7 @@ public:
 	virtual void SetPosition(Aegis::Vec2 pos);
 	virtual void StartMoving();
 	
+	std::shared_ptr<Aegis::Texture> spirte_sheet_;
 	Animation animation_;
 	Aegis::Sprite sprite_;
 	Aegis::AABB rect_;
@@ -60,9 +58,8 @@ class Player : public GameObject
 {
 public:
 	Player(int x, int y)
-		:GameObject(x,y,32,32)
+		:GameObject(x,y,32,32, {96, 0})
 	{
-		sprite_.tex_coords_ = { 96.0f / 192.0f, 0.0f, 128.0f / 192.0f, 1.0f };
 	}
 	void Render(float delta_time) const override;
 };
@@ -71,9 +68,8 @@ class Brutus : public GameObject
 {
 public:
 	Brutus(int x, int y)
-		:GameObject(x, y, 32, 32)
+		:GameObject(x, y, 32, 32, {128, 0})
 	{
-		sprite_.tex_coords_ = { 128.0f / 192.0f, 0.0f, 160.0f / 192.0f, 1.0f };
 		speed_ = .30f;
 		slides_on_ice_ = false;
 	}
@@ -85,9 +81,8 @@ class Bjorne : public GameObject
 {
 public:
 	Bjorne(int x, int y)
-		:GameObject(x, y, 32, 32)
+		:GameObject(x, y, 32, 32, {160, 0})
 	{
-		sprite_.tex_coords_ = { 160.0f / 192.0f, 0.0f, 1.0f, 1.0f };
 		speed_ = .25f;
 
 	}

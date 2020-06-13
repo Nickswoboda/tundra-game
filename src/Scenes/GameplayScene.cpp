@@ -106,7 +106,7 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 
 void GameplayScene::Render(float delta_time)
 {
-	Aegis::Renderer2D::BeginScene(camera_.view_projection_matrix_);
+	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
 	Aegis::RendererClear();
 	tile_map_->Render();
 	player_.Render(delta_time);
@@ -123,7 +123,7 @@ void GameplayScene::Render(float delta_time)
 	for (int i = 0; i < num_lives_; ++i) {
 		Aegis::DrawQuad({ 20 + (float) i * 22, 675 }, { 20, 20 }, { 1.0f, 0.1f, 0.1f, 1.0f });
 	}
-	Aegis::Renderer2D::EndScene();
+
 }
 
 void GameplayScene::HandlePlayerMovement(int key_code)
