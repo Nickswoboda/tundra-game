@@ -8,7 +8,9 @@ TileMap::TileMap(const std::string& file_path, int tile_size)
 	: tile_size_(tile_size, tile_size)
 {
 	tile_atlas_ = Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png");
-
+	tile_textures_.emplace_back(std::make_shared<Aegis::SubTexture>(tile_atlas_, Aegis::Vec2(0.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)));
+	tile_textures_.emplace_back(std::make_shared<Aegis::SubTexture>(tile_atlas_, Aegis::Vec2(64.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)));
+	tile_textures_.emplace_back(std::make_shared<Aegis::SubTexture>(tile_atlas_, Aegis::Vec2(32.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)));
 	std::ifstream file(file_path);
 	std::stringstream buffer;
 	buffer << file.rdbuf();
@@ -56,7 +58,7 @@ void TileMap::Render() const
 {
 	for (int col = 0; col < tiles_.size(); ++col) {
 		for (int row = 0; row < tiles_[col].size(); ++row) {
-			Aegis::DrawQuad(tiles_[col][row].pos_, tile_size_, tile_atlas_, { 1.0f, 1.0f, 1.0f, 1.0f }, tiles_[col][row].uv_coords_);
+			Aegis::DrawQuad(tiles_[col][row].pos_, tile_textures_[tiles_[col][row].type_]);
 		}
 	}
 }
