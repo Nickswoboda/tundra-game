@@ -26,9 +26,19 @@ OptionsScene::OptionsScene()
 	}
 
 	vsync_ = Aegis::Application::GetWindow().IsVsync();
-	toggle_vsync_button_ = new Aegis::Button({ 780, 400, 200, 32 }, vsync_ ? "On" : "Off", button_font_);
+	toggle_vsync_button_ = new Aegis::Button({ 780, 400, 200, 32 }, vsync_ ? "On" : "Off", button_font_, [&]() {
+		if (vsync_) {
+			Aegis::Application::GetWindow().SetVsync(false);
+			toggle_vsync_button_->text_ = "Off";
+			vsync_ = false;
+		}
+		else {
+			Aegis::Application::GetWindow().SetVsync(true);
+			toggle_vsync_button_->text_ = "On";
+			vsync_ = true;
+		}});
 
-	back_button_ = new Aegis::Button({ 580, 600, 200, 32 }, "Back", button_font_);
+	back_button_ = new Aegis::Button({ 580, 600, 200, 32 }, "Back", button_font_, [&]() {manager_->PopScene(); });
 
 
 }
@@ -67,30 +77,6 @@ void OptionsScene::Render(float delta_time)
 
 void OptionsScene::OnEvent(Aegis::Event& event)
 {
-	auto click_event = dynamic_cast<Aegis::MouseClickEvent*>(&event);
-	if (click_event) {
-		if (toggle_vsync_button_->IsPressed(click_event->action_)) {
-			if (vsync_) {
-				Aegis::Application::GetWindow().SetVsync(false);
-				toggle_vsync_button_->text_ = "Off";
-				vsync_ = false;
-			}
-			else{
-				Aegis::Application::GetWindow().SetVsync(true);
-				toggle_vsync_button_->text_ = "On";
-				vsync_ = true;
-			}
-		}
-		if (screen_mode_dropdown_->IsPressed(click_event->action_)) {
-
-		}
-		if (resolution_dropdown_->IsPressed(click_event->action_)) {
-
-		}
-		if (back_button_->IsPressed(click_event->action_)) {
-			manager_->PopScene();
-		}
-	}
 }
 
 void OptionsScene::SetResolution(int x, int y)

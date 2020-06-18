@@ -7,12 +7,15 @@ LevelSelectScene::LevelSelectScene()
 	title_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 64);
 	button_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
-	back_button_ = new Aegis::Button({500, 650, 120, 30}, "Back", button_font_);
-	select_button_ = new Aegis::Button({ 640, 650, 120, 30 }, "Select", button_font_);
+	back_button_ = new Aegis::Button({500, 650, 120, 30}, "Back", button_font_, [&]() { manager_->PopScene(); });
+	select_button_ = new Aegis::Button({ 640, 650, 120, 30 }, "Select", button_font_, [&]() { manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(selected_level_))); });
 
+	int level = 0;
 	for (int row = 0; row < 4; ++row) {
 		for (int col = 0; col < 4; ++col){
-			level_buttons_.emplace_back(new Aegis::Button({ 500 + (float)(col * 74), 200 + (float)(row * 74), 64, 64 }, std::to_string((row * 4) + col + 1), button_font_));
+			level_buttons_.emplace_back(new Aegis::Button({ 500 + (float)(col * 74), 200 + (float)(row * 74), 64, 64 }, std::to_string((row * 4) + col + 1), button_font_,
+				[&, level]() { selected_level_ = level; }));
+			++level;
 		}
 	}
 }
@@ -55,22 +58,4 @@ void LevelSelectScene::Render(float delta_time)
 
 void LevelSelectScene::OnEvent(Aegis::Event& event)
 {
-	auto click_event = dynamic_cast<Aegis::MouseClickEvent*>(&event);
-
-	if (click_event) {
-
-		for (int i = 0; i < level_buttons_.size(); ++i) {
-			if (level_buttons_[i]->IsPressed(click_event->action_)) {
-				selected_level_ = i;
-			}
-		}
-		if (back_button_->IsPressed(click_event->action_)) {
-			manager_->PopScene();
-		}
-		else if (select_button_->IsPressed(click_event->action_)) {
-			if (selected_level_ >= 0) {
-				manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(selected_level_)));
-			}
-		}
-	}
 }
