@@ -5,13 +5,14 @@ OptionsScene::OptionsScene()
 	title_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 64);
 	button_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
-	screen_mode_dropdown_ = new Aegis::Dropdown("Screen Mode", { 580, 150, 200, 32 });
+	ui_layer_ = new Aegis::UILayer();
+	screen_mode_dropdown_ = ui_layer_->AddDropdown("Screen Mode", { 580, 150, 200, 32 });
 	screen_mode_dropdown_->AddItem("Fullscreen", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Fullscreen); });
 	screen_mode_dropdown_->AddItem("Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Windowed); });
 	screen_mode_dropdown_->AddItem("Fullscreen Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::FullscreenWindow); });
 	screen_mode_dropdown_->SetCurrentIndex((int)Aegis::Application::GetWindow().GetScreenMode());
 
-	resolution_dropdown_ = new Aegis::Dropdown("Resolution", { 580, 210, 200, 32 });
+	resolution_dropdown_ = ui_layer_->AddDropdown("Resolution", { 580, 210, 200, 32 });
 	resolution_dropdown_->AddItem("1280x720", [&]() {SetResolution(1280, 720); });
 	resolution_dropdown_->AddItem("1600x900", [&]() {SetResolution(1600, 900); });
 	resolution_dropdown_->AddItem("1920x1080", [&]() {SetResolution(1920, 1080); });
@@ -26,7 +27,7 @@ OptionsScene::OptionsScene()
 	}
 
 	vsync_ = Aegis::Application::GetWindow().IsVsync();
-	toggle_vsync_button_ = new Aegis::Button({ 780, 400, 200, 32 }, vsync_ ? "On" : "Off", button_font_, [&]() {
+	toggle_vsync_button_ = ui_layer_->AddButton({ 780, 400, 200, 32 }, vsync_ ? "On" : "Off", button_font_, [&]() {
 		if (vsync_) {
 			Aegis::Application::GetWindow().SetVsync(false);
 			toggle_vsync_button_->text_ = "Off";
@@ -38,7 +39,7 @@ OptionsScene::OptionsScene()
 			vsync_ = true;
 		}});
 
-	back_button_ = new Aegis::Button({ 580, 600, 200, 32 }, "Back", button_font_, [&]() {manager_->PopScene(); });
+	back_button_ = ui_layer_->AddButton({ 580, 600, 200, 32 }, "Back", button_font_, [&]() {manager_->PopScene(); });
 
 
 }
@@ -61,18 +62,7 @@ void OptionsScene::Render(float delta_time)
 
 	Aegis::Renderer2D::SetFont(button_font_);
 
-	if (!screen_mode_dropdown_->collapsed_) {
-		resolution_dropdown_->Render();
-		screen_mode_dropdown_->Render();
-	}
-	else{
-		screen_mode_dropdown_->Render();
-		resolution_dropdown_->Render();
-	}
-
 	Aegis::DrawText("Vsync: ", { 580, toggle_vsync_button_->rect_.pos.y }, { 1.0f, 1.0f, 1.0f, 1.0f });
-	toggle_vsync_button_->Render();
-	back_button_->Render();
 }
 
 void OptionsScene::OnEvent(Aegis::Event& event)

@@ -18,10 +18,6 @@ MenuScene::MenuScene()
 
 MenuScene::~MenuScene()
 {
-	delete new_game_button_;
-	delete level_select_button_;
-	delete options_button_;
-	delete exit_button_;
 }
 
 void MenuScene::Update()
@@ -36,11 +32,6 @@ void MenuScene::Render(float delta_time)
 	Aegis::Renderer2D::SetFont(title_font_);
 
 	Aegis::DrawText("TUNDRA", { 540, 70 + (10 * 1) }, { 1.0, 1.0, 1.0, 1.0f });
-
-	new_game_button_->Render();
-	level_select_button_->Render();
-	options_button_->Render();
-	exit_button_->Render();
 }	
 
 void MenuScene::OnEvent(Aegis::Event& event)
