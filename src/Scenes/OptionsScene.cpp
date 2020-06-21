@@ -6,6 +6,7 @@ OptionsScene::OptionsScene()
 	button_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
 	ui_layer_ = new Aegis::UILayer();
+	ui_layer_->SetFont(button_font_);
 	screen_mode_dropdown_ = ui_layer_->AddDropdown("Screen Mode", { 580, 150, 200, 32 });
 	screen_mode_dropdown_->AddItem("Fullscreen", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Fullscreen); });
 	screen_mode_dropdown_->AddItem("Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Windowed); });
@@ -27,7 +28,7 @@ OptionsScene::OptionsScene()
 	}
 
 	vsync_ = Aegis::Application::GetWindow().IsVsync();
-	toggle_vsync_button_ = ui_layer_->AddButton({ 780, 400, 200, 32 }, vsync_ ? "On" : "Off", button_font_, [&]() {
+	toggle_vsync_button_ = ui_layer_->AddButton({ 780, 400, 200, 32 }, vsync_ ? "On" : "Off", [&]() {
 		if (vsync_) {
 			Aegis::Application::GetWindow().SetVsync(false);
 			toggle_vsync_button_->text_ = "Off";
@@ -39,7 +40,7 @@ OptionsScene::OptionsScene()
 			vsync_ = true;
 		}});
 
-	back_button_ = ui_layer_->AddButton({ 580, 600, 200, 32 }, "Back", button_font_, [&]() {manager_->PopScene(); });
+	back_button_ = ui_layer_->AddButton({ 580, 600, 200, 32 }, "Back", [&]() {manager_->PopScene(); });
 
 
 }

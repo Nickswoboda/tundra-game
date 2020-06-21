@@ -119,7 +119,7 @@ void GameplayScene::Render(float delta_time)
 	Aegis::Renderer2D::EndScene();
 
 	Aegis::Renderer2D::BeginScene(ui_camera_.view_projection_matrix_);
-	
+
 	for (int i = 0; i < num_lives_; ++i) {
 		Aegis::DrawQuad({ 20 + (float) i * 22, 675 }, { 20, 20 }, { 1.0f, 0.1f, 0.1f, 1.0f });
 	}
