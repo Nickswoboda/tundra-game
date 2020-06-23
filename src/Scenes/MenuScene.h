@@ -15,7 +15,7 @@ public:
 	std::shared_ptr<Aegis::Font> title_font_;
 	std::shared_ptr<Aegis::Font> button_font_;
 
-	Aegis::VContainer* v_box_;
+	Aegis::Container* v_box_;
 	Aegis::Button* new_game_button_;
 	Aegis::Button* level_select_button_;
 	Aegis::Button* options_button_;
