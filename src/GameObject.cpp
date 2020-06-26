@@ -33,7 +33,7 @@ void GameObject::Update()
 {
 	animation_.Update();
 	rect_.pos = animation_.current_value_;
-	sprite_.pos_ = rect_.pos;
+	sprite_.rect_.pos = rect_.pos;
 
 	if (rect_.pos == grid_coord_ * TILE_SIZE) {
 		animation_.Stop();
@@ -43,7 +43,7 @@ void GameObject::Update()
 void GameObject::SetPosition(Aegis::Vec2 pos)
 {
 	rect_.pos = pos;
-	sprite_.pos_ = pos;
+	sprite_.rect_.pos = pos;
 }
 
 void Animation::Start(Aegis::Vec2 start, Aegis::Vec2 end, float duration)
