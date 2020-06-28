@@ -37,7 +37,7 @@ void GameplayScene::Update()
 		GetEnemyTargetPos(bjorne_);
 	}
 
-	if (Aegis::AABBHasCollided(player_.rect_, brutus_.rect_) || Aegis::AABBHasCollided(player_.rect_, bjorne_.rect_)) {
+	if (Aegis::AABBHasCollided(player_.sprite_.rect_, brutus_.sprite_.rect_) || Aegis::AABBHasCollided(player_.sprite_.rect_, bjorne_.sprite_.rect_)) {
 		--num_lives_;
 		if (num_lives_ == 0) {
 			manager_->PopScene();
@@ -49,7 +49,7 @@ void GameplayScene::Update()
 	}
 
 	for (auto i = pellets_.begin(); i != pellets_.end();) {
-		if (Aegis::AABBHasCollided(player_.rect_, (*i).rect_)) {
+		if (Aegis::AABBHasCollided(player_.sprite_.rect_, (*i).rect_)) {
 			i = pellets_.erase(i);
 			if (pellets_.size() == 0) {
 				player_.animation_.playing_ = false;

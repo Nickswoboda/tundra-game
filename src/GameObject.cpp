@@ -4,11 +4,11 @@ static const int TILE_SIZE = 32;
 
 void GameObject::StartMoving()
 {
-	Aegis::Vec2 prev_tile_pos = rect_.pos / TILE_SIZE;
+	Aegis::Vec2 prev_tile_pos = sprite_.rect_.pos / TILE_SIZE;
 	Aegis::Vec2 vec = grid_coord_ - prev_tile_pos;
 	int num_tiles = sqrt(vec.x * vec.x + vec.y * vec.y);
 
-	animation_.Start(rect_.pos, grid_coord_ * TILE_SIZE, speed_ * num_tiles);
+	animation_.Start(sprite_.rect_.pos, grid_coord_ * TILE_SIZE, speed_ * num_tiles);
 }
 
 void Player::Render(float delta_time) const
@@ -32,17 +32,15 @@ void Bjorne::Render(float delta_time) const
 void GameObject::Update()
 {
 	animation_.Update();
-	rect_.pos = animation_.current_value_;
-	sprite_.rect_.pos = rect_.pos;
+	sprite_.rect_.pos = animation_.current_value_;
 
-	if (rect_.pos == grid_coord_ * TILE_SIZE) {
+	if (sprite_.rect_.pos == grid_coord_ * TILE_SIZE) {
 		animation_.Stop();
 	}
 }
 
 void GameObject::SetPosition(Aegis::Vec2 pos)
 {
-	rect_.pos = pos;
 	sprite_.rect_.pos = pos;
 }
 

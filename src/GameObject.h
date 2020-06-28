@@ -22,7 +22,7 @@ class GameObject
 {
 public:
 	GameObject(float x, float y, float w, float h, Aegis::Vec2 subtex_pos = {0.0f, 0.0f})
-		:rect_{ x, y, w, h }, sprite_(rect_.pos, {w, h}, Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png"), subtex_pos)
+		:sprite_({x,y}, {w, h}, Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png"), subtex_pos)
 	{
 	}
 		
@@ -34,7 +34,6 @@ public:
 	std::shared_ptr<Aegis::Texture> spirte_sheet_;
 	Animation animation_;
 	Aegis::Sprite sprite_;
-	Aegis::AABB rect_;
 	Aegis::Vec2 grid_coord_;
 	//time to move 1 tile
 	float speed_ = 0.15f;
@@ -46,12 +45,14 @@ class Pellet : public GameObject
 {
 public:
 	Pellet(int x, int y)
-		: GameObject(x, y, 8, 8)
+		: GameObject(x, y, 8, 8), rect_(x,y,8,8)
 	{}
 	void Render(float delta_time) const override
 	{
 		Aegis::DrawQuad(rect_.pos, rect_.size, { 0.5, 0.5, 0.2, 1.0 });
 	}
+
+	Aegis::AABB rect_;
 };
 
 class Player : public GameObject
