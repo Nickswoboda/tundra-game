@@ -17,7 +17,7 @@ public:
 	std::shared_ptr<Aegis::Font> title_font_;
 	std::shared_ptr<Aegis::Font> button_font_;
 
-	Aegis::Button* toggle_vsync_button_;
+	Aegis::Checkbox* vsync_checkbox_;
 	Aegis::Button* back_button_;
 
 	Aegis::Dropdown* screen_mode_dropdown_;

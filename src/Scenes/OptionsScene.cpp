@@ -28,18 +28,7 @@ OptionsScene::OptionsScene()
 	}
 
 	vsync_ = Aegis::Application::GetWindow().IsVsync();
-	toggle_vsync_button_ = ui_layer_->AddButton({ 780, 400, 200, 32 }, vsync_ ? "On" : "Off", [&]() {
-		if (vsync_) {
-			Aegis::Application::GetWindow().SetVsync(false);
-			toggle_vsync_button_->text_ = "Off";
-			vsync_ = false;
-		}
-		else {
-			Aegis::Application::GetWindow().SetVsync(true);
-			toggle_vsync_button_->text_ = "On";
-			vsync_ = true;
-		}});
-
+	vsync_checkbox_ = ui_layer_->AddCheckbox("Vsync", { 780, 400, 200, 32 }, [](bool vsync) {Aegis::Application::GetWindow().SetVsync(vsync);});
 	back_button_ = ui_layer_->AddButton({ 580, 600, 200, 32 }, "Back", [&]() {manager_->PopScene(); });
 
 
@@ -63,7 +52,7 @@ void OptionsScene::Render(float delta_time)
 
 	Aegis::Renderer2D::SetFont(button_font_);
 
-	Aegis::DrawText("Vsync: ", { 580, toggle_vsync_button_->rect_.pos.y }, { 1.0f, 1.0f, 1.0f, 1.0f });
+	Aegis::DrawText("Vsync: ", { 580, vsync_checkbox_->rect_.pos.y }, { 1.0f, 1.0f, 1.0f, 1.0f });
 }
 
 void OptionsScene::OnEvent(Aegis::Event& event)
