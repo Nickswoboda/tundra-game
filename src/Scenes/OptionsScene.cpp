@@ -49,10 +49,6 @@ void OptionsScene::Render(float delta_time)
 
 	Aegis::Renderer2D::SetFont(title_font_);
 	Aegis::DrawText("Options", { 500, 20 }, { 1.0f, 1.0f, 1.0f, 1.0f });
-
-	Aegis::Renderer2D::SetFont(button_font_);
-
-	Aegis::DrawText("Vsync: ", { 580, vsync_checkbox_->rect_.pos.y }, { 1.0f, 1.0f, 1.0f, 1.0f });
 }
 
 void OptionsScene::OnEvent(Aegis::Event& event)
