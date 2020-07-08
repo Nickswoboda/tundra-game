@@ -29,6 +29,8 @@ OptionsScene::OptionsScene()
 
 	vsync_ = Aegis::Application::GetWindow().IsVsync();
 	vsync_checkbox_ = ui_layer_->AddCheckbox("Vsync", { 780, 400, 200, 32 }, [](bool vsync) {Aegis::Application::GetWindow().SetVsync(vsync);});
+	auto checked_texture = Aegis::TextureManager::Instance().Load("assets/textures/pressedbtn.png");
+	vsync_checkbox_->SetTexture(true, checked_texture);
 	back_button_ = ui_layer_->AddButton({ 580, 600, 200, 32 }, "Back", [&]() {manager_->PopScene(); });
 
 
