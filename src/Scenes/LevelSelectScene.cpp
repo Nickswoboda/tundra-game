@@ -9,14 +9,14 @@ LevelSelectScene::LevelSelectScene()
 
 	ui_layer_ = new Aegis::UILayer();
 	ui_layer_->SetFont(button_font_);
-	back_button_ = ui_layer_->AddButton({500, 650, 120, 30}, "Back", [&]() { manager_->PopScene(); });
-	select_button_ = ui_layer_->AddButton({ 640, 650, 120, 30 }, "Select", [&]() { manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(selected_level_))); });
+	back_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({500, 650, 120, 30}, "Back", [&]() { manager_->PopScene(); }));
+	select_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 640, 650, 120, 30 }, "Select", [&]() { manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(selected_level_))); }));
 
 	int level = 0;
 	for (int row = 0; row < 4; ++row) {
 		for (int col = 0; col < 4; ++col){
-			level_buttons_.emplace_back(ui_layer_->AddButton({ 500 + (float)(col * 74), 200 + (float)(row * 74), 64, 64 }, std::to_string((row * 4) + col + 1), 
-				[&, level]() { selected_level_ = level; }));
+			level_buttons_.emplace_back(ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 500 + (float)(col * 74), 200 + (float)(row * 74), 64, 64 }, std::to_string((row * 4) + col + 1), 
+				[&, level]() { selected_level_ = level; })));
 			++level;
 		}
 	}

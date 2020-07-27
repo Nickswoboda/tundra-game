@@ -14,10 +14,10 @@ MenuScene::MenuScene()
 	Aegis::CenterAABBHorizontally(title_sprite_->rect_, {0, 0, 1280, 720});
 	ui_layer_ = new Aegis::UILayer();
 	ui_layer_->SetFont(button_font_);
-	new_game_button_ = ui_layer_->AddButton({ 580, 150, 125, 50 }, "", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(0))); });
-	level_select_button_ = ui_layer_->AddButton({ 580, 190, 200, 32 }, "-Level Select", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new LevelSelectScene())); });
-	options_button_ = ui_layer_->AddButton({ 580, 230, 200, 32 }, "-Options", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene())); });
-	exit_button_ = ui_layer_->AddButton({ 580, 270, 200, 32 }, "-Quit", [&]() { Aegis::Application::Quit(); });
+	new_game_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 580, 150, 125, 50 }, "", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(0))); }));
+	level_select_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 580, 190, 200, 32 }, "-Level Select", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new LevelSelectScene())); }));
+	options_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 580, 230, 200, 32 }, "-Options", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene())); }));
+	exit_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 580, 270, 200, 32 }, "-Quit", [&]() { Aegis::Application::Quit(); }));
 
 	v_box_ = ui_layer_->AddContainer({0, 150, 1280, 570}, Aegis::Container::Vertical, 10, Aegis::Container::Center);
 	v_box_->AddWidget(new_game_button_);
