@@ -6,7 +6,7 @@
 
 MenuScene::MenuScene() 
 {
-	title_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 64);
+	title_font_ = Aegis::Font::Create("assets/fonts/WorkSans-Regular.ttf", 64);
 	button_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
 	auto title_text_texture = Aegis::Texture::TextureFromText("TUNDRA", title_font_);
