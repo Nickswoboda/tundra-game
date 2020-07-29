@@ -22,7 +22,7 @@ class GameObject
 {
 public:
 	GameObject(float x, float y, float w, float h, Aegis::Vec2 subtex_pos = {0.0f, 0.0f})
-		:sprite_({x,y}, {w, h}, Aegis::TextureManager::Instance().Load("assets/textures/tundra-tile-map.png"), subtex_pos)
+		:sprite_({x,y}, {w, h}, Aegis::Texture::Create("assets/textures/tundra-tile-map.png"), subtex_pos)
 	{
 	}
 		
