@@ -12,7 +12,7 @@ MenuScene::MenuScene()
 	auto title_text_texture = Aegis::Texture::TextureFromText("TUNDRA", title_font_);
 	title_sprite_ = std::make_shared<Aegis::Sprite>(Aegis::Vec2(0,50), title_text_texture->size_, title_text_texture);
 	Aegis::CenterAABBHorizontally(title_sprite_->rect_, {0, 0, 1280, 720});
-	ui_layer_ = new Aegis::UILayer();
+	ui_layer_ = std::make_unique<Aegis::UILayer>();
 	ui_layer_->SetFont(button_font_);
 	new_game_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 580, 150, 125, 50 }, "", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(0))); }));
 	level_select_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 580, 190, 200, 32 }, "-Level Select", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new LevelSelectScene())); }));

@@ -5,7 +5,7 @@ OptionsScene::OptionsScene()
 	title_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 64);
 	button_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
-	ui_layer_ = new Aegis::UILayer();
+	ui_layer_ = std::make_unique<Aegis::UILayer>();
 	ui_layer_->SetFont(button_font_);
 	screen_mode_dropdown_ = ui_layer_->AddWidget<Aegis::Dropdown>(new Aegis::Dropdown("Screen Mode", { 580, 150, 200, 32 }));
 	screen_mode_dropdown_->AddItem("Fullscreen", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Fullscreen); });
