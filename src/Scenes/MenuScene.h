@@ -14,6 +14,7 @@ public:
 
 	std::shared_ptr<Aegis::Font> title_font_;
 	std::shared_ptr<Aegis::Font> button_font_;
+	std::shared_ptr<Aegis::Texture> title_background_;
 
 	std::shared_ptr<Aegis::Sprite> title_sprite_;
 	Aegis::Container* v_box_;

@@ -9,6 +9,8 @@ MenuScene::MenuScene()
 	title_font_ = Aegis::Font::Create("assets/fonts/WorkSans-Regular.ttf", 64);
 	button_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
+	title_background_ = Aegis::TextureManager::Instance().Load("assets/textures/TundraBG.png");
+
 	auto title_text_texture = Aegis::Texture::TextureFromText("TUNDRA", title_font_);
 	title_sprite_ = std::make_shared<Aegis::Sprite>(Aegis::Vec2(0,50), title_text_texture->size_, title_text_texture);
 	Aegis::CenterAABBHorizontally(title_sprite_->rect_, {0, 0, 1280, 720});
@@ -42,6 +44,7 @@ void MenuScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
 	Aegis::RendererClear();
+	Aegis::DrawQuad({0.0f, 0.0f}, Aegis::Application::GetWindow().GetSize(), title_background_);
 	Aegis::RenderSprite(*title_sprite_);
 }
 
