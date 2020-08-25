@@ -17,9 +17,11 @@ public:
 	std::shared_ptr<Aegis::Texture> title_background_;
 
 	std::shared_ptr<Aegis::Sprite> title_sprite_;
-	Aegis::Container* v_box_;
-	Aegis::Button* new_game_button_;
-	Aegis::Button* level_select_button_;
-	Aegis::Button* options_button_;
-	Aegis::Button* exit_button_;
+
+	std::shared_ptr<Aegis::Container> v_box_;
+	
+	std::shared_ptr<Aegis::Button> new_game_button_;
+	std::shared_ptr<Aegis::Button> level_select_button_;
+	std::shared_ptr<Aegis::Button> options_button_;
+	std::shared_ptr<Aegis::Button> exit_button_;
 };
