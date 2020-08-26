@@ -1,6 +1,7 @@
 #include "LevelSelectScene.h"
 
 #include "GameplayScene.h"
+#include "LevelEditorScene.h"
 
 LevelSelectScene::LevelSelectScene()
 {
@@ -11,6 +12,8 @@ LevelSelectScene::LevelSelectScene()
 	ui_layer_->SetFont(button_font_);
 	back_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({500, 650, 120, 30}, "Back", [&]() { manager_->PopScene(); }));
 	select_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 640, 650, 120, 30 }, "Select", [&]() { manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(selected_level_))); }));
+	editor_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 780, 650, 120, 30 }, "Editor", [&]() { manager_->PushScene(std::unique_ptr<Scene>(new LevelEditorScene())); }));
+	
 
 	int level = 0;
 	for (int row = 0; row < 4; ++row) {
