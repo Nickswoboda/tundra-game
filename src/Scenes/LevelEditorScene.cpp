@@ -4,13 +4,20 @@ LevelEditorScene::LevelEditorScene()
 {
 	tile_map_ = std::make_unique<TileMap>("assets/levels/level1.txt", 32); 
 	//used to center tilemap within window
-	camera_.SetPosition({-144, -24, 0});
+	camera_.SetPosition({-270, -24, 0});
 	
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
-	ui_layer_->SetFont(Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32));
+	ui_layer_->SetFont(Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 20));
 	
-	back_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({500, 500, 125, 40}, "BACK", [&](){ manager_->PopScene();}));  
-
+	back_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 600, 125, 40}, "BACK", [&](){ manager_->PopScene();}));  
+	ground_tile_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 200, 32, 32}, "G", [&](){ChangeSelectedTile(Tile::Ground);}));  
+	ice_tile_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({100, 200, 32, 32}, "I", [&](){ChangeSelectedTile(Tile::Ice);}));  
+	wall_tile_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({150, 200, 32, 32}, "W", [&](){ChangeSelectedTile(Tile::Wall);}));  
+	bjorne_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 270, 32, 32}, "Bj", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorne);}));  
+	player_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({100, 270, 32, 32}, "Pl", [&](){ChangeSelectedSpawn(SpawnPoint::Player);}));  
+	brutus_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({150, 270, 32, 32}, "Br", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
+	
+	selected_tile_ = Tile::Ground;
 
 }
 
@@ -20,7 +27,36 @@ LevelEditorScene::~LevelEditorScene()
 
 void LevelEditorScene::OnEvent(Aegis::Event& event)
 {
+	auto mouse_click = dynamic_cast<Aegis::MouseClickEvent*>(&event);
+	auto mouse_move = dynamic_cast<Aegis::MouseMoveEvent*>(&event);
 
+	if (mouse_click || (mouse_move && Aegis::Application::GetWindow().IsMousePressed())){
+		
+		//have to substract camera position otherwise mouse_pos is off
+		auto mouse_pos = Aegis::Application::GetWindow().GetMousePos() - Aegis::Vec2(270, 24);
+		auto tile = tile_map_->GetTileByPos(mouse_pos.x, mouse_pos.y);
+
+		if (tile != nullptr) {
+			auto index = tile_map_->GetTileIndex(*tile);
+			Aegis::Vec2 tile_spawn_pos = index * tile_map_->tile_size_;
+
+			if (selected_tile_ != Tile::None){
+				switch (selected_tile_){
+					case Tile::Ground: *tile = Ground(tile_spawn_pos.x, tile_spawn_pos.y); break;
+					case Tile::Ice: *tile = Ice(tile_spawn_pos.x, tile_spawn_pos.y); break;
+					case Tile::Wall: *tile = Wall(tile_spawn_pos.x, tile_spawn_pos.y); break;
+				}
+			}
+
+			else if (selected_spawn_ != SpawnPoint::None){
+				switch (selected_spawn_){
+					case SpawnPoint::Bjorne:  break;
+					case SpawnPoint::Brutus:  break;
+					case SpawnPoint::Player:  break;
+				}
+			}
+		}
+	}
 }
 
 void LevelEditorScene::Update()
@@ -34,4 +70,9 @@ void LevelEditorScene::Render(float delta_time)
 	Aegis::RendererClear();
 
 	tile_map_->Render();
+
+	//have to use negative numbers to counteract camera movement
+	//TODO: add ability to submit text to UILayer
+	Aegis::DrawText("Tiles:", {-200, 150});
+	Aegis::DrawText("Spawns:", {-200, 220});
 }
