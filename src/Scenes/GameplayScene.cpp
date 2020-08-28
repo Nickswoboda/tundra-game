@@ -8,8 +8,12 @@ GameplayScene::GameplayScene(int level)
 {
 	auto& texmgr = Aegis::TextureManager::Instance();
 	texmgr.Load("assets/textures/tundra-tile-map.png");
-	if (level > 1) level = 1;
+
+	if (!std::filesystem::exists("assets/levels/level" + std::to_string(level + 1) + ".txt")){
+		level = 1;
+	}
 	LoadLevel("assets/levels/level" + std::to_string(level + 1) + ".txt");
+	
 	camera_.SetPosition({ -144, -24, 0 });
 }
 
@@ -70,7 +74,8 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 	if (key_event && (key_event->action_ == AE_BUTTON_PRESS || key_event->action_ == AE_BUTTON_REPEAT)) {
 		auto key = key_event->key_;
 		if (key == AE_KEY_J) {
-			SaveLevel();
+			manager_->PopScene();
+			return;
 		}
 		if (key == AE_KEY_K) {
 			ResetLevel();
