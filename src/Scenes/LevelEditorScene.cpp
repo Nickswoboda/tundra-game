@@ -5,7 +5,7 @@
 
 LevelEditorScene::LevelEditorScene()
 {
-	tile_map_ = std::make_unique<TileMap>("assets/levels/level9.txt", 32); 
+	tile_map_ = std::make_unique<TileMap>("assets/levels/level1.txt", 32); 
 	//used to center tilemap within window
 	camera_.SetPosition({-270, -24, 0});
 	
@@ -92,11 +92,11 @@ void LevelEditorScene::SaveLevel()
 	//if (IsValidLevel())
 
 	int level = 1;
-	std::string new_file_path = "C:/dev/tundra-game/assets/levels/level" + std::to_string(level) + ".txt";
+	std::string new_file_path = "assets/levels/level" + std::to_string(level) + ".txt";
 
 	while (std::filesystem::exists(new_file_path)) {
 		++level;
-		new_file_path = "C:/dev/tundra-game/assets/levels/level" + std::to_string(level) + ".txt";
+		new_file_path = "assets/levels/level" + std::to_string(level) + ".txt";
 	}
 	std::ofstream file(new_file_path);
 
