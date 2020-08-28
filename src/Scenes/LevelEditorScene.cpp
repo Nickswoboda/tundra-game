@@ -9,16 +9,19 @@ LevelEditorScene::LevelEditorScene()
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 	ui_layer_->SetFont(Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 20));
 	
-	back_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 600, 125, 40}, "BACK", [&](){ manager_->PopScene();}));  
-	ground_tile_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 200, 32, 32}, "G", [&](){ChangeSelectedTile(Tile::Ground);}));  
-	ice_tile_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({100, 200, 32, 32}, "I", [&](){ChangeSelectedTile(Tile::Ice);}));  
-	wall_tile_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({150, 200, 32, 32}, "W", [&](){ChangeSelectedTile(Tile::Wall);}));  
-	bjorne_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 270, 32, 32}, "Bj", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorne);}));  
-	player_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({100, 270, 32, 32}, "Pl", [&](){ChangeSelectedSpawn(SpawnPoint::Player);}));  
-	brutus_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({150, 270, 32, 32}, "Br", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
+	auto back_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 600, 125, 40}, "BACK", [&](){ manager_->PopScene();}));  
+	auto round_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 200, 32, 32}, "G", [&](){ChangeSelectedTile(Tile::Ground);}));  
+	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({100, 200, 32, 32}, "I", [&](){ChangeSelectedTile(Tile::Ice);}));  
+	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({150, 200, 32, 32}, "W", [&](){ChangeSelectedTile(Tile::Wall);}));  
+	auto bjorne_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 270, 32, 32}, "Bj", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorne);}));  
+	auto player_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({100, 270, 32, 32}, "Pl", [&](){ChangeSelectedSpawn(SpawnPoint::Bruce);}));  
+	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({150, 270, 32, 32}, "Br", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
 	
-	selected_tile_ = Tile::Ground;
-
+	auto tex_atlas = Aegis::Texture::Create("assets/textures/tundra-tile-map.png");
+	bruce_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(96, 0), Aegis::Vec2(32, 32)); 
+	brutus_tex_ =  std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(128, 0), Aegis::Vec2(32, 32)); 
+	bjorne_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(160, 0), Aegis::Vec2(32, 32)); 
+		
 }
 
 LevelEditorScene::~LevelEditorScene()
@@ -50,9 +53,9 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 
 			else if (selected_spawn_ != SpawnPoint::None){
 				switch (selected_spawn_){
-					case SpawnPoint::Bjorne:  break;
-					case SpawnPoint::Brutus:  break;
-					case SpawnPoint::Player:  break;
+					case SpawnPoint::Bjorne: tile_map_->bjorne_start_pos_ = index; break;
+					case SpawnPoint::Brutus:  tile_map_->brutus_start_pos_ = index;break;
+					case SpawnPoint::Bruce:  tile_map_->player_start_pos_ = index; break;
 				}
 			}
 		}
@@ -75,4 +78,8 @@ void LevelEditorScene::Render(float delta_time)
 	//TODO: add ability to submit text to UILayer
 	Aegis::DrawText("Tiles:", {-200, 150});
 	Aegis::DrawText("Spawns:", {-200, 220});
+
+	Aegis::DrawQuad(tile_map_->player_start_pos_ * 32, {32, 32}, bruce_tex_);
+	Aegis::DrawQuad(tile_map_->brutus_start_pos_ * 32, {32, 32}, brutus_tex_);
+	Aegis::DrawQuad(tile_map_->bjorne_start_pos_ * 32, {32, 32}, bjorne_tex_);
 }
