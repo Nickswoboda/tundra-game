@@ -1,8 +1,11 @@
 #include "LevelEditorScene.h"
 
+#include <filesystem>
+#include <fstream>
+
 LevelEditorScene::LevelEditorScene()
 {
-	tile_map_ = std::make_unique<TileMap>("assets/levels/level1.txt", 32); 
+	tile_map_ = std::make_unique<TileMap>("assets/levels/level9.txt", 32); 
 	//used to center tilemap within window
 	camera_.SetPosition({-270, -24, 0});
 	
@@ -16,6 +19,7 @@ LevelEditorScene::LevelEditorScene()
 	auto bjorne_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 270, 32, 32}, "Bj", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorne);}));  
 	auto player_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({100, 270, 32, 32}, "Pl", [&](){ChangeSelectedSpawn(SpawnPoint::Bruce);}));  
 	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({150, 270, 32, 32}, "Br", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
+	auto save_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 550, 125, 40}, "Save", [&]() {SaveLevel();}));
 	
 	auto tex_atlas = Aegis::Texture::Create("assets/textures/tundra-tile-map.png");
 	bruce_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(96, 0), Aegis::Vec2(32, 32)); 
@@ -43,19 +47,18 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 			auto index = tile_map_->GetTileIndex(*tile);
 			Aegis::Vec2 tile_spawn_pos = index * tile_map_->tile_size_;
 
-			if (selected_tile_ != Tile::None){
-				switch (selected_tile_){
-					case Tile::Ground: *tile = Ground(tile_spawn_pos.x, tile_spawn_pos.y); break;
-					case Tile::Ice: *tile = Ice(tile_spawn_pos.x, tile_spawn_pos.y); break;
-					case Tile::Wall: *tile = Wall(tile_spawn_pos.x, tile_spawn_pos.y); break;
-				}
-			}
-
-			else if (selected_spawn_ != SpawnPoint::None){
+			if (selected_spawn_ != SpawnPoint::None){
 				switch (selected_spawn_){
 					case SpawnPoint::Bjorne: tile_map_->bjorne_start_pos_ = index; break;
 					case SpawnPoint::Brutus:  tile_map_->brutus_start_pos_ = index;break;
 					case SpawnPoint::Bruce:  tile_map_->player_start_pos_ = index; break;
+				}
+			}
+			else{
+				switch (selected_tile_){
+					case Tile::Ground: *tile = Ground(tile_spawn_pos.x, tile_spawn_pos.y); break;
+					case Tile::Ice: *tile = Ice(tile_spawn_pos.x, tile_spawn_pos.y); break;
+					case Tile::Wall: *tile = Wall(tile_spawn_pos.x, tile_spawn_pos.y); break;
 				}
 			}
 		}
@@ -82,4 +85,50 @@ void LevelEditorScene::Render(float delta_time)
 	Aegis::DrawQuad(tile_map_->player_start_pos_ * 32, {32, 32}, bruce_tex_);
 	Aegis::DrawQuad(tile_map_->brutus_start_pos_ * 32, {32, 32}, brutus_tex_);
 	Aegis::DrawQuad(tile_map_->bjorne_start_pos_ * 32, {32, 32}, bjorne_tex_);
+}
+
+void LevelEditorScene::SaveLevel()
+{
+	//if (IsValidLevel())
+
+	int level = 1;
+	std::string new_file_path = "C:/dev/tundra-game/assets/levels/level" + std::to_string(level) + ".txt";
+
+	while (std::filesystem::exists(new_file_path)) {
+		++level;
+		new_file_path = "C:/dev/tundra-game/assets/levels/level" + std::to_string(level) + ".txt";
+	}
+	std::ofstream file(new_file_path);
+
+	for (int row = 0; row < tile_map_->grid_size_.y; ++row) {
+		for (int col = 0; col < tile_map_->grid_size_.x; ++col) {
+			auto coord = Aegis::Vec2(col, row);
+
+			if (coord == tile_map_->brutus_start_pos_) {
+				file << 'C';
+			}
+			else if (coord == tile_map_->player_start_pos_) {
+				file << 'P';
+			}
+			else if (coord == tile_map_->bjorne_start_pos_) {
+				file << 'B';
+			}
+			auto type = tile_map_->tiles_[col][row].type_;
+
+			switch (type)
+			{
+			case Tile::Type::Wall: {file << '0'; break; }
+			case Tile::Type::Ice: {file << '1'; break; }
+			case Tile::Type::Ground: {file << ' '; break; }
+			}
+		}
+
+		//don't print newline on last row
+		if (row != tile_map_->grid_size_.y - 1) {
+			file << '\n';
+		}
+	}
+	
+
+	file.close();
 }
