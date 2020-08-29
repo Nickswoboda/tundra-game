@@ -4,6 +4,14 @@
 #include "../Tile.h"
 #include "../TileMap.h"
 
+#include <stack>
+
+struct EditCommand
+{
+	Aegis::Vec2 tile_pos_;
+	Tile::Type type_;
+	
+};
 class LevelEditorScene : public Aegis::Scene
 {
 public:
@@ -15,6 +23,7 @@ public:
 	void OnEvent(Aegis::Event& event) override;
 
 	void SaveLevel();
+	void Undo();
 
 	enum class SpawnPoint
 	{
@@ -36,6 +45,9 @@ public:
 	std::shared_ptr<Aegis::SubTexture> bjorne_tex_;
 	std::shared_ptr<Aegis::SubTexture> brutus_tex_;
 	std::shared_ptr<Aegis::SubTexture> bruce_tex_;
+	
+	int max_undos = 100;
+	std::stack<EditCommand> undo_stack_;
 
 };
 

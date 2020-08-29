@@ -20,6 +20,7 @@ LevelEditorScene::LevelEditorScene()
 	auto player_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({100, 270, 32, 32}, "Pl", [&](){ChangeSelectedSpawn(SpawnPoint::Bruce);}));  
 	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({150, 270, 32, 32}, "Br", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
 	auto save_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 550, 125, 40}, "Save", [&]() {SaveLevel();}));
+	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 500, 125, 40}, "Undo", [&]() {Undo();}));
 	
 	auto tex_atlas = Aegis::Texture::Create("assets/textures/tundra-tile-map.png");
 	bruce_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(96, 0), Aegis::Vec2(32, 32)); 
@@ -37,7 +38,7 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 	auto mouse_click = dynamic_cast<Aegis::MouseClickEvent*>(&event);
 	auto mouse_move = dynamic_cast<Aegis::MouseMoveEvent*>(&event);
 
-	if (mouse_click || (mouse_move && Aegis::Application::GetWindow().IsMousePressed())){
+	if ((mouse_click && mouse_click->action_) == AE_BUTTON_PRESS || (mouse_move && Aegis::Application::GetWindow().IsMousePressed())){
 		
 		//have to substract camera position otherwise mouse_pos is off
 		auto mouse_pos = Aegis::Application::GetWindow().GetMousePos() - Aegis::Vec2(270, 24);
@@ -54,7 +55,8 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 					case SpawnPoint::Bruce:  tile_map_->player_start_pos_ = index; break;
 				}
 			}
-			else{
+			else if (selected_tile_ != tile->type_){
+				undo_stack_.push({index, tile->type_});
 				switch (selected_tile_){
 					case Tile::Ground: *tile = Ground(tile_spawn_pos.x, tile_spawn_pos.y); break;
 					case Tile::Ice: *tile = Ice(tile_spawn_pos.x, tile_spawn_pos.y); break;
@@ -131,4 +133,21 @@ void LevelEditorScene::SaveLevel()
 	
 
 	file.close();
+}
+
+void LevelEditorScene::Undo()
+{
+	if (undo_stack_.empty()) return;
+	else{
+		auto undo = undo_stack_.top();
+		undo_stack_.pop();
+
+		auto tile = tile_map_->GetTileByIndex(undo.tile_pos_.x, undo.tile_pos_.y);
+		auto tile_spawn_pos = undo.tile_pos_ * tile_map_->tile_size_;
+		switch (undo.type_){
+			case Tile::Ground: *tile = Ground(tile_spawn_pos.x, tile_spawn_pos.y); break;
+			case Tile::Ice: *tile = Ice(tile_spawn_pos.x, tile_spawn_pos.y); break;
+			case Tile::Wall: *tile = Wall(tile_spawn_pos.x, tile_spawn_pos.y); break;
+		}
+	}
 }
