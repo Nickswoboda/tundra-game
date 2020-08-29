@@ -36,9 +36,22 @@ LevelEditorScene::~LevelEditorScene()
 void LevelEditorScene::OnEvent(Aegis::Event& event)
 {
 	auto mouse_click = dynamic_cast<Aegis::MouseClickEvent*>(&event);
-	auto mouse_move = dynamic_cast<Aegis::MouseMoveEvent*>(&event);
+	if (mouse_click){
+		if (mouse_click->action_ == AE_BUTTON_PRESS){
+			recording_ = true;
+		}
+		else{
+			recording_ = false;
+			if (!recorded_edits_.empty()){
+				undo_stack_.push(recorded_edits_);
+			}
 
-	if ((mouse_click && mouse_click->action_) == AE_BUTTON_PRESS || (mouse_move && Aegis::Application::GetWindow().IsMousePressed())){
+			while (!recorded_edits_.empty()){
+				recorded_edits_.pop();
+			}
+		}
+	}
+	if (recording_){
 		
 		//have to substract camera position otherwise mouse_pos is off
 		auto mouse_pos = Aegis::Application::GetWindow().GetMousePos() - Aegis::Vec2(270, 24);
@@ -56,7 +69,7 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 				}
 			}
 			else if (selected_tile_ != tile->type_){
-				undo_stack_.push({index, tile->type_});
+				recorded_edits_.push({index, tile->type_});
 				switch (selected_tile_){
 					case Tile::Ground: *tile = Ground(tile_spawn_pos.x, tile_spawn_pos.y); break;
 					case Tile::Ice: *tile = Ice(tile_spawn_pos.x, tile_spawn_pos.y); break;
@@ -139,15 +152,20 @@ void LevelEditorScene::Undo()
 {
 	if (undo_stack_.empty()) return;
 	else{
-		auto undo = undo_stack_.top();
+		auto edits = undo_stack_.top();
 		undo_stack_.pop();
 
-		auto tile = tile_map_->GetTileByIndex(undo.tile_pos_.x, undo.tile_pos_.y);
-		auto tile_spawn_pos = undo.tile_pos_ * tile_map_->tile_size_;
-		switch (undo.type_){
-			case Tile::Ground: *tile = Ground(tile_spawn_pos.x, tile_spawn_pos.y); break;
-			case Tile::Ice: *tile = Ice(tile_spawn_pos.x, tile_spawn_pos.y); break;
-			case Tile::Wall: *tile = Wall(tile_spawn_pos.x, tile_spawn_pos.y); break;
+		while(!edits.empty()){
+			auto undo = edits.top();
+			edits.pop();
+
+			auto tile = tile_map_->GetTileByIndex(undo.tile_pos_.x, undo.tile_pos_.y);
+			auto tile_spawn_pos = undo.tile_pos_ * tile_map_->tile_size_;
+			switch (undo.type_){
+				case Tile::Ground: *tile = Ground(tile_spawn_pos.x, tile_spawn_pos.y); break;
+				case Tile::Ice: *tile = Ice(tile_spawn_pos.x, tile_spawn_pos.y); break;
+				case Tile::Wall: *tile = Wall(tile_spawn_pos.x, tile_spawn_pos.y); break;
+			}
 		}
 	}
 }

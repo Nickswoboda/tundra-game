@@ -46,8 +46,10 @@ public:
 	std::shared_ptr<Aegis::SubTexture> brutus_tex_;
 	std::shared_ptr<Aegis::SubTexture> bruce_tex_;
 	
+	bool recording_ = false;
+	std::stack<EditCommand> recorded_edits_;
 	int max_undos = 100;
-	std::stack<EditCommand> undo_stack_;
+	std::stack<std::stack<EditCommand>> undo_stack_;
 
 };
 
