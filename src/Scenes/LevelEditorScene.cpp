@@ -129,6 +129,7 @@ void LevelEditorScene::SaveLevel()
 			case Tile::Type::Wall: {file << '0'; break; }
 			case Tile::Type::Ice: {file << '1'; break; }
 			case Tile::Type::Ground: {file << ' '; break; }
+			case Tile::Type::NumTypes: break;
 			}
 		}
 
@@ -168,6 +169,7 @@ void TileEditCommand::Execute()
 		case Tile::Ground: tile_ = Ground(tile_.pos_.x, tile_.pos_.y); break;
 		case Tile::Ice: tile_ = Ice(tile_.pos_.x, tile_.pos_.y); break;
 		case Tile::Wall: tile_ = Wall(tile_.pos_.x, tile_.pos_.y); break;
+		case Tile::NumTypes: break;
 	}
 }
 void TileEditCommand::Undo()
@@ -176,6 +178,7 @@ void TileEditCommand::Undo()
 		case Tile::Ground: tile_ = Ground(tile_.pos_.x, tile_.pos_.y); break;
 		case Tile::Ice: tile_ = Ice(tile_.pos_.x, tile_.pos_.y); break;
 		case Tile::Wall: tile_ = Wall(tile_.pos_.x, tile_.pos_.y); break;
+		case Tile::NumTypes: break;
 	}
 }
 
@@ -186,6 +189,7 @@ SpawnEditCommand::SpawnEditCommand(TileMap& tile_map, SpawnPoint spawn_point, Ae
 		case SpawnPoint::Bjorne: prev_index_ = tile_map_.bjorne_start_pos_; break;
 		case SpawnPoint::Brutus: prev_index_ = tile_map_.brutus_start_pos_; break;
 		case SpawnPoint::Bruce: prev_index_ = tile_map_.player_start_pos_; break;
+		case SpawnPoint::None: break;
 	}
 }
 
@@ -195,6 +199,7 @@ void SpawnEditCommand::Execute()
 		case SpawnPoint::Bjorne: tile_map_.bjorne_start_pos_ = new_index_; break;
 		case SpawnPoint::Brutus: tile_map_.brutus_start_pos_ = new_index_; break;
 		case SpawnPoint::Bruce:  tile_map_.player_start_pos_ = new_index_; break;
+		case SpawnPoint::None: break;
 	}
 
 }
@@ -205,6 +210,7 @@ void SpawnEditCommand::Undo()
 		case SpawnPoint::Bjorne: tile_map_.bjorne_start_pos_ = prev_index_; break;
 		case SpawnPoint::Brutus: tile_map_.brutus_start_pos_ = prev_index_; break;
 		case SpawnPoint::Bruce:  tile_map_.player_start_pos_ = prev_index_; break;
+		case SpawnPoint::None: break;
 	}
 
 }
