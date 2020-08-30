@@ -5,7 +5,7 @@
 
 LevelEditorScene::LevelEditorScene()
 {
-	tile_map_ = std::make_unique<TileMap>("assets/levels/level1.txt", 32); 
+	tile_map_ = std::make_unique<TileMap>(31, 21, 32); 
 	//used to center tilemap within window
 	camera_.SetPosition({-270, -24, 0});
 	
@@ -21,6 +21,7 @@ LevelEditorScene::LevelEditorScene()
 	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({150, 270, 32, 32}, "Br", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
 	auto save_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 550, 125, 40}, "Save", [&]() {SaveLevel();}));
 	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 500, 125, 40}, "Undo", [&]() {Undo();}));
+	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 450, 125, 40}, "Reset", [&]() {tile_map_.release(); tile_map_ = std::make_unique<TileMap>(31, 21, 32);}));
 	
 	auto tex_atlas = Aegis::Texture::Create("assets/textures/tundra-tile-map.png");
 	bruce_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(96, 0), Aegis::Vec2(32, 32)); 

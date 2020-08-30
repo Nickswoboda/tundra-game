@@ -9,7 +9,10 @@
 class TileMap
 {
 public:
+
 	TileMap(const std::string& file_path, int tile_size);
+	//base TileMap for level editor
+	TileMap(int width, int height, int tile_size);
 
 	void SetTextureAtlas(const Aegis::Texture& atlas);
 	void Render() const;
