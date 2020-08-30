@@ -60,20 +60,15 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 
 		if (tile != nullptr) {
 			auto index = tile_map_->GetTileIndex(*tile);
-			Aegis::Vec2 tile_spawn_pos = index * tile_map_->tile_size_;
-
 			if (selected_spawn_ != SpawnPoint::None){
-				switch (selected_spawn_){
-					case SpawnPoint::Bjorne: tile_map_->bjorne_start_pos_ = index; break;
-					case SpawnPoint::Brutus:  tile_map_->brutus_start_pos_ = index;break;
-					case SpawnPoint::Bruce:  tile_map_->player_start_pos_ = index; break;
-				}
+				auto command = std::shared_ptr<EditCommand>(new SpawnEditCommand(*tile_map_, selected_spawn_, index));
+				command->Execute();
+				recorded_edits_.push(command);
 			}
 			else if (selected_tile_ != tile->type_){
 				auto command = std::shared_ptr<EditCommand>(new TileEditCommand(*tile, selected_tile_));
+				command->Execute();
 				recorded_edits_.push(command);
-				recorded_edits_.top()->Execute();
-				
 			}
 		}
 	}
@@ -182,4 +177,34 @@ void TileEditCommand::Undo()
 		case Tile::Ice: tile_ = Ice(tile_.pos_.x, tile_.pos_.y); break;
 		case Tile::Wall: tile_ = Wall(tile_.pos_.x, tile_.pos_.y); break;
 	}
+}
+
+SpawnEditCommand::SpawnEditCommand(TileMap& tile_map, SpawnPoint spawn_point, Aegis::Vec2 new_index)
+	: tile_map_(tile_map), spawn_point_(spawn_point),  new_index_(new_index) 
+{
+	switch (spawn_point_){
+		case SpawnPoint::Bjorne: prev_index_ = tile_map_.bjorne_start_pos_; break;
+		case SpawnPoint::Brutus: prev_index_ = tile_map_.brutus_start_pos_; break;
+		case SpawnPoint::Bruce: prev_index_ = tile_map_.player_start_pos_; break;
+	}
+}
+
+void SpawnEditCommand::Execute()
+{
+	switch (spawn_point_){
+		case SpawnPoint::Bjorne: tile_map_.bjorne_start_pos_ = new_index_; break;
+		case SpawnPoint::Brutus: tile_map_.brutus_start_pos_ = new_index_; break;
+		case SpawnPoint::Bruce:  tile_map_.player_start_pos_ = new_index_; break;
+	}
+
+}
+
+void SpawnEditCommand::Undo()
+{
+	switch (spawn_point_){
+		case SpawnPoint::Bjorne: tile_map_.bjorne_start_pos_ = prev_index_; break;
+		case SpawnPoint::Brutus: tile_map_.brutus_start_pos_ = prev_index_; break;
+		case SpawnPoint::Bruce:  tile_map_.player_start_pos_ = prev_index_; break;
+	}
+
 }

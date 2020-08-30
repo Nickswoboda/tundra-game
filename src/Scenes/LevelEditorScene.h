@@ -7,6 +7,14 @@
 #include <stack>
 
 class EditCommand;
+enum class SpawnPoint
+{
+	None,
+	Bjorne,
+	Brutus,
+	Bruce
+};
+
 class LevelEditorScene : public Aegis::Scene
 {
 public:
@@ -19,14 +27,6 @@ public:
 
 	void SaveLevel();
 	void Undo();
-
-	enum class SpawnPoint
-	{
-		None,
-		Bjorne,
-		Brutus,
-		Bruce
-	};
 
 	//tiles can not be placed while a spawn is selected
 	void ChangeSelectedTile(Tile::Type tile) { selected_tile_ = tile; selected_spawn_ = SpawnPoint::None;}
@@ -67,4 +67,18 @@ public:
 	Tile& tile_;
 	Tile::Type prev_type_;
 	Tile::Type new_type_;
+};
+
+class SpawnEditCommand : public EditCommand
+{
+public:
+	SpawnEditCommand(TileMap& tile_map, SpawnPoint spawn_point, Aegis::Vec2 new_index);
+
+	void Execute() override;
+	void Undo() override;
+
+	TileMap& tile_map_;
+	SpawnPoint spawn_point_;
+	Aegis::Vec2 prev_index_;
+	Aegis::Vec2 new_index_;
 };
