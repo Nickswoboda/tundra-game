@@ -43,7 +43,7 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 		else{
 			recording_ = false;
 			if (!recorded_edits_.empty()){
-				undo_stack_.push(recorded_edits_);
+				command_stack_.push(recorded_edits_);
 			}
 
 			while (!recorded_edits_.empty()){
@@ -69,12 +69,10 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 				}
 			}
 			else if (selected_tile_ != tile->type_){
-				recorded_edits_.push({index, tile->type_});
-				switch (selected_tile_){
-					case Tile::Ground: *tile = Ground(tile_spawn_pos.x, tile_spawn_pos.y); break;
-					case Tile::Ice: *tile = Ice(tile_spawn_pos.x, tile_spawn_pos.y); break;
-					case Tile::Wall: *tile = Wall(tile_spawn_pos.x, tile_spawn_pos.y); break;
-				}
+				auto command = std::shared_ptr<EditCommand>(new TileEditCommand(*tile, selected_tile_));
+				recorded_edits_.push(command);
+				recorded_edits_.top()->Execute();
+				
 			}
 		}
 	}
@@ -150,22 +148,37 @@ void LevelEditorScene::SaveLevel()
 
 void LevelEditorScene::Undo()
 {
-	if (undo_stack_.empty()) return;
+	if (command_stack_.empty()) return;
 	else{
-		auto edits = undo_stack_.top();
-		undo_stack_.pop();
+		auto recorded_commands = command_stack_.top();
+		command_stack_.pop();
 
-		while(!edits.empty()){
-			auto undo = edits.top();
-			edits.pop();
-
-			auto tile = tile_map_->GetTileByIndex(undo.tile_pos_.x, undo.tile_pos_.y);
-			auto tile_spawn_pos = undo.tile_pos_ * tile_map_->tile_size_;
-			switch (undo.type_){
-				case Tile::Ground: *tile = Ground(tile_spawn_pos.x, tile_spawn_pos.y); break;
-				case Tile::Ice: *tile = Ice(tile_spawn_pos.x, tile_spawn_pos.y); break;
-				case Tile::Wall: *tile = Wall(tile_spawn_pos.x, tile_spawn_pos.y); break;
-			}
+		while(!recorded_commands.empty()){
+			recorded_commands.top()->Undo();
+			recorded_commands.pop();
+			
 		}
+	}
+}
+
+TileEditCommand::TileEditCommand(Tile& tile, Tile::Type new_type)
+	:tile_(tile), prev_type_(tile.type_), new_type_(new_type)
+{
+}
+
+void TileEditCommand::Execute()
+{
+	switch (new_type_){
+		case Tile::Ground: tile_ = Ground(tile_.pos_.x, tile_.pos_.y); break;
+		case Tile::Ice: tile_ = Ice(tile_.pos_.x, tile_.pos_.y); break;
+		case Tile::Wall: tile_ = Wall(tile_.pos_.x, tile_.pos_.y); break;
+	}
+}
+void TileEditCommand::Undo()
+{
+	switch (prev_type_){
+		case Tile::Ground: tile_ = Ground(tile_.pos_.x, tile_.pos_.y); break;
+		case Tile::Ice: tile_ = Ice(tile_.pos_.x, tile_.pos_.y); break;
+		case Tile::Wall: tile_ = Wall(tile_.pos_.x, tile_.pos_.y); break;
 	}
 }

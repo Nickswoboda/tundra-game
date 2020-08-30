@@ -6,12 +6,7 @@
 
 #include <stack>
 
-struct EditCommand
-{
-	Aegis::Vec2 tile_pos_;
-	Tile::Type type_;
-	
-};
+class EditCommand;
 class LevelEditorScene : public Aegis::Scene
 {
 public:
@@ -47,9 +42,29 @@ public:
 	std::shared_ptr<Aegis::SubTexture> bruce_tex_;
 	
 	bool recording_ = false;
-	std::stack<EditCommand> recorded_edits_;
+	std::stack<std::shared_ptr<EditCommand>> recorded_edits_;
 	int max_undos = 100;
-	std::stack<std::stack<EditCommand>> undo_stack_;
+	std::stack<std::stack<std::shared_ptr<EditCommand>>> command_stack_;
 
 };
 
+class EditCommand
+{
+public:
+	virtual ~EditCommand() {}
+	virtual void Execute() = 0; 
+	virtual void Undo() = 0; 
+};
+
+class TileEditCommand : public EditCommand
+{
+public:
+	TileEditCommand(Tile& tile, Tile::Type new_type);
+
+	void Execute() override;
+	void Undo() override;
+	
+	Tile& tile_;
+	Tile::Type prev_type_;
+	Tile::Type new_type_;
+};
