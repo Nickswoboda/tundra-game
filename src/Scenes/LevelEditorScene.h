@@ -28,6 +28,7 @@ public:
 	bool IsLevelValid();
 	//TODO: possibly implement Vec2 hashing f(x)
 	std::vector<std::vector<int>> GetReachableTileIndices(Aegis::Vec2 start_pos);
+	void PreviewLevel();
 	void SaveLevel();
 	void Undo();
 
@@ -35,7 +36,7 @@ public:
 	void ChangeSelectedTile(Tile::Type tile) { selected_tile_ = tile; selected_spawn_ = SpawnPoint::None;}
 	void ChangeSelectedSpawn(SpawnPoint spawn) { selected_spawn_ = spawn;}
 
-	std::unique_ptr<TileMap> tile_map_;
+	std::shared_ptr<TileMap> tile_map_;
 
 	Tile::Type selected_tile_ = Tile::Type::Ground;
 	SpawnPoint selected_spawn_ = SpawnPoint::None;
@@ -49,6 +50,7 @@ public:
 	int max_undos = 100;
 	std::stack<std::stack<std::shared_ptr<EditCommand>>> command_stack_;
 
+	int level_ = 0;
 };
 
 class EditCommand
