@@ -15,6 +15,7 @@ class GameplayScene : public Aegis::Scene
 public:
 
 	GameplayScene(int level);
+	GameplayScene(std::shared_ptr<TileMap> tile_map);
 
 	void Update() override;
 	void Render(float delta_time) override;
@@ -38,7 +39,7 @@ public:
 	Player player_;
 	Brutus brutus_;
 	Bjorne bjorne_;
-	std::unique_ptr<TileMap> tile_map_;
+	std::shared_ptr<TileMap> tile_map_;
 	int queued_movement_ = -1;
 	std::vector<Pellet> pellets_;
 	int num_lives_ = 3;

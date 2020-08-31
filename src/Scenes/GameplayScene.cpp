@@ -3,6 +3,18 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
+
+GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
+	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), ui_camera_(0, 1280, 720, 0)
+{
+	auto& texmgr = Aegis::TextureManager::Instance();
+	texmgr.Load("assets/textures/tundra-tile-map.png");
+
+	camera_.SetPosition({ -144, -24, 0 });
+
+	tile_map_ = tile_map;
+	SpawnPellets();
+}
 GameplayScene::GameplayScene(int level)
 	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), ui_camera_(0, 1280, 720, 0)
 {
