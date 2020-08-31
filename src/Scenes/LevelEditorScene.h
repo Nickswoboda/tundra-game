@@ -25,6 +25,9 @@ public:
 	void Render(float delta_time) override;
 	void OnEvent(Aegis::Event& event) override;
 
+	bool IsLevelValid();
+	//TODO: possibly implement Vec2 hashing f(x)
+	std::vector<std::vector<int>> GetReachableTileIndices(Aegis::Vec2 start_pos);
 	void SaveLevel();
 	void Undo();
 

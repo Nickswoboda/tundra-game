@@ -1,6 +1,7 @@
 #include "LevelEditorScene.h"
 
 #include <filesystem>
+#include <iostream>
 #include <fstream>
 
 LevelEditorScene::LevelEditorScene()
@@ -61,9 +62,14 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 		if (tile != nullptr) {
 			auto index = tile_map_->GetTileIndex(*tile);
 			if (selected_spawn_ != SpawnPoint::None){
-				auto command = std::shared_ptr<EditCommand>(new SpawnEditCommand(*tile_map_, selected_spawn_, index));
-				command->Execute();
-				recorded_edits_.push(command);
+				//spawns can not be on walls or on top of other entities
+				if (tile_map_->brutus_start_pos_ != index && tile_map_->bjorne_start_pos_ != index && tile_map_->player_start_pos_ != index){
+					if (tile->type_ != Tile::Wall){
+						auto command = std::shared_ptr<EditCommand>(new SpawnEditCommand(*tile_map_, selected_spawn_, index));
+						command->Execute();
+						recorded_edits_.push(command);
+					}
+				}
 			}
 			else if (selected_tile_ != tile->type_){
 				auto command = std::shared_ptr<EditCommand>(new TileEditCommand(*tile, selected_tile_));
@@ -96,9 +102,85 @@ void LevelEditorScene::Render(float delta_time)
 	Aegis::DrawQuad(tile_map_->bjorne_start_pos_ * 32, {32, 32}, bjorne_tex_);
 }
 
+std::vector<std::vector<int>> LevelEditorScene::GetReachableTileIndices(Aegis::Vec2 start_pos)
+{
+	std::vector<Aegis::Vec2> frontier;
+	frontier.push_back(start_pos);
+	std::vector<std::vector<int>> seen(tile_map_->grid_size_.x, std::vector<int>(tile_map_->grid_size_.y, 0));
+	seen[start_pos.x][start_pos.y] = 1;
+	while (!frontier.empty()) {
+		auto current = frontier[0];
+		frontier.erase(frontier.begin());
+
+		Aegis::Vec2 up = current + Aegis::Vec2(0, -1);
+		Aegis::Vec2 down = current + Aegis::Vec2(0, 1);
+		Aegis::Vec2 left = current + Aegis::Vec2(-1, 0);
+		Aegis::Vec2 right = current + Aegis::Vec2(1, 0);
+
+		auto up_tile = tile_map_->GetTileByIndex(up.x, up.y);
+		auto down_tile = tile_map_->GetTileByIndex(down.x, down.y);
+		auto left_tile = tile_map_->GetTileByIndex(left.x, left.y);
+		auto right_tile = tile_map_->GetTileByIndex(right.x, right.y);
+
+		if (up_tile && up_tile->type_ != Tile::Wall) {
+			if (seen[up.x][up.y] == 0){
+				frontier.push_back(up);
+				seen[up.x][up.y] = 1;
+			}
+		}
+		if (down_tile && down_tile->type_ != Tile::Wall) {
+			if (seen[down.x][down.y] == 0){
+				frontier.push_back(down);
+				seen[down.x][down.y] = 1;
+			}
+		}
+		if (left_tile && left_tile->type_ != Tile::Wall) {
+			if (seen[left.x][left.y] == 0){
+				frontier.push_back(left);
+				seen[left.x][left.y] = 1;
+			}
+		}
+		if (right_tile && right_tile->type_ != Tile::Wall) {
+			if (seen[right.x][right.y] == 0){
+				frontier.push_back(right);
+				seen[right.x][right.y] = 1;
+			}
+		}
+
+	}
+	return seen;
+}
+
+bool LevelEditorScene::IsLevelValid()
+{
+	//All Ice tiles and bears must be reachable by player to be considered valid
+	auto reachable_indices = GetReachableTileIndices(tile_map_->player_start_pos_);
+	if (!reachable_indices[tile_map_->brutus_start_pos_.x][tile_map_->brutus_start_pos_.y]){
+		std::cout << "Invalid level\n";
+		return false;
+	}
+	if (!reachable_indices[tile_map_->bjorne_start_pos_.x][tile_map_->bjorne_start_pos_.y]){
+		std::cout << "Invalid level\n";
+		return false;
+	}
+
+	for (int i = 0; i < tile_map_->grid_size_.x; ++i){
+		for (int j = 0; j < tile_map_->grid_size_.y; ++j){
+			if (tile_map_->GetTileByIndex(i, j)->type_ == Tile::Ice){
+				if (!reachable_indices[i][j]){
+					std::cout << "Invalid level\n";
+					return false;
+				}
+			}
+		}
+	}
+	std::cout << "valid\n";
+	return true;
+}
+
 void LevelEditorScene::SaveLevel()
 {
-	//if (IsValidLevel())
+	if (!IsLevelValid()) return;
 
 	int level = 1;
 	std::string new_file_path = "assets/levels/level" + std::to_string(level) + ".txt";
