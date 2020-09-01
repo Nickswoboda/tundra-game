@@ -11,7 +11,9 @@ add_executable (Tundra
 	"src/TileMap.h"
 	"src/TileMap.cpp"
 	"src/Tile.h" "src/Scenes/GameplayScene.cpp" "src/Scenes/MenuScene.cpp"
-	"src/Scenes/LevelSelectScene.cpp" "src/Scenes/OptionsScene.cpp" "src/Scenes/LevelEditorScene.cpp" )
+	"src/Scenes/LevelSelectScene.cpp" "src/Scenes/OptionsScene.cpp" "src/Scenes/LevelEditorScene.cpp" 
+	"src/EditCommand.cpp")
+
 
 target_link_libraries(Tundra Aegis)
 
