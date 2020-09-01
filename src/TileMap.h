@@ -22,6 +22,7 @@ public:
 	Tile* GetTileByIndex(int col, int row);
 	Tile* GetTileByPos(int x_pos, int y_pos);
 
+	std::vector<Tile*> GetAdjacentTiles(Aegis::Vec2 index);
 	std::vector<Tile*> GetTilesUnderneath(int x, int y, int w, int h);
 	std::vector<Tile*> GetTilesUnderneath(const Aegis::AABB& rect);
 

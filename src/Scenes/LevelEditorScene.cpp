@@ -135,45 +135,23 @@ std::vector<std::vector<int>> LevelEditorScene::GetReachableTileIndices(Aegis::V
 	frontier.push_back(start_pos);
 	std::vector<std::vector<int>> seen(tile_map_->grid_size_.x, std::vector<int>(tile_map_->grid_size_.y, 0));
 	seen[start_pos.x][start_pos.y] = 1;
+
 	while (!frontier.empty()) {
-		auto current = frontier[0];
+		auto current_pos = frontier[0];
 		frontier.erase(frontier.begin());
 
-		Aegis::Vec2 up = current + Aegis::Vec2(0, -1);
-		Aegis::Vec2 down = current + Aegis::Vec2(0, 1);
-		Aegis::Vec2 left = current + Aegis::Vec2(-1, 0);
-		Aegis::Vec2 right = current + Aegis::Vec2(1, 0);
+		auto neighbors = tile_map_->GetAdjacentTiles(current_pos);
+		
+		for (auto tile : neighbors){
+			if (tile->type_ != Tile::Wall){
+				Aegis::Vec2 index = tile->pos_ / 32;
 
-		auto up_tile = tile_map_->GetTileByIndex(up.x, up.y);
-		auto down_tile = tile_map_->GetTileByIndex(down.x, down.y);
-		auto left_tile = tile_map_->GetTileByIndex(left.x, left.y);
-		auto right_tile = tile_map_->GetTileByIndex(right.x, right.y);
-
-		if (up_tile && up_tile->type_ != Tile::Wall) {
-			if (seen[up.x][up.y] == 0){
-				frontier.push_back(up);
-				seen[up.x][up.y] = 1;
+				if (!seen[index.x][index.y]){
+					frontier.push_back(index);
+					seen[index.x][index.y] = 1;
+				}
 			}
 		}
-		if (down_tile && down_tile->type_ != Tile::Wall) {
-			if (seen[down.x][down.y] == 0){
-				frontier.push_back(down);
-				seen[down.x][down.y] = 1;
-			}
-		}
-		if (left_tile && left_tile->type_ != Tile::Wall) {
-			if (seen[left.x][left.y] == 0){
-				frontier.push_back(left);
-				seen[left.x][left.y] = 1;
-			}
-		}
-		if (right_tile && right_tile->type_ != Tile::Wall) {
-			if (seen[right.x][right.y] == 0){
-				frontier.push_back(right);
-				seen[right.x][right.y] = 1;
-			}
-		}
-
 	}
 	return seen;
 }

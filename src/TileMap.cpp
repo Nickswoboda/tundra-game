@@ -100,6 +100,26 @@ Tile* TileMap::GetTileByPos(int x_pos, int y_pos)
 	return GetTileByIndex(x_pos / tile_size_.x, y_pos / tile_size_.y);
 }
 
+std::vector<Tile*> TileMap::GetAdjacentTiles(Aegis::Vec2 index)
+{
+	std::vector<Tile*> tiles_;
+	
+	auto up = GetTileByIndex(index.x, index.y - 1);
+	if (up) tiles_.push_back(up);
+	
+	auto down = GetTileByIndex(index.x, index.y + 1);
+	if (down) tiles_.push_back(down);
+
+	auto left = GetTileByIndex(index.x - 1, index.y);
+	if (left) tiles_.push_back(left);
+
+	auto right = GetTileByIndex(index.x + 1, index.y);
+	if (right) tiles_.push_back(right);
+
+
+	return tiles_;
+}
+
 std::vector<Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h)
 {
 	std::vector<Tile*> temp;
