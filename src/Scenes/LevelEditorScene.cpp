@@ -221,48 +221,9 @@ void LevelEditorScene::SaveLevel()
 		show_error_msg_ = true;
 		return;
 	}
-
-	int level = 1;
-	std::string new_file_path = "assets/levels/level" + std::to_string(level) + ".txt";
-
-	while (std::filesystem::exists(new_file_path)) {
-		++level;
-		new_file_path = "assets/levels/level" + std::to_string(level) + ".txt";
+	else{
+		tile_map_->Save();
 	}
-	std::ofstream file(new_file_path);
-
-	for (int row = 0; row < tile_map_->grid_size_.y; ++row) {
-		for (int col = 0; col < tile_map_->grid_size_.x; ++col) {
-			auto coord = Aegis::Vec2(col, row);
-
-			if (coord == tile_map_->brutus_start_pos_) {
-				file << 'C';
-			}
-			else if (coord == tile_map_->player_start_pos_) {
-				file << 'P';
-			}
-			else if (coord == tile_map_->bjorne_start_pos_) {
-				file << 'B';
-			}
-			auto type = tile_map_->tiles_[col][row].type_;
-
-			switch (type)
-			{
-			case Tile::Type::Wall: {file << '0'; break; }
-			case Tile::Type::Ice: {file << '1'; break; }
-			case Tile::Type::Ground: {file << ' '; break; }
-			case Tile::Type::NumTypes: break;
-			}
-		}
-
-		//don't print newline on last row
-		if (row != tile_map_->grid_size_.y - 1) {
-			file << '\n';
-		}
-	}
-	
-
-	file.close();
 }
 
 void LevelEditorScene::Undo()

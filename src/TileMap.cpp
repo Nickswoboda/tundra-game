@@ -1,5 +1,6 @@
 #include "TileMap.h"
 
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 
@@ -139,4 +140,47 @@ Aegis::Vec2 TileMap::GetTileIndex(const Tile& tile) const
 Aegis::Vec2 TileMap::GetGridIndexByPos(const Aegis::Vec2& pos) const
 {
 	return pos / tile_size_;
+}
+
+void TileMap::Save()
+{
+	int level = 1;
+	std::string new_file_path = "assets/levels/level" + std::to_string(level) + ".txt";
+
+	while (std::filesystem::exists(new_file_path)) {
+		++level;
+		new_file_path = "assets/levels/level" + std::to_string(level) + ".txt";
+	}
+	std::ofstream file(new_file_path);
+
+	for (int row = 0; row < grid_size_.y; ++row) {
+		for (int col = 0; col < grid_size_.x; ++col) {
+			auto coord = Aegis::Vec2(col, row);
+
+			if (coord == brutus_start_pos_) {
+				file << 'C';
+			}
+			else if (coord == player_start_pos_) {
+				file << 'P';
+			}
+			else if (coord == bjorne_start_pos_) {
+				file << 'B';
+			}
+			auto type = tiles_[col][row].type_;
+
+			switch (type)
+			{
+			case Tile::Type::Wall: {file << '0'; break; }
+			case Tile::Type::Ice: {file << '1'; break; }
+			case Tile::Type::Ground: {file << ' '; break; }
+			case Tile::Type::NumTypes: break;
+			}
+		}
+
+		//don't print newline on last row
+		if (row != grid_size_.y - 1) {
+			file << '\n';
+		}
+	}
+	file.close();
 }

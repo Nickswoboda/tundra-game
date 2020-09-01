@@ -14,6 +14,8 @@ public:
 	//base TileMap for level editor
 	TileMap(int width, int height, int tile_size);
 
+	void Save();
+
 	void SetTextureAtlas(const Aegis::Texture& atlas);
 	void Render() const;
 
