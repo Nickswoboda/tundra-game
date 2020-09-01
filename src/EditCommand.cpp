@@ -1,4 +1,4 @@
-#include "LevelEditCommands.h"
+#include "EditCommand.h"
 
 TileEditCommand::TileEditCommand(Tile& tile, Tile::Type new_type)
 	:tile_(tile), prev_type_(tile.type_), new_type_(new_type)

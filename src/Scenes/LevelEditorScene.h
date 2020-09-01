@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../LevelEditCommands.h"
+#include "../EditCommand.h"
 
 #include <stack>
 
