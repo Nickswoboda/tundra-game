@@ -8,24 +8,29 @@
 
 LevelEditorScene::LevelEditorScene()
 {
+	font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 24);
 	tile_map_ = std::make_unique<TileMap>(31, 21, 32); 
 	//used to center tilemap within window
 	camera_.SetPosition({-270, -24, 0});
-	
+
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 	ui_layer_->SetFont(Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 20));
 	
-	auto back_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 600, 125, 40}, "BACK", [&](){ manager_->PopScene();}));  
-	auto round_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 200, 32, 32}, "G", [&](){ChangeSelectedTile(Tile::Ground);}));  
-	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({100, 200, 32, 32}, "I", [&](){ChangeSelectedTile(Tile::Ice);}));  
-	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({150, 200, 32, 32}, "W", [&](){ChangeSelectedTile(Tile::Wall);}));  
-	auto bjorne_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 270, 32, 32}, "Bj", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorne);}));  
-	auto player_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({100, 270, 32, 32}, "Pl", [&](){ChangeSelectedSpawn(SpawnPoint::Bruce);}));  
-	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({150, 270, 32, 32}, "Br", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
-	auto save_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 550, 125, 40}, "Save", [&]() {SaveLevel();}));
-	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 500, 125, 40}, "Undo", [&]() {Undo();}));
-	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 450, 125, 40}, "Reset", [&]() {tile_map_ = std::make_unique<TileMap>(31, 21, 32);}));
-	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 50, 400, 125, 40 }, "Preview", [&]() {PreviewLevel(); }));
+	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 70, 64, 64}, "Ground", [&](){ChangeSelectedTile(Tile::Ground); button_highligh_pos_ = {50, 200};}));  
+	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 70, 64, 64}, " Ice", [&](){ChangeSelectedTile(Tile::Ice);}));  
+	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 70, 64, 64}, "Wall", [&](){ChangeSelectedTile(Tile::Wall);}));  
+
+	auto bjorne_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 175, 64, 64}, "Bjorne", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorne);}));  
+	auto player_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 175, 64, 64}, "Bruce", [&](){ChangeSelectedSpawn(SpawnPoint::Bruce);}));  
+	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 175, 64, 64}, "Brutus", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
+
+	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 400, 80, 40}, "Undo", [&]() {Undo();}));
+	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 400, 80, 40}, "Reset", [&]() {tile_map_ = std::make_unique<TileMap>(31, 21, 32);}));
+
+	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 50, 450, 80, 40 }, "Preview", [&]() {PreviewLevel(); }));
+	auto save_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 450, 80, 40}, "Save", [&]() {SaveLevel();}));
+
+	auto back_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({70, 500, 125, 40}, "BACK", [&](){ manager_->PopScene();}));  
 
 	auto tex_atlas = Aegis::Texture::Create("assets/textures/tundra-tile-map.png");
 	bruce_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(96, 0), Aegis::Vec2(32, 32)); 
@@ -63,6 +68,9 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 		auto tile = tile_map_->GetTileByPos(mouse_pos.x, mouse_pos.y);
 
 		if (tile != nullptr) {
+
+			if (show_error_msg_) show_error_msg_ = false;
+
 			auto index = tile_map_->GetTileIndex(*tile);
 			if (selected_spawn_ != SpawnPoint::None){
 				//spawns can not be on walls or on top of other entities
@@ -92,13 +100,29 @@ void LevelEditorScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
 	Aegis::RendererClear();
-
+	Aegis::Renderer2D::SetFont(font_);
 	tile_map_->Render();
+
+	if (show_error_msg_){
+		Aegis::DrawQuad({200, 300}, {675, 55}, {1.0, 1.0, 1.0, 0.8});
+		Aegis::DrawText("Invalid Level.", {400, 300}, {1.0, 0.1, 0.1, 1.0});
+		Aegis::DrawText("Bruce must be able to reach all ice tiles and both bears.", {200, 330}, {1.0, 0.1, 0.1, 1.0});
+	}
 
 	//have to use negative numbers to counteract camera movement
 	//TODO: add ability to submit text to UILayer
-	Aegis::DrawText("Tiles:", {-200, 150});
-	Aegis::DrawText("Spawns:", {-200, 220});
+	switch (selected_tile_){
+		case Tile::Wall: Aegis::DrawText("Tile: Wall", {-230, 120}); break;
+		case Tile::Ice: Aegis::DrawText("Tile: Ice", {-230, 120}); break;
+		case Tile::Ground: Aegis::DrawText("Tile: Ground", {-230, 120}); break;
+		case Tile::NumTypes: Aegis::DrawText("Tile: None", {-230, 120}); break;
+	}
+	switch (selected_spawn_){
+		case SpawnPoint::Bjorne: Aegis::DrawText("Spawn: Bjorne", {-230, 225}); break;
+		case SpawnPoint::Brutus: Aegis::DrawText("Spawn: Brutus", {-230, 225}); break;
+		case SpawnPoint::Bruce: Aegis::DrawText("Spawn: Bruce", {-230, 225}); break;
+		case SpawnPoint::None: Aegis::DrawText("Spawn: None", {-230, 225}); break;
+	}
 
 	Aegis::DrawQuad(tile_map_->player_start_pos_ * 32, {32, 32}, bruce_tex_);
 	Aegis::DrawQuad(tile_map_->brutus_start_pos_ * 32, {32, 32}, brutus_tex_);
@@ -186,11 +210,17 @@ void LevelEditorScene::PreviewLevel()
 	if (IsLevelValid()){
 		manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(tile_map_)));
 	}
+	else{
+		show_error_msg_ = true;
+	}
 }
 
 void LevelEditorScene::SaveLevel()
 {
-	if (!IsLevelValid()) return;
+	if (!IsLevelValid()){
+		show_error_msg_ = true;
+		return;
+	}
 
 	int level = 1;
 	std::string new_file_path = "assets/levels/level" + std::to_string(level) + ".txt";
