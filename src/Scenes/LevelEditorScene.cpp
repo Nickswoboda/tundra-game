@@ -37,7 +37,6 @@ LevelEditorScene::LevelEditorScene()
 	bruce_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(96, 0), Aegis::Vec2(32, 32)); 
 	brutus_tex_ =  std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(128, 0), Aegis::Vec2(32, 32)); 
 	bjorn_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(160, 0), Aegis::Vec2(32, 32)); 
-		
 }
 
 LevelEditorScene::~LevelEditorScene()
@@ -62,6 +61,8 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 			}
 		}
 	}
+	
+	//only occurs when mouse button is being pressed
 	if (recording_edits_){
 		
 		//have to substract camera position otherwise mouse_pos is off
@@ -104,12 +105,6 @@ void LevelEditorScene::Render(float delta_time)
 	Aegis::Renderer2D::SetFont(font_);
 	tile_map_->Render();
 
-	if (show_error_msg_){
-		Aegis::DrawQuad({200, 300}, {675, 55}, {1.0, 1.0, 1.0, 0.8});
-		Aegis::DrawText("Invalid Level.", {400, 300}, {1.0, 0.1, 0.1, 1.0});
-		Aegis::DrawText("Bruce must be able to reach all ice tiles and both bears.", {200, 330}, {1.0, 0.1, 0.1, 1.0});
-	}
-
 	//have to use negative numbers to counteract camera movement
 	//TODO: add ability to submit text to UILayer
 	switch (selected_tile_){
@@ -128,6 +123,12 @@ void LevelEditorScene::Render(float delta_time)
 	Aegis::DrawQuad(tile_map_->player_start_pos_ * 32, {32, 32}, bruce_tex_);
 	Aegis::DrawQuad(tile_map_->brutus_start_pos_ * 32, {32, 32}, brutus_tex_);
 	Aegis::DrawQuad(tile_map_->bjorn_start_pos_ * 32, {32, 32}, bjorn_tex_);
+	
+	if (show_error_msg_){
+		Aegis::DrawQuad({200, 300}, {675, 55}, {1.0, 1.0, 1.0, 0.8});
+		Aegis::DrawText("Invalid Level.", {400, 300}, {1.0, 0.1, 0.1, 1.0});
+		Aegis::DrawText("Bruce must be able to reach all ice tiles and both bears.", {200, 330}, {1.0, 0.1, 0.1, 1.0});
+	}
 }
 
 bool LevelEditorScene::IsLevelValid()
@@ -135,11 +136,9 @@ bool LevelEditorScene::IsLevelValid()
 	//All Ice tiles and bears must be reachable by player to be considered valid
 	auto reachable_indices = tile_map_->GetReachableTileIndices(tile_map_->player_start_pos_);
 	if (!reachable_indices[tile_map_->brutus_start_pos_.x][tile_map_->brutus_start_pos_.y]){
-		std::cout << "Invalid level\n";
 		return false;
 	}
 	if (!reachable_indices[tile_map_->bjorn_start_pos_.x][tile_map_->bjorn_start_pos_.y]){
-		std::cout << "Invalid level\n";
 		return false;
 	}
 
@@ -147,13 +146,12 @@ bool LevelEditorScene::IsLevelValid()
 		for (int j = 0; j < tile_map_->grid_size_.y; ++j){
 			if (tile_map_->GetTileByIndex(i, j)->type_ == Tile::Ice){
 				if (!reachable_indices[i][j]){
-					std::cout << "Invalid level\n";
 					return false;
 				}
 			}
 		}
 	}
-	std::cout << "valid\n";
+
 	return true;
 }
 
@@ -181,6 +179,7 @@ void LevelEditorScene::SaveLevel()
 void LevelEditorScene::Undo()
 {
 	if (edit_stack_.empty()) return;
+
 	else{
 		auto recorded_commands = edit_stack_.top();
 		edit_stack_.pop();
