@@ -31,13 +31,13 @@ TileMap::TileMap(const std::string& file_path, int tile_size)
 		switch (ch)
 		{
 			case 'P': {
-				player_start_pos_ = Aegis::Vec2( col, row ); break;
+				bruce_spawn_index_ = Aegis::Vec2( col, row ); break;
 			}
 			case 'B': {
-				bjorn_start_pos_ = Aegis::Vec2(col, row); break;
+				bjorn_spawn_index_ = Aegis::Vec2(col, row); break;
 			}
 			case 'C': {
-				brutus_start_pos_ = Aegis::Vec2(col, row); break;
+				brutus_spawn_index_ = Aegis::Vec2(col, row); break;
 			}
 			case '0': {
 				tiles_[col].emplace_back(Wall(col * tile_size, row * tile_size)); ++col; break;
@@ -63,8 +63,8 @@ TileMap::TileMap(int width, int height, int tile_size)
 	tile_textures_.emplace_back(std::make_shared<Aegis::SubTexture>(tile_atlas_, Aegis::Vec2(64.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)));
 	tile_textures_.emplace_back(std::make_shared<Aegis::SubTexture>(tile_atlas_, Aegis::Vec2(32.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)));
 
-	brutus_start_pos_ = {1, 0};
-	bjorn_start_pos_ = {2, 0};
+	brutus_spawn_index_ = {1, 0};
+	bjorn_spawn_index_ = {2, 0};
 	for (int i = 0; i < width; ++i){
 		std::vector<Tile> col;
 		for (int j = 0; j < height; ++j){
@@ -203,13 +203,13 @@ void TileMap::Save()
 		for (int col = 0; col < grid_size_.x; ++col) {
 			auto coord = Aegis::Vec2(col, row);
 
-			if (coord == brutus_start_pos_) {
+			if (coord == brutus_spawn_index_) {
 				file << 'C';
 			}
-			else if (coord == player_start_pos_) {
+			else if (coord == bruce_spawn_index_) {
 				file << 'P';
 			}
-			else if (coord == bjorn_start_pos_) {
+			else if (coord == bjorn_spawn_index_) {
 				file << 'B';
 			}
 			auto type = tiles_[col][row].type_;

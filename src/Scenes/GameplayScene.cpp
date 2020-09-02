@@ -328,9 +328,9 @@ void GameplayScene::LoadLevel(const std::string& file_path)
 {
 	tile_map_ = std::make_unique<TileMap>(file_path, 32);
 
-	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
-	SetObjectOnGrid(brutus_, tile_map_->brutus_start_pos_);
-	SetObjectOnGrid(bjorn_, tile_map_->bjorn_start_pos_);
+	SetObjectOnGrid(player_, tile_map_->bruce_spawn_index_);
+	SetObjectOnGrid(brutus_, tile_map_->brutus_spawn_index_);
+	SetObjectOnGrid(bjorn_, tile_map_->bjorn_spawn_index_);
 	GetEnemyTargetPos(brutus_);
 	GetEnemyTargetPos(bjorn_);
 
@@ -345,9 +345,9 @@ void GameplayScene::ResetLevel()
 	brutus_.animation_.Stop();
 	bjorn_.animation_.Stop();
 
-	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
-	SetObjectOnGrid(brutus_, tile_map_->brutus_start_pos_);
-	SetObjectOnGrid(bjorn_, tile_map_->bjorn_start_pos_);
+	SetObjectOnGrid(player_, tile_map_->bruce_spawn_index_);
+	SetObjectOnGrid(brutus_, tile_map_->brutus_spawn_index_);
+	SetObjectOnGrid(bjorn_, tile_map_->bjorn_spawn_index_);
 }
 
 void GameplayScene::SaveLevel() const

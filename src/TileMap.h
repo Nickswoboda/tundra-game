@@ -34,9 +34,9 @@ public:
 	std::vector<std::vector<Tile>> tiles_;
 	std::shared_ptr<Aegis::Texture> tile_atlas_;
 	std::vector<std::shared_ptr<Aegis::SubTexture>> tile_textures_;
-	Aegis::Vec2 player_start_pos_;
-	Aegis::Vec2 bjorn_start_pos_;
-	Aegis::Vec2 brutus_start_pos_;
+	Aegis::Vec2 bruce_spawn_index_;
+	Aegis::Vec2 bjorn_spawn_index_;
+	Aegis::Vec2 brutus_spawn_index_;
 	Aegis::Vec2 tile_size_;
 	Aegis::Vec2 grid_size_;
 

@@ -76,7 +76,7 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 			auto index = tile_map_->GetTileIndex(*tile);
 			if (selected_spawn_ != SpawnPoint::None){
 				//spawns can not be on walls or on top of other entities
-				if (tile_map_->brutus_start_pos_ != index && tile_map_->bjorn_start_pos_ != index && tile_map_->player_start_pos_ != index){
+				if (tile_map_->bruce_spawn_index_ != index && tile_map_->bjorn_spawn_index_ != index && tile_map_->bruce_spawn_index_ != index){
 					if (tile->type_ != Tile::Wall){
 						auto command = std::shared_ptr<EditCommand>(new SpawnEditCommand(*tile_map_, selected_spawn_, index));
 						command->Execute();
@@ -120,9 +120,9 @@ void LevelEditorScene::Render(float delta_time)
 		case SpawnPoint::None: Aegis::DrawText("Spawn: None", {-230, 225}); break;
 	}
 
-	Aegis::DrawQuad(tile_map_->player_start_pos_ * 32, {32, 32}, bruce_tex_);
-	Aegis::DrawQuad(tile_map_->brutus_start_pos_ * 32, {32, 32}, brutus_tex_);
-	Aegis::DrawQuad(tile_map_->bjorn_start_pos_ * 32, {32, 32}, bjorn_tex_);
+	Aegis::DrawQuad(tile_map_->bruce_spawn_index_ * 32, {32, 32}, bruce_tex_);
+	Aegis::DrawQuad(tile_map_->brutus_spawn_index_ * 32, {32, 32}, brutus_tex_);
+	Aegis::DrawQuad(tile_map_->bjorn_spawn_index_ * 32, {32, 32}, bjorn_tex_);
 	
 	if (show_error_msg_){
 		Aegis::DrawQuad({200, 300}, {675, 55}, {1.0, 1.0, 1.0, 0.8});
@@ -134,11 +134,11 @@ void LevelEditorScene::Render(float delta_time)
 bool LevelEditorScene::IsLevelValid()
 {
 	//All Ice tiles and bears must be reachable by player to be considered valid
-	auto reachable_indices = tile_map_->GetReachableTileIndices(tile_map_->player_start_pos_);
-	if (!reachable_indices[tile_map_->brutus_start_pos_.x][tile_map_->brutus_start_pos_.y]){
+	auto reachable_indices = tile_map_->GetReachableTileIndices(tile_map_->bruce_spawn_index_);
+	if (!reachable_indices[tile_map_->brutus_spawn_index_.x][tile_map_->brutus_spawn_index_.y]){
 		return false;
 	}
-	if (!reachable_indices[tile_map_->bjorn_start_pos_.x][tile_map_->bjorn_start_pos_.y]){
+	if (!reachable_indices[tile_map_->bjorn_spawn_index_.x][tile_map_->bjorn_spawn_index_.y]){
 		return false;
 	}
 
