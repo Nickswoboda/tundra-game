@@ -6,7 +6,7 @@
 enum class SpawnPoint
 {
 	None,
-	Bjorne,
+	Bjorn,
 	Brutus,
 	Bruce
 };

@@ -19,6 +19,7 @@ public:
 	std::vector<std::vector<int>> GetReachableTileIndices(Aegis::Vec2 start_pos);
 	void PreviewLevel();
 	void SaveLevel();
+	
 	void Undo();
 
 	//tiles can not be placed while a spawn is selected
@@ -31,18 +32,16 @@ public:
 	Tile::Type selected_tile_ = Tile::Type::Ground;
 	SpawnPoint selected_spawn_ = SpawnPoint::None;
 
-	std::shared_ptr<Aegis::SubTexture> bjorne_tex_;
+	std::shared_ptr<Aegis::SubTexture> bjorn_tex_;
 	std::shared_ptr<Aegis::SubTexture> brutus_tex_;
 	std::shared_ptr<Aegis::SubTexture> bruce_tex_;
 
 	bool show_error_msg_ = false;
 	
-	bool recording_ = false;
+	bool recording_edits_ = false;
 	std::stack<std::shared_ptr<EditCommand>> recorded_edits_;
-	int max_undos = 100;
-	std::stack<std::stack<std::shared_ptr<EditCommand>>> command_stack_;
+	std::stack<std::stack<std::shared_ptr<EditCommand>>> edit_stack_;
 
 	int level_ = 0;
-	Aegis::Vec2 button_highligh_pos_;
 };
 

@@ -23,7 +23,7 @@ void Brutus::Render(float delta_time) const
 	//Aegis::DrawQuad(grid_coord_ * TILE_SIZE, rect_.size, { 1.0f, 0.0f, 0.0f, 0.5f });
 }
 
-void Bjorne::Render(float delta_time) const
+void Bjorn::Render(float delta_time) const
 {
 	Aegis::RenderSprite(sprite_);
 	//Aegis::DrawQuad(grid_coord_ * TILE_SIZE, rect_.size, { 1.0f, 1.0f, 0.0f, 0.5f });

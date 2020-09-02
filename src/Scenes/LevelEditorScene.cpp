@@ -10,17 +10,18 @@ LevelEditorScene::LevelEditorScene()
 {
 	font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 24);
 	tile_map_ = std::make_unique<TileMap>(31, 21, 32); 
+
 	//used to center tilemap within window
 	camera_.SetPosition({-270, -24, 0});
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 	ui_layer_->SetFont(Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 20));
 	
-	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 70, 64, 64}, "Ground", [&](){ChangeSelectedTile(Tile::Ground); button_highligh_pos_ = {50, 200};}));  
+	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 70, 64, 64}, "Ground", [&](){ChangeSelectedTile(Tile::Ground);}));  
 	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 70, 64, 64}, " Ice", [&](){ChangeSelectedTile(Tile::Ice);}));  
 	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 70, 64, 64}, "Wall", [&](){ChangeSelectedTile(Tile::Wall);}));  
 
-	auto bjorne_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 175, 64, 64}, "Bjorne", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorne);}));  
+	auto bjorn_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 175, 64, 64}, "Bjorn", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorn);}));  
 	auto player_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 175, 64, 64}, "Bruce", [&](){ChangeSelectedSpawn(SpawnPoint::Bruce);}));  
 	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 175, 64, 64}, "Brutus", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
 
@@ -30,12 +31,12 @@ LevelEditorScene::LevelEditorScene()
 	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 50, 450, 80, 40 }, "Preview", [&]() {PreviewLevel(); }));
 	auto save_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 450, 80, 40}, "Save", [&]() {SaveLevel();}));
 
-	auto back_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({70, 500, 125, 40}, "BACK", [&](){ manager_->PopScene();}));  
+	auto back_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({70, 500, 125, 40}, "Exit", [&](){ manager_->PopScene();}));  
 
 	auto tex_atlas = Aegis::Texture::Create("assets/textures/tundra-tile-map.png");
 	bruce_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(96, 0), Aegis::Vec2(32, 32)); 
 	brutus_tex_ =  std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(128, 0), Aegis::Vec2(32, 32)); 
-	bjorne_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(160, 0), Aegis::Vec2(32, 32)); 
+	bjorn_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(160, 0), Aegis::Vec2(32, 32)); 
 		
 }
 
@@ -48,12 +49,12 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 	auto mouse_click = dynamic_cast<Aegis::MouseClickEvent*>(&event);
 	if (mouse_click){
 		if (mouse_click->action_ == AE_BUTTON_PRESS){
-			recording_ = true;
+			recording_edits_ = true;
 		}
 		else{
-			recording_ = false;
+			recording_edits_ = false;
 			if (!recorded_edits_.empty()){
-				command_stack_.push(recorded_edits_);
+				edit_stack_.push(recorded_edits_);
 			}
 
 			while (!recorded_edits_.empty()){
@@ -61,7 +62,7 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 			}
 		}
 	}
-	if (recording_){
+	if (recording_edits_){
 		
 		//have to substract camera position otherwise mouse_pos is off
 		auto mouse_pos = Aegis::Application::GetWindow().GetMousePos() - Aegis::Vec2(270, 24);
@@ -74,7 +75,7 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 			auto index = tile_map_->GetTileIndex(*tile);
 			if (selected_spawn_ != SpawnPoint::None){
 				//spawns can not be on walls or on top of other entities
-				if (tile_map_->brutus_start_pos_ != index && tile_map_->bjorne_start_pos_ != index && tile_map_->player_start_pos_ != index){
+				if (tile_map_->brutus_start_pos_ != index && tile_map_->bjorn_start_pos_ != index && tile_map_->player_start_pos_ != index){
 					if (tile->type_ != Tile::Wall){
 						auto command = std::shared_ptr<EditCommand>(new SpawnEditCommand(*tile_map_, selected_spawn_, index));
 						command->Execute();
@@ -118,7 +119,7 @@ void LevelEditorScene::Render(float delta_time)
 		case Tile::NumTypes: Aegis::DrawText("Tile: None", {-230, 120}); break;
 	}
 	switch (selected_spawn_){
-		case SpawnPoint::Bjorne: Aegis::DrawText("Spawn: Bjorne", {-230, 225}); break;
+		case SpawnPoint::Bjorn: Aegis::DrawText("Spawn: Bjorn", {-230, 225}); break;
 		case SpawnPoint::Brutus: Aegis::DrawText("Spawn: Brutus", {-230, 225}); break;
 		case SpawnPoint::Bruce: Aegis::DrawText("Spawn: Bruce", {-230, 225}); break;
 		case SpawnPoint::None: Aegis::DrawText("Spawn: None", {-230, 225}); break;
@@ -126,7 +127,7 @@ void LevelEditorScene::Render(float delta_time)
 
 	Aegis::DrawQuad(tile_map_->player_start_pos_ * 32, {32, 32}, bruce_tex_);
 	Aegis::DrawQuad(tile_map_->brutus_start_pos_ * 32, {32, 32}, brutus_tex_);
-	Aegis::DrawQuad(tile_map_->bjorne_start_pos_ * 32, {32, 32}, bjorne_tex_);
+	Aegis::DrawQuad(tile_map_->bjorn_start_pos_ * 32, {32, 32}, bjorn_tex_);
 }
 
 std::vector<std::vector<int>> LevelEditorScene::GetReachableTileIndices(Aegis::Vec2 start_pos)
@@ -164,7 +165,7 @@ bool LevelEditorScene::IsLevelValid()
 		std::cout << "Invalid level\n";
 		return false;
 	}
-	if (!reachable_indices[tile_map_->bjorne_start_pos_.x][tile_map_->bjorne_start_pos_.y]){
+	if (!reachable_indices[tile_map_->bjorn_start_pos_.x][tile_map_->bjorn_start_pos_.y]){
 		std::cout << "Invalid level\n";
 		return false;
 	}
@@ -206,10 +207,10 @@ void LevelEditorScene::SaveLevel()
 
 void LevelEditorScene::Undo()
 {
-	if (command_stack_.empty()) return;
+	if (edit_stack_.empty()) return;
 	else{
-		auto recorded_commands = command_stack_.top();
-		command_stack_.pop();
+		auto recorded_commands = edit_stack_.top();
+		edit_stack_.pop();
 
 		while(!recorded_commands.empty()){
 			recorded_commands.top()->Undo();

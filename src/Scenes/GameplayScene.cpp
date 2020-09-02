@@ -5,7 +5,7 @@
 #include <filesystem>
 
 GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
-	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), ui_camera_(0, 1280, 720, 0)
+	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0), ui_camera_(0, 1280, 720, 0)
 {
 	auto& texmgr = Aegis::TextureManager::Instance();
 	texmgr.Load("assets/textures/tundra-tile-map.png");
@@ -16,7 +16,7 @@ GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
 	SpawnPellets();
 }
 GameplayScene::GameplayScene(int level)
-	:player_(0, 0), brutus_(0, 0), bjorne_(0, 0), ui_camera_(0, 1280, 720, 0)
+	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0), ui_camera_(0, 1280, 720, 0)
 {
 	auto& texmgr = Aegis::TextureManager::Instance();
 	texmgr.Load("assets/textures/tundra-tile-map.png");
@@ -46,14 +46,14 @@ void GameplayScene::Update()
 		GetEnemyTargetPos(brutus_);
 	}
 
-	if (bjorne_.animation_.playing_) {
-		bjorne_.Update();
+	if (bjorn_.animation_.playing_) {
+		bjorn_.Update();
 	}
 	else {
-		GetEnemyTargetPos(bjorne_);
+		GetEnemyTargetPos(bjorn_);
 	}
 
-	if (Aegis::AABBHasCollided(player_.sprite_.rect_, brutus_.sprite_.rect_) || Aegis::AABBHasCollided(player_.sprite_.rect_, bjorne_.sprite_.rect_)) {
+	if (Aegis::AABBHasCollided(player_.sprite_.rect_, brutus_.sprite_.rect_) || Aegis::AABBHasCollided(player_.sprite_.rect_, bjorn_.sprite_.rect_)) {
 		--num_lives_;
 		if (num_lives_ == 0) {
 			manager_->PopScene();
@@ -128,7 +128,7 @@ void GameplayScene::Render(float delta_time)
 	tile_map_->Render();
 	player_.Render(delta_time);
 	brutus_.Render(delta_time);
-	bjorne_.Render(delta_time);
+	bjorn_.Render(delta_time);
 	for (auto& pellet : pellets_)
 	{
 		pellet.Render(0.0f);
@@ -330,9 +330,9 @@ void GameplayScene::LoadLevel(const std::string& file_path)
 
 	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
 	SetObjectOnGrid(brutus_, tile_map_->brutus_start_pos_);
-	SetObjectOnGrid(bjorne_, tile_map_->bjorne_start_pos_);
+	SetObjectOnGrid(bjorn_, tile_map_->bjorn_start_pos_);
 	GetEnemyTargetPos(brutus_);
-	GetEnemyTargetPos(bjorne_);
+	GetEnemyTargetPos(bjorn_);
 
 	SpawnPellets();
 }
@@ -343,11 +343,11 @@ void GameplayScene::ResetLevel()
 
 	player_.animation_.Stop();
 	brutus_.animation_.Stop();
-	bjorne_.animation_.Stop();
+	bjorn_.animation_.Stop();
 
 	SetObjectOnGrid(player_, tile_map_->player_start_pos_);
 	SetObjectOnGrid(brutus_, tile_map_->brutus_start_pos_);
-	SetObjectOnGrid(bjorne_, tile_map_->bjorne_start_pos_);
+	SetObjectOnGrid(bjorn_, tile_map_->bjorn_start_pos_);
 }
 
 void GameplayScene::SaveLevel() const

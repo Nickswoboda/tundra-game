@@ -38,7 +38,7 @@ public:
 	Aegis::Camera ui_camera_;
 	Player player_;
 	Brutus brutus_;
-	Bjorne bjorne_;
+	Bjorn bjorn_;
 	std::shared_ptr<TileMap> tile_map_;
 	int queued_movement_ = -1;
 	std::vector<Pellet> pellets_;

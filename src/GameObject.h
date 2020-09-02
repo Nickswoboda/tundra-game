@@ -78,10 +78,10 @@ public:
 
 };
 
-class Bjorne : public GameObject
+class Bjorn : public GameObject
 {
 public:
-	Bjorne(int x, int y)
+	Bjorn(int x, int y)
 		:GameObject(x, y, 32, 32, {160, 0})
 	{
 		speed_ = .25f;

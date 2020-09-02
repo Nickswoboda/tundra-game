@@ -34,7 +34,7 @@ TileMap::TileMap(const std::string& file_path, int tile_size)
 				player_start_pos_ = Aegis::Vec2( col, row ); break;
 			}
 			case 'B': {
-				bjorne_start_pos_ = Aegis::Vec2(col, row); break;
+				bjorn_start_pos_ = Aegis::Vec2(col, row); break;
 			}
 			case 'C': {
 				brutus_start_pos_ = Aegis::Vec2(col, row); break;
@@ -64,7 +64,7 @@ TileMap::TileMap(int width, int height, int tile_size)
 	tile_textures_.emplace_back(std::make_shared<Aegis::SubTexture>(tile_atlas_, Aegis::Vec2(32.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)));
 
 	brutus_start_pos_ = {1, 0};
-	bjorne_start_pos_ = {2, 0};
+	bjorn_start_pos_ = {2, 0};
 	for (int i = 0; i < width; ++i){
 		std::vector<Tile> col;
 		for (int j = 0; j < height; ++j){
@@ -183,7 +183,7 @@ void TileMap::Save()
 			else if (coord == player_start_pos_) {
 				file << 'P';
 			}
-			else if (coord == bjorne_start_pos_) {
+			else if (coord == bjorn_start_pos_) {
 				file << 'B';
 			}
 			auto type = tiles_[col][row].type_;

@@ -28,7 +28,7 @@ SpawnEditCommand::SpawnEditCommand(TileMap& tile_map, SpawnPoint spawn_point, Ae
 	: tile_map_(tile_map), spawn_point_(spawn_point),  new_index_(new_index) 
 {
 	switch (spawn_point_){
-		case SpawnPoint::Bjorne: prev_index_ = tile_map_.bjorne_start_pos_; break;
+		case SpawnPoint::Bjorn: prev_index_ = tile_map_.bjorn_start_pos_; break;
 		case SpawnPoint::Brutus: prev_index_ = tile_map_.brutus_start_pos_; break;
 		case SpawnPoint::Bruce: prev_index_ = tile_map_.player_start_pos_; break;
 		case SpawnPoint::None: break;
@@ -38,7 +38,7 @@ SpawnEditCommand::SpawnEditCommand(TileMap& tile_map, SpawnPoint spawn_point, Ae
 void SpawnEditCommand::Execute()
 {
 	switch (spawn_point_){
-		case SpawnPoint::Bjorne: tile_map_.bjorne_start_pos_ = new_index_; break;
+		case SpawnPoint::Bjorn: tile_map_.bjorn_start_pos_ = new_index_; break;
 		case SpawnPoint::Brutus: tile_map_.brutus_start_pos_ = new_index_; break;
 		case SpawnPoint::Bruce:  tile_map_.player_start_pos_ = new_index_; break;
 		case SpawnPoint::None: break;
@@ -49,7 +49,7 @@ void SpawnEditCommand::Execute()
 void SpawnEditCommand::Undo()
 {
 	switch (spawn_point_){
-		case SpawnPoint::Bjorne: tile_map_.bjorne_start_pos_ = prev_index_; break;
+		case SpawnPoint::Bjorn: tile_map_.bjorn_start_pos_ = prev_index_; break;
 		case SpawnPoint::Brutus: tile_map_.brutus_start_pos_ = prev_index_; break;
 		case SpawnPoint::Bruce:  tile_map_.player_start_pos_ = prev_index_; break;
 		case SpawnPoint::None: break;
