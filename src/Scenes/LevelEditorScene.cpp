@@ -12,7 +12,7 @@ LevelEditorScene::LevelEditorScene()
 	tile_map_ = std::make_unique<TileMap>(31, 21, 32); 
 
 	//used to center tilemap within window
-	camera_.SetPosition({-270, -24, 0});
+	camera_.SetPosition({-270, -24});
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 	ui_layer_->SetFont(Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 20));

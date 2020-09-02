@@ -10,7 +10,7 @@ GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
 	auto& texmgr = Aegis::TextureManager::Instance();
 	texmgr.Load("assets/textures/tundra-tile-map.png");
 
-	camera_.SetPosition({ -144, -24, 0 });
+	camera_.SetPosition({ -144, -24});
 
 	tile_map_ = tile_map;
 	SpawnPellets();
@@ -26,7 +26,7 @@ GameplayScene::GameplayScene(int level)
 	}
 	LoadLevel("assets/levels/level" + std::to_string(level + 1) + ".txt");
 	
-	camera_.SetPosition({ -144, -24, 0 });
+	camera_.SetPosition({ -144, -24});
 }
 
 void GameplayScene::Update()
