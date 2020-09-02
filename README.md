@@ -14,7 +14,6 @@ Tundra has been created as a sandbox to test and guide the development of the [A
 - 2 different levels
 ### To do
 - Scores
-- Improve level editor
 - Add more levels
 - Improve art/add sound
 
