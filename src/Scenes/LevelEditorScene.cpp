@@ -130,37 +130,10 @@ void LevelEditorScene::Render(float delta_time)
 	Aegis::DrawQuad(tile_map_->bjorn_start_pos_ * 32, {32, 32}, bjorn_tex_);
 }
 
-std::vector<std::vector<int>> LevelEditorScene::GetReachableTileIndices(Aegis::Vec2 start_pos)
-{
-	std::vector<Aegis::Vec2> frontier;
-	frontier.push_back(start_pos);
-	std::vector<std::vector<int>> seen(tile_map_->grid_size_.x, std::vector<int>(tile_map_->grid_size_.y, 0));
-	seen[start_pos.x][start_pos.y] = 1;
-
-	while (!frontier.empty()) {
-		auto current_pos = frontier[0];
-		frontier.erase(frontier.begin());
-
-		auto neighbors = tile_map_->GetAdjacentTiles(current_pos);
-		
-		for (auto tile : neighbors){
-			if (tile->type_ != Tile::Wall){
-				Aegis::Vec2 index = tile->pos_ / 32;
-
-				if (!seen[index.x][index.y]){
-					frontier.push_back(index);
-					seen[index.x][index.y] = 1;
-				}
-			}
-		}
-	}
-	return seen;
-}
-
 bool LevelEditorScene::IsLevelValid()
 {
 	//All Ice tiles and bears must be reachable by player to be considered valid
-	auto reachable_indices = GetReachableTileIndices(tile_map_->player_start_pos_);
+	auto reachable_indices = tile_map_->GetReachableTileIndices(tile_map_->player_start_pos_);
 	if (!reachable_indices[tile_map_->brutus_start_pos_.x][tile_map_->brutus_start_pos_.y]){
 		std::cout << "Invalid level\n";
 		return false;

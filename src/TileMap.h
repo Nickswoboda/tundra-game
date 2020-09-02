@@ -25,6 +25,8 @@ public:
 	std::vector<Tile*> GetAdjacentTiles(Aegis::Vec2 index);
 	std::vector<Tile*> GetTilesUnderneath(int x, int y, int w, int h);
 	std::vector<Tile*> GetTilesUnderneath(const Aegis::AABB& rect);
+	//TODO: possibly create hash func for Aegis::Vec2
+	std::vector<std::vector<bool>> GetReachableTileIndices(Aegis::Vec2 start_index);
 
 	Aegis::Vec2 GetTileIndex(const Tile& tile) const;
 	Aegis::Vec2 GetGridIndexByPos(const Aegis::Vec2& pos) const;

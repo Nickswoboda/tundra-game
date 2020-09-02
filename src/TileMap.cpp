@@ -147,6 +147,32 @@ std::vector<Tile*> TileMap::GetTilesUnderneath(const Aegis::AABB& rect)
 	return GetTilesUnderneath(rect.pos.x, rect.pos.y, rect.size.x, rect.size.y);
 }
 
+std::vector<std::vector<bool>> TileMap::GetReachableTileIndices(Aegis::Vec2 start_index)
+{
+	std::vector<Aegis::Vec2> frontier;
+	frontier.push_back(start_index);
+	std::vector<std::vector<bool>> seen(grid_size_.x, std::vector<bool>(grid_size_.y, false));
+	seen[start_index.x][start_index.y] = true;
+
+	while (!frontier.empty()) {
+		auto current_pos = frontier[0];
+		frontier.erase(frontier.begin());
+
+		auto neighbors = GetAdjacentTiles(current_pos);
+		
+		for (auto tile : neighbors){
+			if (tile->type_ != Tile::Wall){
+				Aegis::Vec2 index = tile->pos_ / 32;
+
+				if (!seen[index.x][index.y]){
+					frontier.push_back(index);
+					seen[index.x][index.y] = true;
+				}
+			}
+		}
+	}
+	return seen;
+}
 void TileMap::SetTextureAtlas(const Aegis::Texture& atlas)
 {
 	tile_atlas_ = std::make_unique<Aegis::Texture>(atlas);
