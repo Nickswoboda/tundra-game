@@ -12,16 +12,9 @@ public:
 	void Render(float delta_time) override;
 	void OnEvent(Aegis::Event& event) override;
 
-	std::shared_ptr<Aegis::Font> title_font_;
-	std::shared_ptr<Aegis::Font> button_font_;
 	std::shared_ptr<Aegis::Texture> title_background_;
 
 	std::shared_ptr<Aegis::Sprite> title_sprite_;
 
 	std::shared_ptr<Aegis::Container> v_box_;
-	
-	std::shared_ptr<Aegis::Button> new_game_button_;
-	std::shared_ptr<Aegis::Button> level_select_button_;
-	std::shared_ptr<Aegis::Button> options_button_;
-	std::shared_ptr<Aegis::Button> exit_button_;
 };
