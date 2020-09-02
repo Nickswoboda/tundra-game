@@ -5,7 +5,7 @@
 #include <filesystem>
 
 GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
-	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0), ui_camera_(0, 1280, 720, 0)
+	:ui_camera_(0, 1280, 720, 0), player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
 {
 	auto& texmgr = Aegis::TextureManager::Instance();
 	texmgr.Load("assets/textures/tundra-tile-map.png");
@@ -16,7 +16,7 @@ GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
 	SpawnPellets();
 }
 GameplayScene::GameplayScene(int level)
-	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0), ui_camera_(0, 1280, 720, 0)
+	:ui_camera_(0, 1280, 720, 0), player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
 {
 	auto& texmgr = Aegis::TextureManager::Instance();
 	texmgr.Load("assets/textures/tundra-tile-map.png");
@@ -85,30 +85,13 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 
 	if (key_event && (key_event->action_ == AE_BUTTON_PRESS || key_event->action_ == AE_BUTTON_REPEAT)) {
 		auto key = key_event->key_;
-		if (key == AE_KEY_J) {
+		if (key == AE_KEY_ESCAPE) {
 			manager_->PopScene();
 			return;
 		}
 		if (key == AE_KEY_K) {
 			ResetLevel();
 			SpawnPellets();
-		}
-		if (key == AE_KEY_R || key == AE_KEY_T || key == AE_KEY_Y) {
-			//adjust for camera movement
-			auto mouse_pos = Aegis::Application::GetWindow().GetMousePos() - Aegis::Vec2(144, 24);
-			auto tile = tile_map_->GetTileByPos(mouse_pos.x, mouse_pos.y);
-
-			if (tile != nullptr) {
-				auto index = tile_map_->GetTileIndex(*tile);
-
-				Aegis::Vec2 tile_spawn_pos = index * tile_map_->tile_size_;
-				switch (key)
-				{
-				case AE_KEY_R: *tile = Wall(tile_spawn_pos.x, tile_spawn_pos.y); break;
-				case AE_KEY_T: *tile = Ice(tile_spawn_pos.x, tile_spawn_pos.y); break;
-				case AE_KEY_Y: *tile = Ground(tile_spawn_pos.x, tile_spawn_pos.y); break;
-				}
-			}
 		}
 		if (key == AE_KEY_UP || key == AE_KEY_DOWN || key == AE_KEY_LEFT || key == AE_KEY_RIGHT) {
 			if (!player_.animation_.playing_) {
@@ -287,23 +270,13 @@ std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesSliding(const Aegis::Vec
 
 std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesMoving(const Aegis::Vec2& tile) const
 {
-	std::vector<Aegis::Vec2> neighbors;
-	Aegis::Vec2 up = tile + Aegis::Vec2(0, -1);
-	Aegis::Vec2 down = tile + Aegis::Vec2(0, 1);
-	Aegis::Vec2 left = tile + Aegis::Vec2(-1, 0);
-	Aegis::Vec2 right = tile + Aegis::Vec2(1, 0);
+	auto adjacent_tiles = tile_map_->GetAdjacentTiles(tile);
 
-	if (tile_map_->GetTileByIndex(up.x, up.y)->type_ != Tile::Type::Wall) {
-		neighbors.push_back(up);
-	}
-	if (tile_map_->GetTileByIndex(down.x, down.y)->type_ != Tile::Type::Wall) {
-		neighbors.push_back(down);
-	}
-	if (tile_map_->GetTileByIndex(left.x, left.y)->type_ != Tile::Type::Wall) {
-		neighbors.push_back(left);
-	}
-	if (tile_map_->GetTileByIndex(right.x, right.y)->type_ != Tile::Type::Wall) {
-		neighbors.push_back(right);
+	std::vector<Aegis::Vec2> neighbors;
+	for (auto adj : adjacent_tiles){
+		if (adj->type_ != Tile::Wall){
+			neighbors.push_back(adj->pos_ / 32);
+		}
 	}
 
 	return neighbors;
@@ -348,37 +321,5 @@ void GameplayScene::ResetLevel()
 	SetObjectOnGrid(player_, tile_map_->bruce_spawn_index_);
 	SetObjectOnGrid(brutus_, tile_map_->brutus_spawn_index_);
 	SetObjectOnGrid(bjorn_, tile_map_->bjorn_spawn_index_);
-}
-
-void GameplayScene::SaveLevel() const
-{
-	int level = 1;
-	std::string new_file_path = "C:/dev/tundra/assets/levels/level" + std::to_string(level) + ".txt";
-
-	while (std::filesystem::exists(new_file_path)) {
-		++level;
-		new_file_path = "C:/dev/tundra/assets/levels/level" + std::to_string(level) + ".txt";
-	}
-	std::ofstream file(new_file_path);
-
-	for (int row = 0; row < tile_map_->grid_size_.x; ++row) {
-		for (int col = 0; col < tile_map_->grid_size_.y; ++col) {
-			auto type = tile_map_->tiles_[col][row].type_;
-
-			switch (type)
-			{
-			case Tile::Type::Wall: {file << '0'; break; }
-			case Tile::Type::Ice: {file << '1'; break; }
-			case Tile::Type::Ground: {file << ' '; break; }
-			}
-		}
-
-		//don't print newline on last row
-		if (row != tile_map_->grid_size_.y - 1) {
-			file << '\n';
-		}
-	}
-
-	file.close();
 }
 

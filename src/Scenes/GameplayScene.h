@@ -33,7 +33,6 @@ public:
 	void SpawnPellets();
 	void LoadLevel(const std::string& file_path);
 	void ResetLevel();
-	void SaveLevel() const;
 
 	Aegis::Camera ui_camera_;
 	Player player_;
