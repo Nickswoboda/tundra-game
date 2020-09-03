@@ -3,6 +3,7 @@
 #include "GameplayScene.h"
 #include "LevelEditorScene.h"
 
+#include <filesystem>
 LevelSelectScene::LevelSelectScene()
 {
 	title_font_ = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 64);
@@ -13,15 +14,21 @@ LevelSelectScene::LevelSelectScene()
 	auto back_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({500, 650, 120, 30}, "Back", [&]() { manager_->PopScene(); }));
 	auto select_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 640, 650, 120, 30 }, "Select", [&]() { manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(selected_level_))); }));
 	auto editor_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 780, 650, 120, 30 }, "Editor", [&]() { manager_->PushScene(std::unique_ptr<Scene>(new LevelEditorScene())); }));
-	
 
-	int level = 0;
-	for (int row = 0; row < 4; ++row) {
-		for (int col = 0; col < 4; ++col){
-			level_buttons_.emplace_back(ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 500 + (float)(col * 74), 200 + (float)(row * 74), 64, 64 }, std::to_string((row * 4) + col + 1), 
-				[&, level]() { selected_level_ = level; })));
-			++level;
+	int level = 1;
+	int x_pos = 500;
+	int y_pos = 200;
+	while (std::filesystem::exists("assets/levels/level" + std::to_string(level) + ".txt")){
+		level_buttons_.emplace_back(ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({(float)x_pos, (float)y_pos, 64, 64}, std::to_string(level), [&, level](){selected_level_ = level;})));
+		x_pos += 74;
+
+		//maximum of 4 buttons per row
+		if (level % 4 == 0){
+			x_pos = 500;
+			y_pos += 74;
 		}
+
+		++level;
 	}
 }
 
