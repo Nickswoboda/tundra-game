@@ -156,40 +156,49 @@ Aegis::Vec2 GameplayScene::GetSlidingTargetTile(const Aegis::Vec2& start, Direct
 	case Direction::Up: {
 		//Move past ice, move back against wall, stand on ground
 		--y_index;
-		while (tile_map_->GetTileByIndex(start.x, y_index)->type_ == Tile::Type::Ice) {
+		Tile* tile = tile_map_->GetTileByIndex(start.x, y_index);
+		while (tile && tile->type_ == Tile::Type::Ice) {
 			--y_index;
+			tile = tile_map_->GetTileByIndex(start.x, y_index);
 		}
-		if (tile_map_->GetTileByIndex(start.x, y_index)->type_ == Tile::Type::Wall) {
+		if (!tile || tile->type_ == Tile::Type::Wall) {
 			++y_index;
 		}
 		break;
 	}
 	case Direction::Down: {
 		++y_index;
-		while (tile_map_->GetTileByIndex(start.x, y_index)->type_ == Tile::Type::Ice) {
+
+		Tile* tile = tile_map_->GetTileByIndex(start.x, y_index);
+		while (tile && tile->type_ == Tile::Type::Ice) {
 			++y_index;
+			tile = tile_map_->GetTileByIndex(start.x, y_index);
 		}
-		if (tile_map_->GetTileByIndex(start.x, y_index)->type_ == Tile::Type::Wall) {
+		if (!tile || tile->type_ == Tile::Type::Wall) {
 			--y_index;
 		}
 		break;
 	}
 	case Direction::Left: {
 		--x_index;
-		while (tile_map_->GetTileByIndex(x_index, start.y)->type_ == Tile::Type::Ice) {
+		Tile* tile = tile_map_->GetTileByIndex(x_index, start.y);
+		while (tile && tile->type_ == Tile::Type::Ice) {
 			--x_index;
+			tile = tile_map_->GetTileByIndex(x_index, start.y);
 		}
-		if (tile_map_->GetTileByIndex(x_index, start.y)->type_ == Tile::Type::Wall) {
+		if (!tile || tile->type_ == Tile::Type::Wall) {
 			++x_index;
 		}
 		break;
 	}
 	case Direction::Right: {
 		++x_index;
-		while (tile_map_->GetTileByIndex(x_index, start.y)->type_ == Tile::Type::Ice) {
+		Tile* tile = tile_map_->GetTileByIndex(x_index, start.y);
+		while (tile && tile->type_ == Tile::Type::Ice) {
 			++x_index;
+			tile = tile_map_->GetTileByIndex(x_index, start.y);
 		}
-		if (tile_map_->GetTileByIndex(x_index, start.y)->type_ == Tile::Type::Wall) {
+		if (!tile || tile->type_ == Tile::Type::Wall) {
 			--x_index;
 		}
 		break;
