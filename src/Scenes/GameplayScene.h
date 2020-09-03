@@ -31,7 +31,7 @@ public:
 	std::vector<Aegis::Vec2> GetNeighborTilesSliding(const Aegis::Vec2& tile) const;
 
 	void SpawnPellets();
-	void LoadLevel(const std::string& file_path);
+	void SetUpLevel();
 	void ResetLevel();
 
 	Aegis::Camera ui_camera_;

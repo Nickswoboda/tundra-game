@@ -10,7 +10,7 @@ GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
 	camera_.SetPosition({ -144, -24});
 
 	tile_map_ = tile_map;
-	SpawnPellets();
+	SetUpLevel();
 }
 GameplayScene::GameplayScene(int level)
 	:ui_camera_(0, 1280, 720, 0), player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
@@ -18,7 +18,8 @@ GameplayScene::GameplayScene(int level)
 	if (!std::filesystem::exists("assets/levels/level" + std::to_string(level + 1) + ".txt")){
 		level = 1;
 	}
-	LoadLevel("assets/levels/level" + std::to_string(level + 1) + ".txt");
+	tile_map_ = std::make_shared<TileMap>("assets/levels/level" + std::to_string(level + 1) + ".txt", 32);
+	SetUpLevel();
 	
 	camera_.SetPosition({ -144, -24});
 }
@@ -300,10 +301,8 @@ void GameplayScene::SpawnPellets()
 	}
 }
 
-void GameplayScene::LoadLevel(const std::string& file_path)
+void GameplayScene::SetUpLevel()
 {
-	tile_map_ = std::make_unique<TileMap>(file_path, 32);
-
 	SetObjectOnGrid(player_, tile_map_->bruce_spawn_index_);
 	SetObjectOnGrid(brutus_, tile_map_->brutus_spawn_index_);
 	SetObjectOnGrid(bjorn_, tile_map_->bjorn_spawn_index_);
