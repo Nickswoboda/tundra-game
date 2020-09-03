@@ -5,8 +5,8 @@
 
 LevelSelectScene::LevelSelectScene()
 {
-	title_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 64);
-	button_font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 32);
+	title_font_ = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 64);
+	button_font_ = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 32);
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 	ui_layer_->SetFont(button_font_);

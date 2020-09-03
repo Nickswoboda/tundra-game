@@ -6,7 +6,7 @@
 
 MenuScene::MenuScene() 
 {
-	title_background_ = Aegis::TextureManager::Instance().Load("assets/textures/TundraBG.png");
+	title_background_ = Aegis::TextureManager::Load("assets/textures/TundraBG.png");
 
 	auto title_texture = Aegis::Texture::Create("assets/textures/TundraTitle.png"); 
 	title_sprite_ = std::make_shared<Aegis::Sprite>(Aegis::Vec2(0,50), title_texture->size_, title_texture);
@@ -24,10 +24,10 @@ MenuScene::MenuScene()
 	v_box_->AddWidget(options_button_);
 	v_box_->AddWidget(exit_button_);
 	
-	new_game_button_->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Instance().Load("assets/textures/PlayButton.png"));
-	level_select_button_->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Instance().Load("assets/textures/LevelSelectButton.png"));
-	options_button_->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Instance().Load("assets/textures/OptionsButton.png"));
-	exit_button_->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Instance().Load("assets/textures/ExitButton.png"));
+	new_game_button_->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Load("assets/textures/PlayButton.png"));
+	level_select_button_->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Load("assets/textures/LevelSelectButton.png"));
+	options_button_->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Load("assets/textures/OptionsButton.png"));
+	exit_button_->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Load("assets/textures/ExitButton.png"));
 	
 }
 

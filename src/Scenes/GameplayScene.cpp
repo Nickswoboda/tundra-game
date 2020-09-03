@@ -7,9 +7,6 @@
 GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
 	:ui_camera_(0, 1280, 720, 0), player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
 {
-	auto& texmgr = Aegis::TextureManager::Instance();
-	texmgr.Load("assets/textures/tundra-tile-map.png");
-
 	camera_.SetPosition({ -144, -24});
 
 	tile_map_ = tile_map;
@@ -18,9 +15,6 @@ GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
 GameplayScene::GameplayScene(int level)
 	:ui_camera_(0, 1280, 720, 0), player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
 {
-	auto& texmgr = Aegis::TextureManager::Instance();
-	texmgr.Load("assets/textures/tundra-tile-map.png");
-
 	if (!std::filesystem::exists("assets/levels/level" + std::to_string(level + 1) + ".txt")){
 		level = 1;
 	}

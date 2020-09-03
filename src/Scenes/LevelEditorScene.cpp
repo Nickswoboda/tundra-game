@@ -8,14 +8,14 @@
 
 LevelEditorScene::LevelEditorScene()
 {
-	font_ = Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 24);
+	font_ = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 24);
 	tile_map_ = std::make_unique<TileMap>(31, 21, 32); 
 
 	//used to center tilemap within window
 	camera_.SetPosition({-270, -24});
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
-	ui_layer_->SetFont(Aegis::FontManager::Instance().Load("assets/fonts/WorkSans-Regular.ttf", 20));
+	ui_layer_->SetFont(Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 20));
 	
 	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 70, 64, 64}, "Ground", [&](){ChangeSelectedTile(Tile::Ground);}));  
 	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 70, 64, 64}, " Ice", [&](){ChangeSelectedTile(Tile::Ice);}));  
