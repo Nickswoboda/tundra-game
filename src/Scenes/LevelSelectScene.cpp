@@ -48,8 +48,8 @@ void LevelSelectScene::Render(float delta_time)
 	Aegis::DrawText("Level Select", { 490, 20 }, { 1.0, 1.0f, 1.0f, 1.0f });
 
 	if (selected_level_ != -1) {
-		auto pos = level_buttons_[selected_level_]->rect_.pos;
-		auto size = level_buttons_[selected_level_]->rect_.size;
+		auto pos = level_buttons_[selected_level_ - 1]->rect_.pos;
+		auto size = level_buttons_[selected_level_ - 1]->rect_.size;
 		Aegis::DrawQuad(pos, size, { 1.0f, 1.0f, 1.0f, 0.4 });
 	}
 }

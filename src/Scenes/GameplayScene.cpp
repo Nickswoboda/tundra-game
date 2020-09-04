@@ -7,18 +7,15 @@
 GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
 	:ui_camera_(0, 1280, 720, 0), player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
 {
-	camera_.SetPosition({ -144, -24});
-
 	tile_map_ = tile_map;
 	SetUpLevel();
+
+	camera_.SetPosition({ -144, -24});
 }
 GameplayScene::GameplayScene(int level)
 	:ui_camera_(0, 1280, 720, 0), player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
 {
-	if (!std::filesystem::exists("assets/levels/level" + std::to_string(level + 1) + ".txt")){
-		level = 1;
-	}
-	tile_map_ = std::make_shared<TileMap>("assets/levels/level" + std::to_string(level + 1) + ".txt", 32);
+	tile_map_ = std::make_shared<TileMap>("assets/levels/level" + std::to_string(level) + ".txt", 32);
 	SetUpLevel();
 	
 	camera_.SetPosition({ -144, -24});
