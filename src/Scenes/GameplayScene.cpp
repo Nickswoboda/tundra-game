@@ -276,7 +276,7 @@ std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesMoving(const Aegis::Vec2
 
 	std::vector<Aegis::Vec2> neighbors;
 	for (auto index : adjacent_indices){
-		if (tile_map_->GetTileByIndex(index.x, index.y)){
+		if (!tile_map_->GetTileByIndex(index.x, index.y)->is_solid_){
 			neighbors.push_back(index);
 		}
 	}
@@ -290,10 +290,10 @@ void GameplayScene::SpawnPellets()
 		pellets_.clear();
 	}
 
-	for (const auto& col : tile_map_->tiles_) {
-		for (const auto& tile : col) {
-			if (tile->is_slippery_) {
-				pellets_.emplace_back(Pellet(10, 10));
+	for (int i = 0; i < tile_map_->grid_size_.x; ++i){
+		for (int j = 0; j < tile_map_->grid_size_.y; ++j){
+			if (tile_map_->GetTileByIndex(i, j)->is_slippery_){
+				pellets_.emplace_back(Pellet((i * 32) + 12, (j * 32) + 12));
 			}
 		}
 	}
