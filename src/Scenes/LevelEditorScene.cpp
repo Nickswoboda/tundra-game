@@ -15,11 +15,12 @@ LevelEditorScene::LevelEditorScene()
 	camera_.SetPosition({-270, -24});
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
-	ui_layer_->SetFont(Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 20));
+	auto ui_font = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 20);
+	ui_layer_->SetFont(ui_font);
 	
-	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 70, 64, 64}, "Ground", [&](){ChangeSelectedTile(Tile::Ground);}));  
-	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 70, 64, 64}, " Ice", [&](){ChangeSelectedTile(Tile::Ice);}));  
-	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 70, 64, 64}, "Wall", [&](){ChangeSelectedTile(Tile::Wall);}));  
+	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 70, 64, 64}, "Ground", [&](){ChangeSelectedTile(tile_map_->ground_tile_);}));  
+	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 70, 64, 64}, " Ice", [&](){ChangeSelectedTile(tile_map_->ice_tile_);}));  
+	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 70, 64, 64}, "Wall", [&](){ChangeSelectedTile(tile_map_->wall_tile_);}));  
 
 	auto bjorn_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 175, 64, 64}, "Bjorn", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorn);}));  
 	auto player_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 175, 64, 64}, "Bruce", [&](){ChangeSelectedSpawn(SpawnPoint::Bruce);}));  
@@ -73,19 +74,19 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 
 			if (show_error_msg_) show_error_msg_ = false;
 
-			auto index = tile_map_->GetTileIndex(*tile);
+			auto index = tile_map_->GetGridIndexByPos(mouse_pos);
 			if (selected_spawn_ != SpawnPoint::None){
 				//spawns can not be on walls or on top of other entities
 				if (tile_map_->bruce_spawn_index_ != index && tile_map_->bjorn_spawn_index_ != index && tile_map_->bruce_spawn_index_ != index){
-					if (tile->type_ != Tile::Wall){
+					if (!tile->is_solid_){
 						auto command = std::shared_ptr<EditCommand>(new SpawnEditCommand(*tile_map_, selected_spawn_, index));
 						command->Execute();
 						recorded_edits_.push(command);
 					}
 				}
 			}
-			else if (selected_tile_ != tile->type_){
-				auto command = std::shared_ptr<EditCommand>(new TileEditCommand(*tile, selected_tile_));
+			else if (selected_tile_ == tile){
+				auto command = std::shared_ptr<EditCommand>(new TileEditCommand(*tile_map_, index, *selected_tile_));
 				command->Execute();
 				recorded_edits_.push(command);
 			}
@@ -107,12 +108,10 @@ void LevelEditorScene::Render(float delta_time)
 
 	//have to use negative numbers to counteract camera movement
 	//TODO: add ability to submit text to UILayer
-	switch (selected_tile_){
-		case Tile::Wall: Aegis::DrawText("Tile: Wall", {-230, 120}); break;
-		case Tile::Ice: Aegis::DrawText("Tile: Ice", {-230, 120}); break;
-		case Tile::Ground: Aegis::DrawText("Tile: Ground", {-230, 120}); break;
-		case Tile::NumTypes: Aegis::DrawText("Tile: None", {-230, 120}); break;
-	}
+	if (selected_tile_->is_solid_) Aegis::DrawText("Tile: Wall", {-230, 120}); 
+	else if (selected_tile_->is_slippery_) Aegis::DrawText("Tile: Ice", {-230, 120});
+	else Aegis::DrawText("Tile: Ground", {-230, 120});
+	
 	switch (selected_spawn_){
 		case SpawnPoint::Bjorn: Aegis::DrawText("Spawn: Bjorn", {-230, 225}); break;
 		case SpawnPoint::Brutus: Aegis::DrawText("Spawn: Brutus", {-230, 225}); break;
@@ -144,7 +143,7 @@ bool LevelEditorScene::IsLevelValid()
 
 	for (int i = 0; i < tile_map_->grid_size_.x; ++i){
 		for (int j = 0; j < tile_map_->grid_size_.y; ++j){
-			if (tile_map_->GetTileByIndex(i, j)->type_ == Tile::Ice){
+			if (tile_map_->GetTileByIndex(i, j)->is_slippery_){
 				if (!reachable_indices[i][j]){
 					return false;
 				}

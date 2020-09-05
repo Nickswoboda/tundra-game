@@ -154,12 +154,12 @@ Aegis::Vec2 GameplayScene::GetSlidingTargetTile(const Aegis::Vec2& start, Direct
 	case Direction::Up: {
 		//Move past ice, move back against wall, stand on ground
 		--y_index;
-		Tile* tile = tile_map_->GetTileByIndex(start.x, y_index);
-		while (tile && tile->type_ == Tile::Type::Ice) {
+		const Tile* tile = tile_map_->GetTileByIndex(start.x, y_index);
+		while (tile && tile->is_slippery_) {
 			--y_index;
 			tile = tile_map_->GetTileByIndex(start.x, y_index);
 		}
-		if (!tile || tile->type_ == Tile::Type::Wall) {
+		if (!tile || tile->is_solid_) {
 			++y_index;
 		}
 		break;
@@ -167,36 +167,36 @@ Aegis::Vec2 GameplayScene::GetSlidingTargetTile(const Aegis::Vec2& start, Direct
 	case Direction::Down: {
 		++y_index;
 
-		Tile* tile = tile_map_->GetTileByIndex(start.x, y_index);
-		while (tile && tile->type_ == Tile::Type::Ice) {
+		const Tile* tile = tile_map_->GetTileByIndex(start.x, y_index);
+		while (tile && tile->is_slippery_) {
 			++y_index;
 			tile = tile_map_->GetTileByIndex(start.x, y_index);
 		}
-		if (!tile || tile->type_ == Tile::Type::Wall) {
+		if (!tile || tile->is_solid_) {
 			--y_index;
 		}
 		break;
 	}
 	case Direction::Left: {
 		--x_index;
-		Tile* tile = tile_map_->GetTileByIndex(x_index, start.y);
-		while (tile && tile->type_ == Tile::Type::Ice) {
+		const Tile* tile = tile_map_->GetTileByIndex(x_index, start.y);
+		while (tile && tile->is_slippery_) {
 			--x_index;
 			tile = tile_map_->GetTileByIndex(x_index, start.y);
 		}
-		if (!tile || tile->type_ == Tile::Type::Wall) {
+		if (!tile || tile->is_solid_) {
 			++x_index;
 		}
 		break;
 	}
 	case Direction::Right: {
 		++x_index;
-		Tile* tile = tile_map_->GetTileByIndex(x_index, start.y);
-		while (tile && tile->type_ == Tile::Type::Ice) {
+		const Tile* tile = tile_map_->GetTileByIndex(x_index, start.y);
+		while (tile && tile->is_slippery_) {
 			++x_index;
 			tile = tile_map_->GetTileByIndex(x_index, start.y);
 		}
-		if (!tile || tile->type_ == Tile::Type::Wall) {
+		if (!tile || tile->is_solid_) {
 			--x_index;
 		}
 		break;
@@ -271,12 +271,12 @@ std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesSliding(const Aegis::Vec
 
 std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesMoving(const Aegis::Vec2& tile) const
 {
-	auto adjacent_tiles = tile_map_->GetAdjacentTiles(tile);
+	auto adjacent_indices = tile_map_->GetAdjacentTilesIndices(tile);
 
 	std::vector<Aegis::Vec2> neighbors;
-	for (auto adj : adjacent_tiles){
-		if (adj->type_ != Tile::Wall){
-			neighbors.push_back(adj->pos_ / 32);
+	for (auto index : adjacent_indices){
+		if (tile_map_->GetTileByIndex(index.x, index.y)){
+			neighbors.push_back(index);
 		}
 	}
 
@@ -291,8 +291,8 @@ void GameplayScene::SpawnPellets()
 
 	for (const auto& col : tile_map_->tiles_) {
 		for (const auto& tile : col) {
-			if (tile.type_ == Tile::Type::Ice) {
-				pellets_.emplace_back(Pellet(tile.pos_.x + 12, tile.pos_.y + 12));
+			if (tile->is_slippery_) {
+				pellets_.emplace_back(Pellet(10, 10));
 			}
 		}
 	}

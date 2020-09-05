@@ -10,7 +10,7 @@ public:
 		: texture_(texture), is_solid_(is_solid), is_slippery_(is_slippery)
 	{}
 
-	std::shared_ptr<Aegis::SubTexture> texture_;
+	const std::shared_ptr<Aegis::SubTexture> texture_;
 	const bool is_solid_; 
 	const bool is_slippery_;
 	

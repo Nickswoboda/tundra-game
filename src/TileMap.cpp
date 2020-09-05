@@ -24,7 +24,7 @@ TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Ae
 			++row; col = 0;
 		}
 		if (tiles_.size() <= col) {
-			tiles_.push_back(std::vector<Tile*>());
+			tiles_.push_back(std::vector<const Tile*>());
 		}
 		switch (ch)
 		{
@@ -62,7 +62,7 @@ TileMap::TileMap(int width, int height, int tile_size, std::shared_ptr<Aegis::Te
 	brutus_spawn_index_ = {1, 0};
 	bjorn_spawn_index_ = {2, 0};
 	for (int i = 0; i < width; ++i){
-		std::vector<Tile*> col;
+		std::vector<const Tile*> col;
 		for (int j = 0; j < height; ++j){
 			col.push_back(&wall_tile_);
 		}
@@ -83,7 +83,7 @@ void TileMap::Render() const
 	}
 }
 
-const Tile& TileMap::GetTileByIndex(int col, int row)
+const Tile* TileMap::GetTileByIndex(int col, int row)
 {
 	if (row >= grid_size_.y || row < 0 || col >= grid_size_.x || col < 0) {
 		return nullptr;
@@ -92,9 +92,14 @@ const Tile& TileMap::GetTileByIndex(int col, int row)
 	return tiles_[col][row];
 }
 
-Tile* TileMap::GetTileByPos(int x_pos, int y_pos)
+const Tile* TileMap::GetTileByPos(int x_pos, int y_pos)
 {
 	return GetTileByIndex(x_pos / tile_size_, y_pos / tile_size_);
+}
+
+void TileMap::SetTile(const Aegis::Vec2 index, const Tile& tile)
+{
+	tiles_[index.x][index.y] = &tile;
 }
 
 std::vector<Aegis::Vec2> TileMap::GetAdjacentTilesIndices(Aegis::Vec2 index)
@@ -116,9 +121,9 @@ std::vector<Aegis::Vec2> TileMap::GetAdjacentTilesIndices(Aegis::Vec2 index)
 	return indices;
 }
 
-std::vector<Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h)
+std::vector<const Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h)
 {
-	std::vector<Tile*> temp;
+	std::vector<const Tile*> temp;
 
 	int left_index = std::max(0.0f, (float)x / tile_size_);
 	int right_index = std::min(grid_size_.x, (float)(x + w - 1) / tile_size_);
@@ -128,7 +133,7 @@ std::vector<Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h)
 
 	for (int i = left_index; i <= right_index; ++i) {
 		for (int j = top_index; j <= bottom_index; ++j) {
-			Tile* tile = GetTileByIndex(i, j);
+			const Tile* tile = GetTileByIndex(i, j);
 			if (tile != nullptr) {
 				temp.push_back(tiles_[i][j]);
 			}
@@ -138,7 +143,7 @@ std::vector<Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h)
 	return temp;
 }
 
-std::vector<Tile*> TileMap::GetTilesUnderneath(const Aegis::AABB& rect)
+std::vector<const Tile*> TileMap::GetTilesUnderneath(const Aegis::AABB& rect)
 {
 	return GetTilesUnderneath(rect.pos.x, rect.pos.y, rect.size.x, rect.size.y);
 }

@@ -30,7 +30,7 @@ public:
 	const TileMap& tile_map_;
 	const Aegis::Vec2 index_;
 	const Tile& new_tile_;
-	const Tile& prev_tile_;
+	const Tile* prev_tile_;
 };
 
 class SpawnEditCommand : public EditCommand

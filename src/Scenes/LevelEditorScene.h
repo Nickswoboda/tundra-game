@@ -21,12 +21,12 @@ public:
 	void Undo();
 
 	//tiles can not be placed while a spawn is selected
-	void ChangeSelectedTile(Tile::Type tile) { selected_tile_ = tile; selected_spawn_ = SpawnPoint::None;}
-	void ChangeSelectedSpawn(SpawnPoint spawn) { selected_spawn_ = spawn; selected_tile_ = Tile::NumTypes;}
+	void ChangeSelectedTile(const Tile& tile) { selected_tile_ = &tile; selected_spawn_ = SpawnPoint::None;}
+	void ChangeSelectedSpawn(SpawnPoint spawn) { selected_spawn_ = spawn; selected_tile_ = nullptr;}
 
 	std::shared_ptr<TileMap> tile_map_;
 
-	Tile::Type selected_tile_ = Tile::Type::Ground;
+	const Tile* selected_tile_ = nullptr;
 	SpawnPoint selected_spawn_ = SpawnPoint::None;
 
 	std::shared_ptr<Aegis::Font> font_;
