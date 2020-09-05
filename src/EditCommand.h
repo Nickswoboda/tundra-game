@@ -22,15 +22,15 @@ public:
 class TileEditCommand : public EditCommand
 {
 public:
-	TileEditCommand(const TileMap& tile_map, const Aegis::Vec2 index, const Tile& new_tile);
+	TileEditCommand(TileMap& tile_map, const Aegis::Vec2 index, const Tile& new_tile);
 
 	void Execute() override;
 	void Undo() override;
 	
-	const TileMap& tile_map_;
+	TileMap& tile_map_;
 	const Aegis::Vec2 index_;
 	const Tile& new_tile_;
-	const Tile* prev_tile_;
+	const Tile& prev_tile_;
 };
 
 class SpawnEditCommand : public EditCommand

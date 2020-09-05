@@ -15,7 +15,8 @@ GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
 GameplayScene::GameplayScene(int level)
 	:ui_camera_(0, 1280, 720, 0), player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
 {
-	tile_map_ = std::make_shared<TileMap>("assets/levels/level" + std::to_string(level) + ".txt", 32);
+	auto atlas = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
+	tile_map_ = std::make_shared<TileMap>("assets/levels/level" + std::to_string(level) + ".txt", 32, atlas);
 	SetUpLevel();
 	
 	camera_.SetPosition({ -144, -24});

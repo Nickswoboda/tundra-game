@@ -9,7 +9,12 @@
 LevelEditorScene::LevelEditorScene()
 {
 	font_ = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 24);
-	tile_map_ = std::make_unique<TileMap>(31, 21, 32); 
+	auto tex_atlas = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
+	tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas); 
+
+	bruce_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(96, 0), Aegis::Vec2(32, 32)); 
+	brutus_tex_ =  std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(128, 0), Aegis::Vec2(32, 32)); 
+	bjorn_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(160, 0), Aegis::Vec2(32, 32)); 
 
 	//used to center tilemap within window
 	camera_.SetPosition({-270, -24});
@@ -27,17 +32,13 @@ LevelEditorScene::LevelEditorScene()
 	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 175, 64, 64}, "Brutus", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
 
 	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 400, 80, 40}, "Undo", [&]() {Undo();}));
-	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 400, 80, 40}, "Reset", [&]() {tile_map_ = std::make_unique<TileMap>(31, 21, 32);}));
+	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 400, 80, 40}, "Reset", [&]() {tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas);}));
 
 	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 50, 450, 80, 40 }, "Preview", [&]() {PreviewLevel(); }));
 	auto save_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 450, 80, 40}, "Save", [&]() {SaveLevel();}));
 
 	auto back_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({70, 500, 125, 40}, "Exit", [&](){ manager_->PopScene();}));  
 
-	auto tex_atlas = Aegis::Texture::Create("assets/textures/tundra-tile-map.png");
-	bruce_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(96, 0), Aegis::Vec2(32, 32)); 
-	brutus_tex_ =  std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(128, 0), Aegis::Vec2(32, 32)); 
-	bjorn_tex_ = std::make_shared<Aegis::SubTexture>(tex_atlas, Aegis::Vec2(160, 0), Aegis::Vec2(32, 32)); 
 }
 
 LevelEditorScene::~LevelEditorScene()
@@ -85,7 +86,7 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 					}
 				}
 			}
-			else if (selected_tile_ == tile){
+			else if (selected_tile_ != tile){
 				auto command = std::shared_ptr<EditCommand>(new TileEditCommand(*tile_map_, index, *selected_tile_));
 				command->Execute();
 				recorded_edits_.push(command);
@@ -108,7 +109,8 @@ void LevelEditorScene::Render(float delta_time)
 
 	//have to use negative numbers to counteract camera movement
 	//TODO: add ability to submit text to UILayer
-	if (selected_tile_->is_solid_) Aegis::DrawText("Tile: Wall", {-230, 120}); 
+	if (selected_tile_ == nullptr) Aegis::DrawText("Tile: None", {-230, 120});
+	else if (selected_tile_->is_solid_) Aegis::DrawText("Tile: Wall", {-230, 120}); 
 	else if (selected_tile_->is_slippery_) Aegis::DrawText("Tile: Ice", {-230, 120});
 	else Aegis::DrawText("Tile: Ground", {-230, 120});
 	

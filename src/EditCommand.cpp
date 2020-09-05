@@ -1,27 +1,17 @@
 #include "EditCommand.h"
 
-TileEditCommand::TileEditCommand(const TileMap& tile_map, const Aegis::Vec2 index, const Tile& new_tile)
-	:tile_map_(tile_map), index_(index), new_tile_(new_tile), prev_tile_(tile_map_.tiles_[index.x][index.y]) 
+TileEditCommand::TileEditCommand(TileMap& tile_map, const Aegis::Vec2 index, const Tile& new_tile)
+	:tile_map_(tile_map), index_(index), new_tile_(new_tile), prev_tile_(*(tile_map_.tiles_[index.x][index.y])) 
 {
 }
 
 void TileEditCommand::Execute()
 {
-	switch (new_type_){
-		case Tile::Ground: tile_ = Ground(tile_.pos_.x, tile_.pos_.y); break;
-		case Tile::Ice: tile_ = Ice(tile_.pos_.x, tile_.pos_.y); break;
-		case Tile::Wall: tile_ = Wall(tile_.pos_.x, tile_.pos_.y); break;
-		case Tile::NumTypes: break;
-	}
+	tile_map_.SetTile(index_, new_tile_);
 }
 void TileEditCommand::Undo()
 {
-	switch (prev_type_){
-		case Tile::Ground: tile_ = Ground(tile_.pos_.x, tile_.pos_.y); break;
-		case Tile::Ice: tile_ = Ice(tile_.pos_.x, tile_.pos_.y); break;
-		case Tile::Wall: tile_ = Wall(tile_.pos_.x, tile_.pos_.y); break;
-		case Tile::NumTypes: break;
-	}
+	tile_map_.SetTile(index_, prev_tile_);
 }
 
 SpawnEditCommand::SpawnEditCommand(TileMap& tile_map, SpawnPoint spawn_point, Aegis::Vec2 new_index)
