@@ -175,7 +175,9 @@ std::vector<std::vector<bool>> TileMap::GetReachableTileIndices(Aegis::Vec2 star
 
 Aegis::Vec2 TileMap::GetGridIndexByPos(const Aegis::Vec2& pos) const
 {
-	return pos / tile_size_;
+	auto index = pos / tile_size_;
+	//want to truncate for positioning
+	return Aegis::Vec2((int)index.x, (int)index.y);
 }
 
 void TileMap::Save()
