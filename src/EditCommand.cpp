@@ -1,7 +1,7 @@
 #include "EditCommand.h"
 
-TileEditCommand::TileEditCommand(Tile& tile, Tile::Type new_type)
-	:tile_(tile), prev_type_(tile.type_), new_type_(new_type)
+TileEditCommand::TileEditCommand(const TileMap& tile_map, const Aegis::Vec2 index, const Tile& new_tile)
+	:tile_map_(tile_map), index_(index), new_tile_(new_tile), prev_tile_(tile_map_.tiles_[index.x][index.y]) 
 {
 }
 
