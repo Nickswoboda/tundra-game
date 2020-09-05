@@ -32,7 +32,10 @@ LevelEditorScene::LevelEditorScene()
 	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 175, 64, 64}, "Brutus", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
 
 	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 400, 80, 40}, "Undo", [&]() {Undo();}));
-	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 400, 80, 40}, "Reset", [&]() {tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas);}));
+	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 400, 80, 40}, "Reset", [&]() {
+				auto tex_atlas = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
+				tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas);
+					}));
 
 	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 50, 450, 80, 40 }, "Preview", [&]() {PreviewLevel(); }));
 	auto save_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 450, 80, 40}, "Save", [&]() {SaveLevel();}));
@@ -86,7 +89,7 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 					}
 				}
 			}
-			else if (selected_tile_ != tile){
+			else if (selected_tile_ && selected_tile_ != tile){
 				auto command = std::shared_ptr<EditCommand>(new TileEditCommand(*tile_map_, index, *selected_tile_));
 				command->Execute();
 				recorded_edits_.push(command);
