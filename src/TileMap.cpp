@@ -162,7 +162,7 @@ std::vector<std::vector<bool>> TileMap::GetReachableTileIndices(Aegis::Vec2 star
 		auto neighbors = GetAdjacentTilesIndices(current_pos);
 		
 		for (auto index : neighbors){
-			if (tiles_[index.x][index.y]->is_solid_){
+			if (!tiles_[index.x][index.y]->is_solid_){
 				if (!seen[index.x][index.y]){
 					frontier.push_back(index);
 					seen[index.x][index.y] = true;
