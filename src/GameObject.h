@@ -29,12 +29,13 @@ public:
 	virtual void Update();
 	virtual void Render(float delta_time) const = 0;
 	virtual void SetPosition(Aegis::Vec2 pos);
-	virtual void StartMoving();
+	virtual void MoveTo(const Aegis::Vec2 pos);
 	
 	std::shared_ptr<Aegis::Texture> spirte_sheet_;
 	Animation animation_;
 	Aegis::Sprite sprite_;
-	Aegis::Vec2 grid_coord_;
+	Aegis::Vec2 grid_index_;
+	Aegis::Vec2 target_grid_index_;
 	//time to move 1 tile
 	float speed_ = 0.15f;
 	bool slides_on_ice_ = true;

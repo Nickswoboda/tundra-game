@@ -24,6 +24,10 @@ GameplayScene::GameplayScene(int level)
 
 void GameplayScene::Update()
 {
+	//player_.Update();
+	//brutus_.Update();
+	//bjorn_.Update();
+	//
 	if (player_.animation_.playing_) {
 		player_.Update();
 	}
@@ -87,6 +91,8 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 			SpawnPellets();
 		}
 		if (key == AE_KEY_UP || key == AE_KEY_DOWN || key == AE_KEY_LEFT || key == AE_KEY_RIGHT) {
+			//index = GetSlidingTargetTile(player_.sprite_, UP);
+			//player_.MoveToIndex(index);
 			if (!player_.animation_.playing_) {
 				HandlePlayerMovement(key);
 			}
@@ -130,19 +136,12 @@ void GameplayScene::HandlePlayerMovement(int key_code)
 	case GLFW_KEY_RIGHT: dir = Direction::Right;  break;
 	}
 
-	if (player_.grid_coord_ == GetSlidingTargetTile(player_.grid_coord_, dir)) {
-		return;
-	}
-	else {
-		player_.grid_coord_ = GetSlidingTargetTile(player_.grid_coord_, dir);
-		player_.StartMoving();
-	}
+	player_.MoveTo(GetSlidingTargetTile(player_.grid_index_, dir));
 }
 
 void GameplayScene::GetEnemyTargetPos(GameObject& obj)
 {
-	obj.grid_coord_ = GetTargetTileCoordBFS(obj.grid_coord_, player_.grid_coord_, obj.slides_on_ice_);
-	obj.StartMoving();
+	obj.MoveTo(GetTargetTileCoordBFS(obj.grid_index_, player_.grid_index_, obj.slides_on_ice_));
 }
 
 Aegis::Vec2 GameplayScene::GetSlidingTargetTile(const Aegis::Vec2& start, Direction dir) const
@@ -215,6 +214,7 @@ Aegis::Vec2 GameplayScene::GetTargetTileCoordBFS(const Aegis::Vec2& start, const
 {
 	std::vector<Aegis::Vec2> frontier;
 	frontier.push_back(start);
+	//TODO: Use a 2D array of Vec2 for parent
 	std::unordered_map<std::string, Aegis::Vec2> parent;
 	parent[ToString(start)] = start;
 	while (!frontier.empty()) {
@@ -249,13 +249,12 @@ Aegis::Vec2 GameplayScene::GetTargetTileCoordBFS(const Aegis::Vec2& start, const
 	while (parent[ToString(path_start)] != start) {
 		path_start = parent[ToString(path_start)];
 	}
-
+	std::cout << "parent map size: " << parent.size() << '\n';
 	return path_start;
 }
 
 void GameplayScene::SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos)
 {
-	obj.grid_coord_ = pos;
 	obj.SetPosition(pos * tile_map_->tile_size_);
 }
 

@@ -2,31 +2,29 @@
 
 static const int TILE_SIZE = 32;
 
-void GameObject::StartMoving()
+void GameObject::MoveTo(const Aegis::Vec2 pos)
 {
 	Aegis::Vec2 prev_tile_pos = sprite_.rect_.pos / TILE_SIZE;
-	Aegis::Vec2 vec = grid_coord_ - prev_tile_pos;
+	Aegis::Vec2 vec = pos - prev_tile_pos;
 	int num_tiles = sqrt(vec.x * vec.x + vec.y * vec.y);
+	target_grid_index_ = pos;
 
-	animation_.Start(sprite_.rect_.pos, grid_coord_ * TILE_SIZE, speed_ * num_tiles);
+	animation_.Start(sprite_.rect_.pos, pos * TILE_SIZE, speed_ * num_tiles);
 }
 
 void Player::Render(float delta_time) const
 {
 	Aegis::RenderSprite(sprite_);
-	//Aegis::DrawQuad(grid_coord_ * TILE_SIZE, rect_.size, { 0.0f, 1.0f, 0.0f, 0.5f });
 }
 
 void Brutus::Render(float delta_time) const
 {
 	Aegis::RenderSprite(sprite_);
-	//Aegis::DrawQuad(grid_coord_ * TILE_SIZE, rect_.size, { 1.0f, 0.0f, 0.0f, 0.5f });
 }
 
 void Bjorn::Render(float delta_time) const
 {
 	Aegis::RenderSprite(sprite_);
-	//Aegis::DrawQuad(grid_coord_ * TILE_SIZE, rect_.size, { 1.0f, 1.0f, 0.0f, 0.5f });
 }
 
 void GameObject::Update()
@@ -34,14 +32,16 @@ void GameObject::Update()
 	animation_.Update();
 	sprite_.rect_.pos = animation_.current_value_;
 
-	if (sprite_.rect_.pos == grid_coord_ * TILE_SIZE) {
+	if (sprite_.rect_.pos == target_grid_index_ * TILE_SIZE) {
 		animation_.Stop();
+		grid_index_ = target_grid_index_;
 	}
 }
 
 void GameObject::SetPosition(Aegis::Vec2 pos)
 {
 	sprite_.rect_.pos = pos;
+	grid_index_ = pos / TILE_SIZE;
 }
 
 void Animation::Start(Aegis::Vec2 start, Aegis::Vec2 end, float duration)
