@@ -12,21 +12,6 @@ void GameObject::MoveTo(const Aegis::Vec2 pos)
 	animation_.Start(sprite_.rect_.pos, pos * TILE_SIZE, speed_ * num_tiles);
 }
 
-void Player::Render(float delta_time) const
-{
-	Aegis::RenderSprite(sprite_);
-}
-
-void Brutus::Render(float delta_time) const
-{
-	Aegis::RenderSprite(sprite_);
-}
-
-void Bjorn::Render(float delta_time) const
-{
-	Aegis::RenderSprite(sprite_);
-}
-
 void GameObject::Update()
 {
 	animation_.Update();

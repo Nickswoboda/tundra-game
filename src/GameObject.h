@@ -27,7 +27,7 @@ public:
 	}
 		
 	virtual void Update();
-	virtual void Render(float delta_time) const = 0;
+	virtual void Render(float delta_time) const {Aegis::RenderSprite(sprite_);}
 	virtual void SetPosition(Aegis::Vec2 pos);
 	virtual void MoveTo(const Aegis::Vec2 pos);
 	
@@ -63,7 +63,6 @@ public:
 		:GameObject(x,y,32,32, {96, 0})
 	{
 	}
-	void Render(float delta_time) const override;
 };
 
 class Brutus : public GameObject
@@ -75,7 +74,6 @@ public:
 		speed_ = .30f;
 		slides_on_ice_ = false;
 	}
-	void Render(float delta_time) const override;
 
 };
 
@@ -88,6 +86,4 @@ public:
 		speed_ = .25f;
 
 	}
-	void Render(float delta_time) const override;
-
 };
