@@ -91,14 +91,7 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 			SpawnPellets();
 		}
 		if (key == AE_KEY_UP || key == AE_KEY_DOWN || key == AE_KEY_LEFT || key == AE_KEY_RIGHT) {
-			//index = GetSlidingTargetTile(player_.sprite_, UP);
-			//player_.MoveToIndex(index);
-			if (!player_.animation_.playing_) {
-				HandlePlayerMovement(key);
-			}
-			else {
-				queued_movement_ = key;
-			}
+			HandlePlayerMovement(key);
 		}
 	}
 }
@@ -136,7 +129,12 @@ void GameplayScene::HandlePlayerMovement(int key_code)
 	case GLFW_KEY_RIGHT: dir = Direction::Right;  break;
 	}
 
-	player_.MoveTo(GetSlidingTargetTile(player_.grid_index_, dir));
+	if (player_.animation_.playing_){
+		player_.MoveTo(GetSlidingTargetTile(player_.target_grid_index_, dir));
+	}
+	else{
+		player_.MoveTo(GetSlidingTargetTile(player_.grid_index_, dir));
+	}
 }
 
 void GameplayScene::GetEnemyTargetPos(GameObject& obj)

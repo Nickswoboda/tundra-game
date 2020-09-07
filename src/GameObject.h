@@ -60,9 +60,13 @@ class Player : public GameObject
 {
 public:
 	Player(int x, int y)
-		:GameObject(x,y,32,32, {96, 0})
+		:GameObject(x,y,32,32, {96, 0}), queued_movement_(-1, 0)
 	{
 	}
+	void Update() override;
+	void MoveTo(const Aegis::Vec2 pos) override;
+
+	Aegis::Vec2 queued_movement_;
 };
 
 class Brutus : public GameObject

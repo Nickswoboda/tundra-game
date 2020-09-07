@@ -12,6 +12,16 @@ void GameObject::MoveTo(const Aegis::Vec2 pos)
 	animation_.Start(sprite_.rect_.pos, pos * TILE_SIZE, speed_ * num_tiles);
 }
 
+void Player::MoveTo(const Aegis::Vec2 pos)
+{
+	if (!animation_.playing_){
+		GameObject::MoveTo(pos);
+	}
+	else{
+		queued_movement_ = pos;
+	}
+}
+
 void GameObject::Update()
 {
 	animation_.Update();
@@ -20,6 +30,22 @@ void GameObject::Update()
 	if (sprite_.rect_.pos == target_grid_index_ * TILE_SIZE) {
 		animation_.Stop();
 		grid_index_ = target_grid_index_;
+	}
+}
+
+void Player::Update()
+{
+	animation_.Update();
+	sprite_.rect_.pos = animation_.current_value_;
+
+	if (sprite_.rect_.pos == target_grid_index_ * TILE_SIZE) {
+		animation_.Stop();
+		grid_index_ = target_grid_index_;
+		
+		if (queued_movement_.x != -1){
+			MoveTo(queued_movement_);
+			queued_movement_.x = -1;
+		}
 	}
 }
 
