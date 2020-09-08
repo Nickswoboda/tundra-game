@@ -24,18 +24,16 @@ GameplayScene::GameplayScene(int level)
 
 void GameplayScene::Update()
 {
-	//brutus_.Update();
-	//bjorn_.Update();
 	player_.Update();
 
 	brutus_.Update();
 	if (!brutus_.IsMoving()){
-		GetEnemyTargetPos(brutus_);
+		brutus_.MoveTo(GetEnemyTargetPos(brutus_));
 	}
 
 	bjorn_.Update();
 	if (!bjorn_.IsMoving()) {
-		GetEnemyTargetPos(bjorn_);
+		bjorn_.MoveTo(GetEnemyTargetPos(bjorn_));
 	}
 
 	if (Aegis::AABBHasCollided(player_.sprite_.rect_, brutus_.sprite_.rect_) || Aegis::AABBHasCollided(player_.sprite_.rect_, bjorn_.sprite_.rect_)) {
@@ -75,7 +73,6 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 		}
 		if (key == AE_KEY_K) {
 			ResetLevel();
-			SpawnPellets();
 		}
 		if (key == AE_KEY_UP || key == AE_KEY_DOWN || key == AE_KEY_LEFT || key == AE_KEY_RIGHT) {
 			HandlePlayerMovement(key);
@@ -87,10 +84,12 @@ void GameplayScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
 	Aegis::RendererClear();
+	
 	tile_map_->Render();
 	player_.Render(delta_time);
 	brutus_.Render(delta_time);
 	bjorn_.Render(delta_time);
+	
 	for (auto& pellet : pellets_)
 	{
 		pellet.Render(0.0f);
@@ -116,7 +115,7 @@ void GameplayScene::HandlePlayerMovement(int key_code)
 	case GLFW_KEY_RIGHT: dir = Direction::Right;  break;
 	}
 
-	if (player_.animation_.playing_){
+	if (player_.IsMoving()){
 		player_.MoveTo(GetSlidingTargetTile(player_.target_grid_index_, dir));
 	}
 	else{
@@ -124,9 +123,9 @@ void GameplayScene::HandlePlayerMovement(int key_code)
 	}
 }
 
-void GameplayScene::GetEnemyTargetPos(GameObject& obj)
+Aegis::Vec2 GameplayScene::GetEnemyTargetPos(GameObject& obj)
 {
-	obj.MoveTo(GetTargetTileCoordBFS(obj.grid_index_, player_.grid_index_, obj.slides_on_ice_));
+	return GetTargetTileCoordBFS(obj.grid_index_, player_.grid_index_, obj.slides_on_ice_);
 }
 
 Aegis::Vec2 GameplayScene::GetSlidingTargetTile(const Aegis::Vec2& start, Direction dir) const
@@ -191,17 +190,15 @@ Aegis::Vec2 GameplayScene::GetSlidingTargetTile(const Aegis::Vec2& start, Direct
 	return Aegis::Vec2(x_index, y_index);
 }
 
-std::string ToString(const Aegis::Vec2 val) {
-	return std::to_string(val.x) + std::to_string(val.y);
-}
 
 Aegis::Vec2 GameplayScene::GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool slides) const
 {
 	std::vector<Aegis::Vec2> frontier;
 	frontier.push_back(start);
-	//TODO: Use a 2D array of Vec2 for parent
-	std::unordered_map<std::string, Aegis::Vec2> parent;
-	parent[ToString(start)] = start;
+
+	std::vector<std::vector<Aegis::Vec2>> parent(tile_map_->grid_size_.x, std::vector<Aegis::Vec2>(tile_map_->grid_size_.y, Aegis::Vec2(-1, -1)));
+	parent[start.x][start.y] = start;
+
 	while (!frontier.empty()) {
 		auto current = frontier[0];
 		frontier.erase(frontier.begin());
@@ -218,23 +215,23 @@ Aegis::Vec2 GameplayScene::GetTargetTileCoordBFS(const Aegis::Vec2& start, const
 		}
 
 		for (auto& neighbor : neighbors) {
-			if (parent.find(ToString(neighbor)) == parent.end()) {
+			//if not already in list
+			if (parent[neighbor.x][neighbor.y].x == -1 ) {
 				frontier.push_back(neighbor);
-				parent[ToString(neighbor)] = current;
+				parent[neighbor.x][neighbor.y] = current;
 			}
 		}
 	}
 	//if no path available
-	if (parent[ToString(end)] == Aegis::Vec2(0, 0)) {
+	if (parent[end.x][end.y].x == -1) {
 		std::cout << "Unable to find path BFS";
 		return start;
 	}
 
 	Aegis::Vec2 path_start = end;
-	while (parent[ToString(path_start)] != start) {
-		path_start = parent[ToString(path_start)];
+	while (parent[path_start.x][path_start.y] != start) {
+		path_start = parent[path_start.x][path_start.y];
 	}
-	std::cout << "parent map size: " << parent.size() << '\n';
 	return path_start;
 }
 
@@ -303,5 +300,7 @@ void GameplayScene::ResetLevel()
 	SetObjectOnGrid(player_, tile_map_->bruce_spawn_index_);
 	SetObjectOnGrid(brutus_, tile_map_->brutus_spawn_index_);
 	SetObjectOnGrid(bjorn_, tile_map_->bjorn_spawn_index_);
+
+	SpawnPellets();
 }
 

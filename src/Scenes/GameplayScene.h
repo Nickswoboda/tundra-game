@@ -22,7 +22,7 @@ public:
 	void OnEvent(Aegis::Event& event) override;
 
 	void HandlePlayerMovement(int key_code);
-	void GetEnemyTargetPos(GameObject& obj);
+	Aegis::Vec2 GetEnemyTargetPos(GameObject& obj);
 	Aegis::Vec2 GetSlidingTargetTile(const Aegis::Vec2& start, Direction dir) const;
 	Aegis::Vec2 GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding) const;
 	void SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos);
