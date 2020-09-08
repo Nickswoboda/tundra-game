@@ -30,6 +30,7 @@ public:
 	virtual void Render(float delta_time) const {Aegis::RenderSprite(sprite_);}
 	virtual void SetPosition(Aegis::Vec2 pos);
 	virtual void MoveTo(const Aegis::Vec2 pos);
+	virtual bool IsMoving() { return animation_.playing_;}
 	
 	std::shared_ptr<Aegis::Texture> spirte_sheet_;
 	Animation animation_;

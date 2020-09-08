@@ -24,27 +24,31 @@ void Player::MoveTo(const Aegis::Vec2 pos)
 
 void GameObject::Update()
 {
-	animation_.Update();
-	sprite_.rect_.pos = animation_.current_value_;
+	if (animation_.playing_) {
+		animation_.Update();
+		sprite_.rect_.pos = animation_.current_value_;
 
-	if (sprite_.rect_.pos == target_grid_index_ * TILE_SIZE) {
-		animation_.Stop();
-		grid_index_ = target_grid_index_;
+		if (sprite_.rect_.pos == target_grid_index_ * TILE_SIZE) {
+			animation_.Stop();
+			grid_index_ = target_grid_index_;
+		}
 	}
 }
 
 void Player::Update()
 {
-	animation_.Update();
-	sprite_.rect_.pos = animation_.current_value_;
+	if (animation_.playing_) {
+		animation_.Update();
+		sprite_.rect_.pos = animation_.current_value_;
 
-	if (sprite_.rect_.pos == target_grid_index_ * TILE_SIZE) {
-		animation_.Stop();
-		grid_index_ = target_grid_index_;
-		
-		if (queued_movement_.x != -1){
-			MoveTo(queued_movement_);
-			queued_movement_.x = -1;
+		if (sprite_.rect_.pos == target_grid_index_ * TILE_SIZE) {
+			animation_.Stop();
+			grid_index_ = target_grid_index_;
+
+			if (queued_movement_.x != -1) {
+				MoveTo(queued_movement_);
+				queued_movement_.x = -1;
+			}
 		}
 	}
 }

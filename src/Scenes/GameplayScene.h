@@ -39,7 +39,6 @@ public:
 	Brutus brutus_;
 	Bjorn bjorn_;
 	std::shared_ptr<TileMap> tile_map_;
-	int queued_movement_ = -1;
 	std::vector<Pellet> pellets_;
 	int num_lives_ = 3;
 };

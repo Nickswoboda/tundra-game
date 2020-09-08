@@ -24,29 +24,17 @@ GameplayScene::GameplayScene(int level)
 
 void GameplayScene::Update()
 {
-	//player_.Update();
 	//brutus_.Update();
 	//bjorn_.Update();
-	//
-	if (player_.animation_.playing_) {
-		player_.Update();
-	}
-	else if (queued_movement_ != -1) {
-		HandlePlayerMovement(queued_movement_);
-		queued_movement_ = -1;
-	}
+	player_.Update();
 
-	if (brutus_.animation_.playing_) {
-		brutus_.Update();
-	}
-	else {
+	brutus_.Update();
+	if (!brutus_.IsMoving()){
 		GetEnemyTargetPos(brutus_);
 	}
 
-	if (bjorn_.animation_.playing_) {
-		bjorn_.Update();
-	}
-	else {
+	bjorn_.Update();
+	if (!bjorn_.IsMoving()) {
 		GetEnemyTargetPos(bjorn_);
 	}
 
@@ -66,7 +54,6 @@ void GameplayScene::Update()
 			i = pellets_.erase(i);
 			if (pellets_.size() == 0) {
 				player_.animation_.playing_ = false;
-				queued_movement_ = -1;
 				return;
 			}
 		}
@@ -309,8 +296,6 @@ void GameplayScene::SetUpLevel()
 
 void GameplayScene::ResetLevel()
 {
-	queued_movement_ = -1;
-
 	player_.animation_.Stop();
 	brutus_.animation_.Stop();
 	bjorn_.animation_.Stop();
