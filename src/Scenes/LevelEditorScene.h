@@ -21,8 +21,8 @@ public:
 	void Undo();
 
 	//tiles can not be placed while a spawn is selected
-	void ChangeSelectedTile(const Tile& tile) { selected_tile_ = &tile; selected_spawn_ = SpawnPoint::None;}
-	void ChangeSelectedSpawn(SpawnPoint spawn) { selected_spawn_ = spawn; selected_tile_ = nullptr;}
+	void ChangeSelectedTile(const Tile& tile); 
+	void ChangeSelectedSpawn(SpawnPoint spawn);
 
 	std::shared_ptr<TileMap> tile_map_;
 
@@ -33,6 +33,9 @@ public:
 	std::shared_ptr<Aegis::SubTexture> bjorn_tex_;
 	std::shared_ptr<Aegis::SubTexture> brutus_tex_;
 	std::shared_ptr<Aegis::SubTexture> bruce_tex_;
+
+	std::shared_ptr<Aegis::Text> tile_text_;
+	std::shared_ptr<Aegis::Text> spawn_text_;
 
 	bool show_error_msg_ = false;
 	

@@ -26,10 +26,12 @@ LevelEditorScene::LevelEditorScene()
 	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 70, 64, 64}, "Ground", [&](){ChangeSelectedTile(tile_map_->ground_tile_);}));  
 	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 70, 64, 64}, " Ice", [&](){ChangeSelectedTile(tile_map_->ice_tile_);}));  
 	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 70, 64, 64}, "Wall", [&](){ChangeSelectedTile(tile_map_->wall_tile_);}));  
+	tile_text_ = ui_layer_->AddWidget<Aegis::Text>(new Aegis::Text("Tile: None", {40, 144}));
 
 	auto bjorn_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 175, 64, 64}, "Bjorn", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorn);}));  
 	auto player_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 175, 64, 64}, "Bruce", [&](){ChangeSelectedSpawn(SpawnPoint::Bruce);}));  
 	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 175, 64, 64}, "Brutus", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
+	spawn_text_ = ui_layer_->AddWidget<Aegis::Text>(new Aegis::Text("Spawn: None", {40, 249}));
 
 	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 400, 80, 40}, "Undo", [&]() {Undo();}));
 	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 400, 80, 40}, "Reset", [&]() {
@@ -41,6 +43,8 @@ LevelEditorScene::LevelEditorScene()
 	auto save_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 450, 80, 40}, "Save", [&]() {SaveLevel();}));
 
 	auto back_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({70, 500, 125, 40}, "Exit", [&](){ manager_->PopScene();}));  
+
+
 
 }
 
@@ -109,20 +113,6 @@ void LevelEditorScene::Render(float delta_time)
 	Aegis::RendererClear();
 	Aegis::Renderer2D::SetFont(font_);
 	tile_map_->Render();
-
-	//have to use negative numbers to counteract camera movement
-	//TODO: add ability to submit text to UILayer
-	if (selected_tile_ == nullptr) Aegis::DrawText("Tile: None", {-230, 120});
-	else if (selected_tile_->is_solid_) Aegis::DrawText("Tile: Wall", {-230, 120}); 
-	else if (selected_tile_->is_slippery_) Aegis::DrawText("Tile: Ice", {-230, 120});
-	else Aegis::DrawText("Tile: Ground", {-230, 120});
-	
-	switch (selected_spawn_){
-		case SpawnPoint::Bjorn: Aegis::DrawText("Spawn: Bjorn", {-230, 225}); break;
-		case SpawnPoint::Brutus: Aegis::DrawText("Spawn: Brutus", {-230, 225}); break;
-		case SpawnPoint::Bruce: Aegis::DrawText("Spawn: Bruce", {-230, 225}); break;
-		case SpawnPoint::None: Aegis::DrawText("Spawn: None", {-230, 225}); break;
-	}
 
 	Aegis::DrawQuad(tile_map_->bruce_spawn_index_ * 32, {32, 32}, bruce_tex_);
 	Aegis::DrawQuad(tile_map_->brutus_spawn_index_ * 32, {32, 32}, brutus_tex_);
@@ -193,5 +183,30 @@ void LevelEditorScene::Undo()
 			recorded_commands.pop();
 			
 		}
+	}
+}
+
+void LevelEditorScene::ChangeSelectedTile(const Tile& tile)
+{
+	selected_tile_ = &tile; 
+	selected_spawn_ = SpawnPoint::None;
+	spawn_text_->text_ = "Spawn: None";
+
+	if (tile.is_solid_) tile_text_->text_ = "Tile: Wall";
+	else if (tile.is_slippery_) tile_text_->text_ = "Tile: Ice";
+	else tile_text_->text_ = "Tile: Ground";
+}
+
+void LevelEditorScene::ChangeSelectedSpawn(SpawnPoint spawn)
+{
+	selected_spawn_ = spawn; 
+	selected_tile_ = nullptr;
+	tile_text_->text_ = "Tile: None";
+
+	switch (spawn){
+		case SpawnPoint::Bjorn: spawn_text_->text_ = "Spawn: Bjorn"; break;
+		case SpawnPoint::Bruce: spawn_text_->text_ = "Spawn: Bruce"; break;
+		case SpawnPoint::Brutus: spawn_text_->text_ = "Spawn: Brutus"; break;
+		case SpawnPoint::None: break;
 	}
 }
