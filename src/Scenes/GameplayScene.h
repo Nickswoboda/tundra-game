@@ -2,13 +2,6 @@
 #include "../TileMap.h"
 #include <stack>
 #include <memory>
-enum class Direction {
-	None,
-	Up,
-	Down,
-	Left,
-	Right
-};
 
 class GameplayScene : public Aegis::Scene
 {
@@ -23,7 +16,7 @@ public:
 
 	void HandlePlayerMovement(int key_code);
 	Aegis::Vec2 GetEnemyTargetPos(GameObject& obj);
-	Aegis::Vec2 GetSlidingTargetTile(const Aegis::Vec2& start, Direction dir) const;
+	Aegis::Vec2 GetSlidingTargetTile(const Aegis::Vec2& start, const Aegis::Vec2& dir) const;
 	Aegis::Vec2 GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding) const;
 	void SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos);
 

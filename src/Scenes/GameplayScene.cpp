@@ -106,15 +106,16 @@ void GameplayScene::Render(float delta_time)
 
 void GameplayScene::HandlePlayerMovement(int key_code)
 {
-	Direction dir = Direction::None;
+	Aegis::Vec2 dir;
 	switch (key_code)
 	{
-	case GLFW_KEY_UP: dir = Direction::Up;  break;
-	case GLFW_KEY_DOWN: dir = Direction::Down;  break;
-	case GLFW_KEY_LEFT: dir = Direction::Left;  break;
-	case GLFW_KEY_RIGHT: dir = Direction::Right;  break;
+	case GLFW_KEY_UP: dir = {0, -1};  break;
+	case GLFW_KEY_DOWN: dir = {0, 1}; break;
+	case GLFW_KEY_LEFT: dir = {-1, 0};  break;
+	case GLFW_KEY_RIGHT: dir = {1, 0};  break;
 	}
 
+	//if already moving, uses target_index to queue up movement
 	if (player_.IsMoving()){
 		player_.MoveTo(GetSlidingTargetTile(player_.target_grid_index_, dir));
 	}
@@ -128,66 +129,22 @@ Aegis::Vec2 GameplayScene::GetEnemyTargetPos(GameObject& obj)
 	return GetTargetTileCoordBFS(obj.grid_index_, player_.grid_index_, obj.slides_on_ice_);
 }
 
-Aegis::Vec2 GameplayScene::GetSlidingTargetTile(const Aegis::Vec2& start, Direction dir) const
+Aegis::Vec2 GameplayScene::GetSlidingTargetTile(const Aegis::Vec2& start, const Aegis::Vec2& dir) const
 {
-	int x_index = start.x;
-	int y_index = start.y;
+	Aegis::Vec2 pos = start;
 
-	switch (dir)
-	{
-	case Direction::Up: {
-		//Move past ice, move back against wall, stand on ground
-		--y_index;
-		const Tile* tile = tile_map_->GetTileByIndex(start.x, y_index);
-		while (tile && tile->is_slippery_) {
-			--y_index;
-			tile = tile_map_->GetTileByIndex(start.x, y_index);
-		}
-		if (!tile || tile->is_solid_) {
-			++y_index;
-		}
-		break;
+	//Check each tile, if ice, go to next tile. If ground, stop, if wall or edge of map, go back one tile
+	pos += dir;
+	const Tile* tile = tile_map_->GetTileByIndex(pos.x, pos.y); 
+	while (tile && tile->is_slippery_){
+		pos += dir;
+		tile = tile_map_->GetTileByIndex(pos.x, pos.y); 
 	}
-	case Direction::Down: {
-		++y_index;
-
-		const Tile* tile = tile_map_->GetTileByIndex(start.x, y_index);
-		while (tile && tile->is_slippery_) {
-			++y_index;
-			tile = tile_map_->GetTileByIndex(start.x, y_index);
-		}
-		if (!tile || tile->is_solid_) {
-			--y_index;
-		}
-		break;
-	}
-	case Direction::Left: {
-		--x_index;
-		const Tile* tile = tile_map_->GetTileByIndex(x_index, start.y);
-		while (tile && tile->is_slippery_) {
-			--x_index;
-			tile = tile_map_->GetTileByIndex(x_index, start.y);
-		}
-		if (!tile || tile->is_solid_) {
-			++x_index;
-		}
-		break;
-	}
-	case Direction::Right: {
-		++x_index;
-		const Tile* tile = tile_map_->GetTileByIndex(x_index, start.y);
-		while (tile && tile->is_slippery_) {
-			++x_index;
-			tile = tile_map_->GetTileByIndex(x_index, start.y);
-		}
-		if (!tile || tile->is_solid_) {
-			--x_index;
-		}
-		break;
-	}
+	if (!tile || tile->is_solid_){
+		pos -= dir;
 	}
 
-	return Aegis::Vec2(x_index, y_index);
+	return Aegis::Vec2(pos.x, pos.y);
 }
 
 
@@ -243,10 +200,10 @@ void GameplayScene::SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos)
 std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesSliding(const Aegis::Vec2& tile) const
 {
 	std::vector<Aegis::Vec2> neighbors;
-	neighbors.push_back(GetSlidingTargetTile(tile, Direction::Up));
-	neighbors.push_back(GetSlidingTargetTile(tile, Direction::Down));
-	neighbors.push_back(GetSlidingTargetTile(tile, Direction::Left));
-	neighbors.push_back(GetSlidingTargetTile(tile, Direction::Right));
+	neighbors.push_back(GetSlidingTargetTile(tile, {0, -1}));
+	neighbors.push_back(GetSlidingTargetTile(tile, {0, 1}));
+	neighbors.push_back(GetSlidingTargetTile(tile, {-1, 0}));
+	neighbors.push_back(GetSlidingTargetTile(tile, {1, 0}));
 
 	return neighbors;
 }
