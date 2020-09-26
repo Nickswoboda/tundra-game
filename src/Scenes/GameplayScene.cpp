@@ -5,21 +5,31 @@
 #include <filesystem>
 
 GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
-	:ui_camera_(0, 1280, 720, 0), player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
+	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
 {
 	tile_map_ = tile_map;
-	SetUpLevel();
 
 	camera_.SetPosition({ -144, -24});
+
+	ui_layer_ = std::make_unique<Aegis::UILayer>();
+	for (int i = 0; i < max_lives_; ++i){
+		heart_textures_[i] = ui_layer_->AddWidget<Aegis::TextureWidget>(new Aegis::TextureWidget({1.0f, 0.0f, 0.0f, 1.0f}, { 50.0f + (i * 30), 50}, {25.0f, 25.0f}));
+	}
+	SetUpLevel();
 }
 GameplayScene::GameplayScene(int level)
-	:ui_camera_(0, 1280, 720, 0), player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
+	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
 {
 	auto atlas = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
 	tile_map_ = std::make_shared<TileMap>("assets/levels/level" + std::to_string(level) + ".txt", 32, atlas);
-	SetUpLevel();
 	
 	camera_.SetPosition({ -144, -24});
+
+	ui_layer_ = std::make_unique<Aegis::UILayer>();
+	for (int i = 0; i < max_lives_; ++i){
+		heart_textures_[i] = ui_layer_->AddWidget<Aegis::TextureWidget>(new Aegis::TextureWidget({1.0f, 0.0f, 0.0f, 1.0f}, { 50.0f + (i * 30), 50}, {25.0f, 25.0f}));
+	}
+	SetUpLevel();
 }
 
 void GameplayScene::Update()
@@ -37,12 +47,12 @@ void GameplayScene::Update()
 	}
 
 	if (Aegis::AABBHasCollided(player_.sprite_.rect_, brutus_.sprite_.rect_) || Aegis::AABBHasCollided(player_.sprite_.rect_, bjorn_.sprite_.rect_)) {
-		--num_lives_;
-		if (num_lives_ == 0) {
+		RemoveLife();
+		if (num_lives_ == 0){
 			manager_->PopScene();
 			return;
 		}
-		else {
+		else{
 			ResetLevel();
 		}
 	}
@@ -94,14 +104,6 @@ void GameplayScene::Render(float delta_time)
 	{
 		pellet.Render(0.0f);
 	}
-	Aegis::Renderer2D::EndScene();
-
-	Aegis::Renderer2D::BeginScene(ui_camera_.view_projection_matrix_);
-
-	for (int i = 0; i < num_lives_; ++i) {
-		Aegis::DrawQuad({ 20 + (float) i * 22, 675 }, { 20, 20 }, { 1.0f, 0.1f, 0.1f, 1.0f });
-	}
-
 }
 
 void GameplayScene::HandlePlayerMovement(int key_code)
@@ -254,10 +256,11 @@ void GameplayScene::ResetLevel()
 	brutus_.animation_.Stop();
 	bjorn_.animation_.Stop();
 
-	SetObjectOnGrid(player_, tile_map_->bruce_spawn_index_);
-	SetObjectOnGrid(brutus_, tile_map_->brutus_spawn_index_);
-	SetObjectOnGrid(bjorn_, tile_map_->bjorn_spawn_index_);
-
-	SpawnPellets();
+	SetUpLevel();
 }
 
+void GameplayScene::RemoveLife()
+{
+	--num_lives_;
+	heart_textures_[num_lives_]->visible_ = false;
+}

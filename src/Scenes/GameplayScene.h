@@ -23,15 +23,18 @@ public:
 	std::vector<Aegis::Vec2> GetNeighborTilesMoving(const Aegis::Vec2& tile) const;
 	std::vector<Aegis::Vec2> GetNeighborTilesSliding(const Aegis::Vec2& tile) const;
 
+	void RemoveLife();
+
 	void SpawnPellets();
 	void SetUpLevel();
 	void ResetLevel();
 
-	Aegis::Camera ui_camera_;
 	Player player_;
 	Brutus brutus_;
 	Bjorn bjorn_;
 	std::shared_ptr<TileMap> tile_map_;
 	std::vector<Pellet> pellets_;
+	const int max_lives_ = 3;
 	int num_lives_ = 3;
+	std::array<std::shared_ptr<Aegis::TextureWidget>, 3> heart_textures_;
 };
