@@ -19,6 +19,7 @@ public:
 	Aegis::Vec2 GetSlidingTargetTile(const Aegis::Vec2& start, const Aegis::Vec2& dir) const;
 	Aegis::Vec2 GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding) const;
 	void SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos);
+	void ResetObjectPositions();
 
 	std::vector<Aegis::Vec2> GetNeighborTilesMoving(const Aegis::Vec2& tile) const;
 	std::vector<Aegis::Vec2> GetNeighborTilesSliding(const Aegis::Vec2& tile) const;
@@ -27,7 +28,6 @@ public:
 
 	void SpawnPellets();
 	void SetUpLevel();
-	void ResetLevel();
 
 	Player player_;
 	Brutus brutus_;

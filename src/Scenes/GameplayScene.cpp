@@ -53,7 +53,7 @@ void GameplayScene::Update()
 			return;
 		}
 		else{
-			ResetLevel();
+			ResetObjectPositions();
 		}
 	}
 
@@ -82,7 +82,7 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 			return;
 		}
 		if (key == AE_KEY_K) {
-			ResetLevel();
+			SetUpLevel();
 		}
 		if (key == AE_KEY_UP || key == AE_KEY_DOWN || key == AE_KEY_LEFT || key == AE_KEY_RIGHT) {
 			HandlePlayerMovement(key);
@@ -199,6 +199,18 @@ void GameplayScene::SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos)
 	obj.SetPosition(pos * tile_map_->tile_size_);
 }
 
+void GameplayScene::ResetObjectPositions()
+{
+	SetObjectOnGrid(player_, tile_map_->bruce_spawn_index_);
+	SetObjectOnGrid(brutus_, tile_map_->brutus_spawn_index_);
+	SetObjectOnGrid(bjorn_, tile_map_->bjorn_spawn_index_);
+	GetEnemyTargetPos(brutus_);
+	GetEnemyTargetPos(bjorn_);
+	player_.animation_.Stop();
+	brutus_.animation_.Stop();
+	bjorn_.animation_.Stop();
+}
+
 std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesSliding(const Aegis::Vec2& tile) const
 {
 	std::vector<Aegis::Vec2> neighbors;
@@ -241,22 +253,9 @@ void GameplayScene::SpawnPellets()
 
 void GameplayScene::SetUpLevel()
 {
-	SetObjectOnGrid(player_, tile_map_->bruce_spawn_index_);
-	SetObjectOnGrid(brutus_, tile_map_->brutus_spawn_index_);
-	SetObjectOnGrid(bjorn_, tile_map_->bjorn_spawn_index_);
-	GetEnemyTargetPos(brutus_);
-	GetEnemyTargetPos(bjorn_);
+	ResetObjectPositions();
 
 	SpawnPellets();
-}
-
-void GameplayScene::ResetLevel()
-{
-	player_.animation_.Stop();
-	brutus_.animation_.Stop();
-	bjorn_.animation_.Stop();
-
-	SetUpLevel();
 }
 
 void GameplayScene::RemoveLife()
