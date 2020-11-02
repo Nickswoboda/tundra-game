@@ -30,9 +30,9 @@ public:
 	SpawnPoint selected_spawn_ = SpawnPoint::None;
 
 	std::shared_ptr<Aegis::Font> font_;
-	std::shared_ptr<Aegis::SubTexture> bjorn_tex_;
-	std::shared_ptr<Aegis::SubTexture> brutus_tex_;
-	std::shared_ptr<Aegis::SubTexture> bruce_tex_;
+	std::shared_ptr<Aegis::Texture> bjorn_tex_;
+	std::shared_ptr<Aegis::Texture> brutus_tex_;
+	std::shared_ptr<Aegis::Texture> bruce_tex_;
 
 	std::shared_ptr<Aegis::Text> tile_text_;
 	std::shared_ptr<Aegis::Text> spawn_text_;
