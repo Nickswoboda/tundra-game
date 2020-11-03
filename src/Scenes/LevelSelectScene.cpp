@@ -11,8 +11,10 @@ LevelSelectScene::LevelSelectScene()
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 	ui_layer_->SetFont(button_font_);
-	auto back_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({500, 650, 120, 30}, "Back", [&]() { manager_->PopScene(); }));
-	auto select_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 640, 650, 120, 30 }, "Select", [&]() { manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(selected_level_))); }));
+	auto back_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({560, 650, 120, 30}, "Back", [&]() { manager_->PopScene(); }));
+	auto select_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 500, 550, 120, 30 }, "Select", [&]() { if (selected_level_ != -1) manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(selected_level_))); }));
+	auto edit_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({630, 550, 120, 30}, "Edit", [&]() { if (selected_level_ != -1) manager_->PushScene(std::unique_ptr<Scene>(new LevelEditorScene(selected_level_)));}));
+	auto create_level_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({520, 600, 220, 30}, "New Level", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new LevelEditorScene()));}));
 
 	int level = 1;
 	int x_pos = 500;

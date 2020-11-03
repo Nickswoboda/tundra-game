@@ -7,7 +7,8 @@
 class LevelEditorScene : public Aegis::Scene
 {
 public:
-	LevelEditorScene();
+	//-1 indicates that level will be empty
+	LevelEditorScene(int level = -1);
 	~LevelEditorScene();
 
 	void Update() override;
@@ -43,6 +44,6 @@ public:
 	std::stack<std::shared_ptr<EditCommand>> recorded_edits_;
 	std::stack<std::stack<std::shared_ptr<EditCommand>>> edit_stack_;
 
-	int level_ = 0;
+	int level_num_;
 };
 

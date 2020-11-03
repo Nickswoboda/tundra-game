@@ -14,7 +14,7 @@ public:
 	//base TileMap for level editor
 	TileMap(int width, int height, int tile_size, std::shared_ptr<Aegis::Texture> atlas);
 
-	void Save();
+	void Save(int level_num = -1);
 
 	void Render() const;
 

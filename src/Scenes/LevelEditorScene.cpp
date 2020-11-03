@@ -6,11 +6,19 @@
 #include <iostream>
 #include <fstream>
 
-LevelEditorScene::LevelEditorScene()
+LevelEditorScene::LevelEditorScene(int level)
+	:level_num_(level)
 {
 	font_ = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 24);
 	auto tex_atlas = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
-	tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas); 
+
+	if (level == -1){
+		//create empty level
+		tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas); 
+	}
+	else{
+		tile_map_ = std::make_unique<TileMap>("assets/levels/level" + std::to_string(level) + ".txt", 32, tex_atlas);
+	}
 
 	bruce_tex_ = Aegis::Texture::SubTexture(tex_atlas, Aegis::Vec2(96, 0), Aegis::Vec2(32, 32)); 
 	brutus_tex_ =  Aegis::Texture::SubTexture(tex_atlas, Aegis::Vec2(128, 0), Aegis::Vec2(32, 32)); 
@@ -166,7 +174,7 @@ void LevelEditorScene::SaveLevel()
 		return;
 	}
 	else{
-		tile_map_->Save();
+		tile_map_->Save(level_num_);
 	}
 }
 
