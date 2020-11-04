@@ -23,9 +23,14 @@ void GameplayScene::Init()
 	camera_.SetPosition({ -144, -24});
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
+
+	auto lives_text = ui_layer_->AddWidget<Aegis::Text>(new Aegis::Text("Lives:", {20, 30}));
 	for (int i = 0; i < max_lives_; ++i){
-		heart_textures_[i] = ui_layer_->AddWidget<Aegis::TextureWidget>(new Aegis::TextureWidget({1.0f, 0.0f, 0.0f, 1.0f}, { 50.0f + (i * 30), 50}, {25.0f, 25.0f}));
+		heart_textures_[i] = ui_layer_->AddWidget<Aegis::TextureWidget>(new Aegis::TextureWidget({1.0f, 0.0f, 0.0f, 1.0f}, { 20.0f + (i * 30), 50}, {25.0f, 25.0f}));
 	}
+
+	auto score_text = ui_layer_->AddWidget<Aegis::Text>(new Aegis::Text("Score:", {20, 80}));
+	score_label_ = ui_layer_->AddWidget<Aegis::Text>(new Aegis::Text(std::to_string(score_), {20, 100}));
 	SetUpLevel();
 }
 
@@ -57,6 +62,7 @@ void GameplayScene::Update()
 	for (auto i = pellets_.begin(); i != pellets_.end();) {
 		if (Aegis::AABBHasCollided(player_.sprite_.rect_, (*i).rect_)) {
 			i = pellets_.erase(i);
+			IncrementScore(10);
 			if (pellets_.size() == 0) {
 				player_.animation_.playing_ = false;
 				return;
@@ -259,4 +265,11 @@ void GameplayScene::RemoveLife()
 {
 	--num_lives_;
 	heart_textures_[num_lives_]->visible_ = false;
+}
+
+void GameplayScene::IncrementScore(int amount)
+{
+	score_ += amount;
+
+	score_label_->text_ = std::to_string(score_);
 }

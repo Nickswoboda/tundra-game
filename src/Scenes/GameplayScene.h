@@ -27,6 +27,7 @@ public:
 	std::vector<Aegis::Vec2> GetNeighborTilesSliding(const Aegis::Vec2& tile) const;
 
 	void RemoveLife();
+	void IncrementScore(int amount);
 
 	void SpawnPellets();
 	void SetUpLevel();
@@ -39,4 +40,7 @@ public:
 	const int max_lives_ = 3;
 	int num_lives_ = 3;
 	std::array<std::shared_ptr<Aegis::TextureWidget>, 3> heart_textures_;
+
+	int score_ = 0;
+	std::shared_ptr<Aegis::Text> score_label_;
 };
