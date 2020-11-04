@@ -5,24 +5,21 @@
 #include <filesystem>
 
 GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
-	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
+	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0), tile_map_(tile_map)
 {
-	tile_map_ = tile_map;
-
-	camera_.SetPosition({ -144, -24});
-
-	ui_layer_ = std::make_unique<Aegis::UILayer>();
-	for (int i = 0; i < max_lives_; ++i){
-		heart_textures_[i] = ui_layer_->AddWidget<Aegis::TextureWidget>(new Aegis::TextureWidget({1.0f, 0.0f, 0.0f, 1.0f}, { 50.0f + (i * 30), 50}, {25.0f, 25.0f}));
-	}
-	SetUpLevel();
+	Init();
 }
 GameplayScene::GameplayScene(int level)
 	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
 {
 	auto atlas = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
 	tile_map_ = std::make_shared<TileMap>("assets/levels/level" + std::to_string(level) + ".txt", 32, atlas);
-	
+
+	Init();
+}
+
+void GameplayScene::Init()
+{
 	camera_.SetPosition({ -144, -24});
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
