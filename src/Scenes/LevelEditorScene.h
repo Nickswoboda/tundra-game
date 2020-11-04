@@ -35,8 +35,8 @@ public:
 	std::shared_ptr<Aegis::Texture> brutus_tex_;
 	std::shared_ptr<Aegis::Texture> bruce_tex_;
 
-	std::shared_ptr<Aegis::Text> tile_text_;
-	std::shared_ptr<Aegis::Text> spawn_text_;
+	std::shared_ptr<Aegis::Label> tile_text_;
+	std::shared_ptr<Aegis::Label> spawn_text_;
 
 	bool show_error_msg_ = false;
 	

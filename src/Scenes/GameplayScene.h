@@ -42,5 +42,5 @@ public:
 	std::array<std::shared_ptr<Aegis::TextureWidget>, 3> heart_textures_;
 
 	int score_ = 0;
-	std::shared_ptr<Aegis::Text> score_label_;
+	std::shared_ptr<Aegis::Label> score_label_;
 };

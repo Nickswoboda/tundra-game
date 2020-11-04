@@ -34,12 +34,12 @@ LevelEditorScene::LevelEditorScene(int level)
 	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 70, 64, 64}, "Ground", [&](){ChangeSelectedTile(tile_map_->ground_tile_);}));  
 	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 70, 64, 64}, " Ice", [&](){ChangeSelectedTile(tile_map_->ice_tile_);}));  
 	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 70, 64, 64}, "Wall", [&](){ChangeSelectedTile(tile_map_->wall_tile_);}));  
-	tile_text_ = ui_layer_->AddWidget<Aegis::Text>(new Aegis::Text("Tile: None", {40, 144}));
+	tile_text_ = ui_layer_->AddWidget<Aegis::Label>(new Aegis::Label("Tile: None", {40, 144}));
 
 	auto bjorn_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 175, 64, 64}, "Bjorn", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorn);}));  
 	auto player_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 175, 64, 64}, "Bruce", [&](){ChangeSelectedSpawn(SpawnPoint::Bruce);}));  
 	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 175, 64, 64}, "Brutus", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
-	spawn_text_ = ui_layer_->AddWidget<Aegis::Text>(new Aegis::Text("Spawn: None", {40, 249}));
+	spawn_text_ = ui_layer_->AddWidget<Aegis::Label>(new Aegis::Label("Spawn: None", {40, 249}));
 
 	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 400, 80, 40}, "Undo", [&]() {Undo();}));
 	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 400, 80, 40}, "Reset", [&]() {
