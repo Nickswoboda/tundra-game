@@ -8,13 +8,13 @@ OptionsScene::OptionsScene()
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 	ui_layer_->SetFont(button_font_);
 
-	auto screen_mode_dropdown_ = ui_layer_->AddWidget<Aegis::Dropdown>(new Aegis::Dropdown("Screen Mode", { 580, 150, 200, 32 }));
+	auto screen_mode_dropdown_ = ui_layer_->AddWidget<Aegis::Dropdown>("Screen Mode", Aegis::AABB( 580, 150, 200, 32 ));
 	screen_mode_dropdown_->AddItem("Fullscreen", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Fullscreen); });
 	screen_mode_dropdown_->AddItem("Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Windowed); });
 	screen_mode_dropdown_->AddItem("Fullscreen Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::FullscreenWindow); });
 	screen_mode_dropdown_->SetCurrentIndex((int)Aegis::Application::GetWindow().GetScreenMode());
 
-	auto resolution_dropdown_ = ui_layer_->AddWidget<Aegis::Dropdown>(new Aegis::Dropdown("Resolution", { 580, 210, 200, 32 }));
+	auto resolution_dropdown_ = ui_layer_->AddWidget<Aegis::Dropdown>("Resolution", Aegis::AABB( 580, 210, 200, 32 ));
 	resolution_dropdown_->AddItem("1280x720", [&]() {SetResolution(1280, 720); });
 	resolution_dropdown_->AddItem("1600x900", [&]() {SetResolution(1600, 900); });
 	resolution_dropdown_->AddItem("1920x1080", [&]() {SetResolution(1920, 1080); });
@@ -29,10 +29,10 @@ OptionsScene::OptionsScene()
 	}
 
 	vsync_ = Aegis::Application::GetWindow().IsVsync();
-	auto vsync_checkbox_ = ui_layer_->AddWidget<Aegis::Checkbox>(new Aegis::Checkbox("Vsync", { 780, 400, 200, 32 }, [](bool vsync) {Aegis::Application::GetWindow().SetVsync(vsync);}));
+	auto vsync_checkbox_ = ui_layer_->AddWidget<Aegis::Checkbox>("Vsync", Aegis::AABB( 780, 400, 200, 32 ), [](bool vsync) {Aegis::Application::GetWindow().SetVsync(vsync);});
 	auto checked_texture = Aegis::TextureManager::Load("assets/textures/pressedbtn.png");
 	vsync_checkbox_->SetTexture(true, checked_texture);
-	auto back_button_ = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 580, 600, 200, 32 }, "Back", [&]() {manager_->PopScene(); }));
+	auto back_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 600, 200, 32 ), "Back", [&]() {manager_->PopScene(); });
 
 
 }

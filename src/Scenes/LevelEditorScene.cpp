@@ -31,26 +31,26 @@ LevelEditorScene::LevelEditorScene(int level)
 	auto ui_font = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 20);
 	ui_layer_->SetFont(ui_font);
 	
-	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 70, 64, 64}, "Ground", [&](){ChangeSelectedTile(tile_map_->ground_tile_);}));  
-	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 70, 64, 64}, " Ice", [&](){ChangeSelectedTile(tile_map_->ice_tile_);}));  
-	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 70, 64, 64}, "Wall", [&](){ChangeSelectedTile(tile_map_->wall_tile_);}));  
-	tile_text_ = ui_layer_->AddWidget<Aegis::Label>(new Aegis::Label("Tile: None", {40, 144}));
+	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 40, 70, 64, 64 ), "Ground", [&](){ChangeSelectedTile(tile_map_->ground_tile_);});  
+	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 110, 70, 64, 64 ), " Ice", [&](){ChangeSelectedTile(tile_map_->ice_tile_);});  
+	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 180, 70, 64, 64 ), "Wall", [&](){ChangeSelectedTile(tile_map_->wall_tile_);});  
+	tile_text_ = ui_layer_->AddWidget<Aegis::Label>("Tile: None", Aegis::Vec2(40, 144));
 
-	auto bjorn_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({40, 175, 64, 64}, "Bjorn", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorn);}));  
-	auto player_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({110, 175, 64, 64}, "Bruce", [&](){ChangeSelectedSpawn(SpawnPoint::Bruce);}));  
-	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({180, 175, 64, 64}, "Brutus", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);}));  
-	spawn_text_ = ui_layer_->AddWidget<Aegis::Label>(new Aegis::Label("Spawn: None", {40, 249}));
+	auto bjorn_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 40, 175, 64, 64 ), "Bjorn", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorn);});  
+	auto player_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 110, 175, 64, 64 ), "Bruce", [&](){ChangeSelectedSpawn(SpawnPoint::Bruce);});  
+	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 180, 175, 64, 64 ), "Brutus", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);});  
+	spawn_text_ = ui_layer_->AddWidget<Aegis::Label>("Spawn: None", Aegis::Vec2(40, 249));
 
-	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({50, 400, 80, 40}, "Undo", [&]() {Undo();}));
-	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 400, 80, 40}, "Reset", [&]() {
+	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 80, 40 ), "Undo", [&]() {Undo();});
+	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 80, 40 ), "Reset", [&]() {
 				auto tex_atlas = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
 				tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas);
-					}));
+					});
 
-	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({ 50, 450, 80, 40 }, "Preview", [&]() {PreviewLevel(); }));
-	auto save_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({140, 450, 80, 40}, "Save", [&]() {SaveLevel();}));
+	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB(  50, 450, 80, 40  ), "Preview", [&]() {PreviewLevel(); });
+	auto save_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 450, 80, 40 ), "Save", [&]() {SaveLevel();});
 
-	auto back_button = ui_layer_->AddWidget<Aegis::Button>(new Aegis::Button({70, 500, 125, 40}, "Exit", [&](){ manager_->PopScene();}));  
+	auto back_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 70, 500, 125, 40 ), "Exit", [&](){ manager_->PopScene();});  
 
 
 

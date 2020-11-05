@@ -24,13 +24,13 @@ void GameplayScene::Init()
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 
-	auto lives_text = ui_layer_->AddWidget<Aegis::Label>(new Aegis::Label("Lives:", {20, 30}));
+	auto lives_text = ui_layer_->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(20, 30));
 	for (int i = 0; i < max_lives_; ++i){
-		heart_textures_[i] = ui_layer_->AddWidget<Aegis::TextureWidget>(new Aegis::TextureWidget({1.0f, 0.0f, 0.0f, 1.0f}, { 20.0f + (i * 30), 50}, {25.0f, 25.0f}));
+		heart_textures_[i] = ui_layer_->AddWidget<Aegis::TextureWidget>(Aegis::Vec4( 1.0f, 0.0f, 0.0f, 1.0f), Aegis::Vec2( 20.0f + (i * 30), 50), Aegis::Vec2( 25.0f, 25.0f ));
 	}
 
-	auto score_text = ui_layer_->AddWidget<Aegis::Label>(new Aegis::Label("Score:", {20, 80}));
-	score_label_ = ui_layer_->AddWidget<Aegis::Label>(new Aegis::Label(std::to_string(score_), {20, 100}));
+	auto score_text = ui_layer_->AddWidget<Aegis::Label>("Score:", Aegis::Vec2( 20, 80 ));
+	score_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string(score_), Aegis::Vec2( 20, 100 ));
 	SetUpLevel();
 }
 
