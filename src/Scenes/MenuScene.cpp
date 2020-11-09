@@ -43,7 +43,6 @@ void MenuScene::Update()
 void MenuScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
-	Aegis::RendererClear();
 	Aegis::DrawQuad({0.0f, 0.0f}, Aegis::Application::GetWindow().GetSize(), title_background_);
 	Aegis::RenderSprite(*title_sprite_);
 }

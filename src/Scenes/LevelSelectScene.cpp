@@ -45,10 +45,9 @@ void LevelSelectScene::Update()
 void LevelSelectScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
-	Aegis::RendererClear();
 
 	Aegis::Renderer2D::SetFont(title_font_);
-	Aegis::DrawText("Level Select", { 490, 20 }, { 1.0, 1.0f, 1.0f, 1.0f });
+	Aegis::DrawText("Level Select", { 490, 20 });
 
 	if (selected_level_ != -1) {
 		auto pos = level_buttons_[selected_level_ - 1]->rect_.pos;

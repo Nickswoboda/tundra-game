@@ -96,7 +96,6 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 void GameplayScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
-	Aegis::RendererClear();
 	
 	tile_map_->Render();
 	player_.Render(delta_time);

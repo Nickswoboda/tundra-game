@@ -118,7 +118,6 @@ void LevelEditorScene::Update()
 void LevelEditorScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
-	Aegis::RendererClear();
 	Aegis::Renderer2D::SetFont(font_);
 	tile_map_->Render();
 

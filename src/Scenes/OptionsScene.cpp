@@ -48,10 +48,9 @@ void OptionsScene::Update()
 void OptionsScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
-	Aegis::RendererClear();
 
 	Aegis::Renderer2D::SetFont(title_font_);
-	Aegis::DrawText("Options", { 500, 20 }, { 1.0f, 1.0f, 1.0f, 1.0f });
+	Aegis::DrawText("Options", { 500, 20 });
 }
 
 void OptionsScene::OnEvent(Aegis::Event& event)
