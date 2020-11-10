@@ -21,7 +21,9 @@ LevelSelectScene::LevelSelectScene()
 	int x_pos = 500;
 	int y_pos = 200;
 	while (std::filesystem::exists("assets/levels/level" + std::to_string(level) + ".txt")){
-		level_buttons_.emplace_back(ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( (float)x_pos, (float)y_pos, 64, 64 ), std::to_string(level), [&, level](){selected_level_ = level;}));
+		auto button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB(x_pos, y_pos, 64, 64), std::to_string(level), [&, level]() {selected_level_ = level;});
+		button->dbl_click_callback_ = [&, level]() {manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(level)));};
+		level_buttons_.push_back(button);
 		x_pos += 74;
 
 		//maximum of 4 buttons per row
