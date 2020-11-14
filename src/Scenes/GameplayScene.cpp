@@ -31,11 +31,27 @@ void GameplayScene::Init()
 
 	auto score_text = ui_layer_->AddWidget<Aegis::Label>("Score:", Aegis::Vec2( 20, 80 ));
 	score_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string(score_), Aegis::Vec2( 20, 100 ));
+
+	countdown_.Start(3000);
+	countdown_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string((int)countdown_.GetRemainingInSeconds() + 1), Aegis::Vec2(600, 300), Aegis::Vec4(0.0f,0.0f, 0.0f, 1.0f));
+	auto countdown_font = Aegis::FontManager::Load("assets/fonts/Roboto-Regular.ttf", 128);
+	countdown_label_->SetFont(countdown_font);
+
 	SetUpLevel();
 }
 
 void GameplayScene::Update()
 {
+	while (!countdown_.stopped_){
+		countdown_.Update();
+		//countdown + 1 so that it goes from 3, 2, 1 instead of 2, 1, 0
+		countdown_label_->text_ = std::to_string((int)countdown_.GetRemainingInSeconds() + 1);
+
+		if (countdown_.stopped_){
+			countdown_label_->visible_ = false;
+		}
+		return;
+	}
 	player_.Update();
 
 	brutus_.Update();
@@ -211,6 +227,9 @@ void GameplayScene::ResetObjectPositions()
 	player_.animation_.Stop();
 	brutus_.animation_.Stop();
 	bjorn_.animation_.Stop();
+
+	countdown_label_->visible_ = true;
+	countdown_.Start(3000);
 }
 
 std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesSliding(const Aegis::Vec2& tile) const

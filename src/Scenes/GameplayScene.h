@@ -43,4 +43,6 @@ public:
 
 	int score_ = 0;
 	std::shared_ptr<Aegis::Label> score_label_;
+	Aegis::Timer countdown_;
+	std::shared_ptr<Aegis::Label> countdown_label_;
 };
