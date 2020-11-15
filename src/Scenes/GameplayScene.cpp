@@ -32,17 +32,24 @@ void GameplayScene::Init()
 	auto score_text = ui_layer_->AddWidget<Aegis::Label>("Score:", Aegis::Vec2( 20, 80 ));
 	score_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string(score_), Aegis::Vec2( 20, 100 ));
 
-	countdown_.Start(3000);
+	countdown_.Start(2500);
 	countdown_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string((int)countdown_.GetRemainingInSeconds() + 1), Aegis::Vec2(600, 300), Aegis::Vec4(0.0f,0.0f, 0.0f, 1.0f));
 	auto countdown_font = Aegis::FontManager::Load("assets/fonts/Roboto-Regular.ttf", 128);
 	countdown_label_->SetFont(countdown_font);
 
+	dialog_ = ui_layer_->AddWidget<Aegis::Dialog>("You lose. Try Again?", Aegis::Vec2(400, 200), Aegis::Vec2(300, 300));
+	dialog_->SetAcceptedCallback([&]() { SetUpLevel(); dialog_->visible_ = false; });
+	dialog_->SetRejectedCallback([&](){ dialog_->visible_ = false; manager_->PopScene(); });
+	dialog_->visible_ = false;
 	SetUpLevel();
 }
 
 void GameplayScene::Update()
 {
-	while (!countdown_.stopped_){
+	if (dialog_->visible_){
+		return;
+	}
+	if (!countdown_.stopped_){
 		countdown_.Update();
 		//countdown + 1 so that it goes from 3, 2, 1 instead of 2, 1, 0
 		countdown_label_->text_ = std::to_string((int)countdown_.GetRemainingInSeconds() + 1);
@@ -67,7 +74,7 @@ void GameplayScene::Update()
 	if (Aegis::AABBHasCollided(player_.sprite_.rect_, brutus_.sprite_.rect_) || Aegis::AABBHasCollided(player_.sprite_.rect_, bjorn_.sprite_.rect_)) {
 		RemoveLife();
 		if (num_lives_ == 0){
-			manager_->PopScene();
+			dialog_->visible_ = true;
 			return;
 		}
 		else{
@@ -275,8 +282,16 @@ void GameplayScene::SpawnPellets()
 void GameplayScene::SetUpLevel()
 {
 	ResetObjectPositions();
-
 	SpawnPellets();
+
+	num_lives_ = 3;
+	for (auto& texture : heart_textures_){
+		texture->visible_ = true;
+	}
+
+	score_ = 0;
+	score_label_->text_ = std::to_string(score_);
+
 }
 
 void GameplayScene::RemoveLife()
