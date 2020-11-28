@@ -12,7 +12,7 @@ OptionsScene::OptionsScene()
 	screen_mode_dropdown_->AddItem("Fullscreen", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Fullscreen); });
 	screen_mode_dropdown_->AddItem("Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::Windowed); });
 	screen_mode_dropdown_->AddItem("Fullscreen Windowed", []() {Aegis::Application::GetWindow().SetScreenMode(Aegis::ScreenMode::FullscreenWindow); });
-	screen_mode_dropdown_->SetCurrentIndex((int)Aegis::Application::GetWindow().GetScreenMode());
+	screen_mode_dropdown_->MoveToTop((int)Aegis::Application::GetWindow().GetScreenMode());
 
 	auto resolution_dropdown_ = ui_layer_->AddWidget<Aegis::Dropdown>("Resolution", Aegis::AABB( 580, 210, 200, 32 ));
 	resolution_dropdown_->AddItem("1280x720", [&]() {SetResolution(1280, 720); });
@@ -22,10 +22,10 @@ OptionsScene::OptionsScene()
 
 	//quick way of determinning which item is shown first in dropdown. Will be removed when I get to implementing a true UI system
 	if (Aegis::Application::GetWindow().GetResolution().x == 1600){
-		resolution_dropdown_->SetCurrentIndex(1);
+		resolution_dropdown_->MoveToTop(1);
 	}
 	else if (Aegis::Application::GetWindow().GetResolution().x == 1920) {
-		resolution_dropdown_->SetCurrentIndex(2);
+		resolution_dropdown_->MoveToTop(2);
 	}
 
 	vsync_ = Aegis::Application::GetWindow().IsVsync();
