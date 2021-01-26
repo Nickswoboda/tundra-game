@@ -8,6 +8,8 @@ add_executable (Tundra
 	"src/main.cpp" 
 	"src/GameObject.cpp"
 	"src/GameObject.h"
+	"src/Particle.h"
+	"src/Particle.cpp"
 	"src/TileMap.h"
 	"src/TileMap.cpp"
 	"src/Tile.h" "src/Scenes/GameplayScene.cpp" "src/Scenes/MenuScene.cpp"

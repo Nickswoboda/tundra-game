@@ -30,6 +30,7 @@ MenuScene::MenuScene()
 	options_button_->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Load("assets/textures/OptionsButton.png"));
 	exit_button_->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Load("assets/textures/ExitButton.png"));
 	
+	snow_engine_ = std::make_unique<ParticleEngine>(512, Aegis::Vec2(-200, -700), Aegis::Vec2(Aegis::Application::GetWindow().GetSize().x, 0), Aegis::Vec2(0.2, 2), Aegis::Vec2(1, 3));
 }
 
 MenuScene::~MenuScene()
@@ -38,6 +39,7 @@ MenuScene::~MenuScene()
 
 void MenuScene::Update()
 {
+	snow_engine_->Update();
 }
 
 void MenuScene::Render(float delta_time)
@@ -45,6 +47,7 @@ void MenuScene::Render(float delta_time)
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
 	Aegis::DrawQuad({0.0f, 0.0f}, Aegis::Application::GetWindow().GetSize(), title_background_);
 	Aegis::RenderSprite(*title_sprite_);
+	snow_engine_->Render();
 }
 
 void MenuScene::OnEvent(Aegis::Event& event)

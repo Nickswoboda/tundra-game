@@ -2,6 +2,8 @@
 
 #include "src/Aegis.h"
 
+#include "../Particle.h"
+
 class MenuScene : public Aegis::Scene
 {
 public:
@@ -17,4 +19,6 @@ public:
 	std::shared_ptr<Aegis::Sprite> title_sprite_;
 
 	std::shared_ptr<Aegis::Container> v_box_;
+
+	std::shared_ptr<ParticleEngine> snow_engine_;
 };
