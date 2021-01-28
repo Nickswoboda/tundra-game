@@ -5,6 +5,8 @@
 #include "OptionsScene.h"
 #include "LevelEditorScene.h"
 
+#include <iostream>
+
 MenuScene::MenuScene() 
 {
 	title_background_ = Aegis::TextureManager::Load("assets/textures/TundraBG.png");
@@ -31,6 +33,8 @@ MenuScene::MenuScene()
 	exit_button_->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Load("assets/textures/ExitButton.png"));
 	
 	snow_engine_ = std::make_unique<ParticleEngine>(512, Aegis::Vec2(-200, -700), Aegis::Vec2(Aegis::Application::GetWindow().GetSize().x, 0), Aegis::Vec2(0.2, 2), Aegis::Vec2(1, 3));
+	bg_music_ = std::make_shared<Aegis::SoundEffect>("assets/audio/bgm.ogg");
+	bg_music_->Play();
 }
 
 MenuScene::~MenuScene()

@@ -21,4 +21,6 @@ public:
 	std::shared_ptr<Aegis::Container> v_box_;
 
 	std::shared_ptr<ParticleEngine> snow_engine_;
+
+	std::shared_ptr<Aegis::SoundEffect> bg_music_;
 };
