@@ -21,6 +21,11 @@ MenuScene::MenuScene()
 	auto options_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 230, 200, 50 ), "", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene())); });
 	auto exit_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 270, 200, 50 ), "", [&]() { Aegis::Application::Quit(); });
 
+	auto mute_button = ui_layer_->AddWidget<Aegis::Checkbox>("", Aegis::AABB(1200, 650, 50, 50), [](bool checked) {Aegis::AudioPlayer::SetVolume(checked ? 0 : 100);});
+
+	mute_button->SetTexture(false, Aegis::TextureManager::Load("assets/textures/audioOn.png"));
+	mute_button->SetTexture(true, Aegis::TextureManager::Load("assets/textures/audioOff.png"));
+
 	v_box_ = ui_layer_->AddContainer({0, 170, 1280, 570}, Aegis::Container::Vertical, 10, Aegis::Container::Center);
 	v_box_->AddWidget(new_game_button_);
 	v_box_->AddWidget(level_select_button_);
@@ -34,11 +39,8 @@ MenuScene::MenuScene()
 	
 	snow_engine_ = std::make_unique<ParticleEngine>(512, Aegis::Vec2(-200, -700), Aegis::Vec2(Aegis::Application::GetWindow().GetSize().x, 0), Aegis::Vec2(0.2, 2), Aegis::Vec2(1, 3));
 	bg_music_ = std::make_shared<Aegis::SoundEffect>("assets/audio/bgm.ogg");
-	bg_music_->Play();
-}
-
-MenuScene::~MenuScene()
-{
+	
+	Aegis::AudioPlayer::Play(bg_music_->source_id_);
 }
 
 void MenuScene::Update()
