@@ -7,7 +7,7 @@ ParticleEngine::ParticleEngine(int num_particles, Aegis::Vec2 min_spawn_pos, Aeg
 	 x_vel_rng_(min_vel.x, max_vel.x), y_vel_rng_(min_vel.y, max_vel.y), num_particles_(num_particles)
 {
 	unsigned char white_data[4] = { 255, 255, 255, 255 };
-	texture_ = std::make_unique<Aegis::Texture>(white_data, 1, 1, 4);
+	texture_ = Aegis::Texture::Create(white_data, 1, 1, 4);
 
 	for (int i = 0; i < num_particles_; ++i){
 		CreateParticle(i);

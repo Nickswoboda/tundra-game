@@ -20,9 +20,9 @@ LevelEditorScene::LevelEditorScene(int level)
 		tile_map_ = std::make_unique<TileMap>("assets/levels/level" + std::to_string(level) + ".txt", 32, tex_atlas);
 	}
 
-	bruce_tex_ = Aegis::Texture::SubTexture(tex_atlas, Aegis::Vec2(96, 0), Aegis::Vec2(32, 32)); 
-	brutus_tex_ =  Aegis::Texture::SubTexture(tex_atlas, Aegis::Vec2(128, 0), Aegis::Vec2(32, 32)); 
-	bjorn_tex_ = Aegis::Texture::SubTexture(tex_atlas, Aegis::Vec2(160, 0), Aegis::Vec2(32, 32)); 
+	bruce_tex_ = Aegis::SubTexture::Create(tex_atlas, Aegis::Vec2(96, 0), Aegis::Vec2(32, 32));
+	brutus_tex_ =  Aegis::SubTexture::Create(tex_atlas, Aegis::Vec2(128, 0), Aegis::Vec2(32, 32));
+	bjorn_tex_ = Aegis::SubTexture::Create(tex_atlas, Aegis::Vec2(160, 0), Aegis::Vec2(32, 32));
 
 	//used to center tilemap within window
 	camera_.SetPosition({-270, -24});

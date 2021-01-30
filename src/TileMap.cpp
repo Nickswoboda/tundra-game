@@ -7,9 +7,9 @@
 #include <algorithm>
 TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Aegis::Texture> atlas)
 	: tile_atlas_(atlas), tile_size_(tile_size),
-	  wall_tile_(Aegis::Texture::SubTexture(tile_atlas_, Aegis::Vec2(0.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), true, false),
-	  ice_tile_(Aegis::Texture::SubTexture(tile_atlas_, Aegis::Vec2(64.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), false, true),
-	  ground_tile_(Aegis::Texture::SubTexture(tile_atlas_, Aegis::Vec2(32.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), false, false)
+	  wall_tile_(Aegis::SubTexture::Create(tile_atlas_, Aegis::Vec2(0.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), true, false),
+	  ice_tile_(Aegis::SubTexture::Create(tile_atlas_, Aegis::Vec2(64.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), false, true),
+	  ground_tile_(Aegis::SubTexture::Create(tile_atlas_, Aegis::Vec2(32.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), false, false)
 {
 	std::ifstream file(file_path);
 	std::stringstream buffer;
@@ -55,9 +55,9 @@ TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Ae
 
 TileMap::TileMap(int width, int height, int tile_size, std::shared_ptr<Aegis::Texture> atlas)
 	: tile_atlas_(atlas), tile_size_(tile_size),
-	  wall_tile_(Aegis::Texture::SubTexture(tile_atlas_, Aegis::Vec2(0.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), true, false),
-	  ice_tile_(Aegis::Texture::SubTexture(tile_atlas_, Aegis::Vec2(64.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), false, true),
-	  ground_tile_(Aegis::Texture::SubTexture(tile_atlas_, Aegis::Vec2(32.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), false, false)
+	  wall_tile_(Aegis::SubTexture::Create(tile_atlas_, Aegis::Vec2(0.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), true, false),
+	  ice_tile_(Aegis::SubTexture::Create(tile_atlas_, Aegis::Vec2(64.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), false, true),
+	  ground_tile_(Aegis::SubTexture::Create(tile_atlas_, Aegis::Vec2(32.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), false, false)
 {
 	brutus_spawn_index_ = {1, 0};
 	bjorn_spawn_index_ = {2, 0};
