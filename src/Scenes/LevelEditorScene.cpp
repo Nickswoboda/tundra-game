@@ -31,29 +31,36 @@ LevelEditorScene::LevelEditorScene(int level)
 	auto ui_font = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 20);
 	ui_layer_->SetFont(ui_font);
 	
-	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 40, 70, 64, 64 ), "Ground", [&](){ChangeSelectedTile(tile_map_->ground_tile_);});  
-	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 110, 70, 64, 64 ), " Ice", [&](){ChangeSelectedTile(tile_map_->ice_tile_);});  
-	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 180, 70, 64, 64 ), "Wall", [&](){ChangeSelectedTile(tile_map_->wall_tile_);});  
+	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 40, 70, 64, 64 ), "Ground");  
+	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 110, 70, 64, 64 ), " Ice");  
+	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 180, 70, 64, 64 ), "Wall");  
+	ground_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->ground_tile_);});
+	ice_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->ice_tile_);});
+	wall_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->wall_tile_);});
+
 	tile_text_ = ui_layer_->AddWidget<Aegis::Label>("Tile: None", Aegis::Vec2(40, 144));
 
-	auto bjorn_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 40, 175, 64, 64 ), "Bjorn", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorn);});  
-	auto player_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 110, 175, 64, 64 ), "Bruce", [&](){ChangeSelectedSpawn(SpawnPoint::Bruce);});  
-	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 180, 175, 64, 64 ), "Brutus", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);});  
+	auto bjorn_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 40, 175, 64, 64 ), "Bjorn");  
+	auto player_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 110, 175, 64, 64 ), "Bruce");  
+	auto brutus_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 180, 175, 64, 64 ), "Brutus");  
+	bjorn_button->ConnectSignal("pressed", [&](){ChangeSelectedSpawn(SpawnPoint::Bjorn);});
+	player_button->ConnectSignal("pressed", [&](){ChangeSelectedSpawn(SpawnPoint::Bruce);});
+	brutus_button->ConnectSignal("pressed", [&](){ChangeSelectedSpawn(SpawnPoint::Brutus);});
 	spawn_text_ = ui_layer_->AddWidget<Aegis::Label>("Spawn: None", Aegis::Vec2(40, 249));
 
-	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 80, 40 ), "Undo", [&]() {Undo();});
-	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 80, 40 ), "Reset", [&]() {
-				auto tex_atlas = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
-				tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas);
-					});
+	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 80, 40 ), "Undo");
+	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 80, 40 ), "Reset");
+	
+	undo_button->ConnectSignal("pressed", [&](){Undo();});
+	reset_button->ConnectSignal("pressed", [&, tex_atlas](){tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas);});
 
-	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB(  50, 450, 80, 40  ), "Preview", [&]() {PreviewLevel(); });
-	auto save_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 450, 80, 40 ), "Save", [&]() {SaveLevel();});
+	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB(  50, 450, 80, 40  ), "Preview");
+	auto save_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 450, 80, 40 ), "Save");
+	auto back_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 70, 500, 125, 40 ), "Exit");  
 
-	auto back_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 70, 500, 125, 40 ), "Exit", [&](){ manager_->PopScene();});  
-
-
-
+	preview_button->ConnectSignal("pressed", [&](){PreviewLevel();});
+	save_button->ConnectSignal("pressed", [&](){SaveLevel();});
+	back_button->ConnectSignal("pressed", [&](){manager_->PopScene();});
 }
 
 LevelEditorScene::~LevelEditorScene()

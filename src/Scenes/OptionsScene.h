@@ -16,6 +16,4 @@ public:
 
 	std::shared_ptr<Aegis::Font> title_font_;
 	std::shared_ptr<Aegis::Font> button_font_;
-
-	bool vsync_ = false;
 };

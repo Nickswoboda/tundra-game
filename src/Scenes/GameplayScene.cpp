@@ -38,8 +38,8 @@ void GameplayScene::Init()
 	countdown_label_->SetFont(countdown_font);
 
 	dialog_ = ui_layer_->AddWidget<Aegis::Dialog>("You lose. Try Again?", Aegis::Vec2(400, 200), Aegis::Vec2(300, 300));
-	dialog_->SetAcceptedCallback([&]() { SetUpLevel(); dialog_->visible_ = false; });
-	dialog_->SetRejectedCallback([&](){ dialog_->visible_ = false; manager_->PopScene(); });
+	dialog_->ConnectSignal("accepted", [&](){SetUpLevel(); dialog_->visible_ = false;});
+	dialog_->ConnectSignal("rejected", [&](){manager_->PopScene();});
 	dialog_->visible_ = false;
 	SetUpLevel();
 }

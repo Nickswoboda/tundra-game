@@ -16,12 +16,19 @@ MenuScene::MenuScene()
 	Aegis::CenterAABBHorizontally(title_sprite_->rect_, {0, 0, 1280, 720});
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 
-	auto new_game_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 170, 200, 50 ), "", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(1))); });
-	auto level_select_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 220, 200, 50 ), "", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new LevelSelectScene())); });
-	auto options_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 230, 200, 50 ), "", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene())); });
-	auto exit_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 270, 200, 50 ), "", [&]() { Aegis::Application::Quit(); });
+	auto new_game_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 170, 200, 50 ), "");
+	auto level_select_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 220, 200, 50 ), "");
+	auto options_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 230, 200, 50 ), "");
+	auto exit_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 270, 200, 50 ), "");
 
-	auto mute_button = ui_layer_->AddWidget<Aegis::Checkbox>("", Aegis::AABB(1200, 650, 50, 50), [](bool checked) {Aegis::AudioPlayer::SetVolume(checked ? 0 : 100);});
+	new_game_button_->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(1)));});
+	level_select_button_->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new LevelSelectScene()));});
+	options_button_->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene()));});
+	exit_button_->ConnectSignal("pressed", []() { Aegis::Application::Quit();});
+
+	auto mute_button = ui_layer_->AddWidget<Aegis::Checkbox>("", Aegis::AABB(1200, 650, 50, 50));
+	mute_button->ConnectSignal("checked", [](){Aegis::AudioPlayer::SetVolume(0);});
+	mute_button->ConnectSignal("unchecked", [](){Aegis::AudioPlayer::SetVolume(100);});
 
 	mute_button->SetTexture(false, Aegis::TextureManager::Load("assets/textures/audioOn.png"));
 	mute_button->SetTexture(true, Aegis::TextureManager::Load("assets/textures/audioOff.png"));

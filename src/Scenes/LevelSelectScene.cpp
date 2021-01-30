@@ -12,17 +12,23 @@ LevelSelectScene::LevelSelectScene()
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 	ui_layer_->SetFont(button_font_);
 
-	auto back_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 560, 650, 120, 30 ), "Back", [&]() { manager_->PopScene(); });
-	auto select_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 500, 550, 120, 30 ), "Select", [&]() { if (selected_level_ != -1) manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(selected_level_))); });
-	auto edit_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 630, 550, 120, 30 ), "Edit", [&]() { if (selected_level_ != -1) manager_->PushScene(std::unique_ptr<Scene>(new LevelEditorScene(selected_level_)));});
-	auto create_level_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 520, 600, 220, 30 ), "New Level", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new LevelEditorScene()));});
+	auto back_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 560, 650, 120, 30 ), "Back");
+	auto select_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 500, 550, 120, 30 ), "Select");
+	auto edit_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 630, 550, 120, 30 ), "Edit");
+	auto create_level_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 520, 600, 220, 30 ), "New Level");
+
+	back_button->ConnectSignal("pressed", [&]() { manager_->PopScene();});
+	select_button->ConnectSignal("pressed", [&]() { if (selected_level_ != -1) manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(selected_level_))); });
+	edit_button->ConnectSignal("pressed", [&]() { if (selected_level_ != -1) manager_->PushScene(std::unique_ptr<Scene>(new LevelEditorScene(selected_level_)));});
+	create_level_button->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new LevelEditorScene()));});
 
 	int level = 1;
 	int x_pos = 500;
 	int y_pos = 200;
 	while (std::filesystem::exists("assets/levels/level" + std::to_string(level) + ".txt")){
-		auto button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB(x_pos, y_pos, 64, 64), std::to_string(level), [&, level]() {selected_level_ = level;});
-		button->dbl_click_callback_ = [&, level]() {manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(level)));};
+		auto button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB(x_pos, y_pos, 64, 64), std::to_string(level));
+		button->ConnectSignal("pressed", [&, level]() { selected_level_ = level;});
+		button->ConnectSignal("double pressed", [&, level]() {manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(level)));});
 		level_buttons_.push_back(button);
 		x_pos += 74;
 

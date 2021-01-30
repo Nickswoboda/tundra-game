@@ -19,7 +19,6 @@ OptionsScene::OptionsScene()
 	resolution_dropdown_->AddItem("1600x900", [&]() {SetResolution(1600, 900); });
 	resolution_dropdown_->AddItem("1920x1080", [&]() {SetResolution(1920, 1080); });
 
-
 	//quick way of determinning which item is shown first in dropdown. Will be removed when I get to implementing a true UI system
 	if (Aegis::Application::GetWindow().GetResolution().x == 1600){
 		resolution_dropdown_->MoveToTop(1);
@@ -28,13 +27,13 @@ OptionsScene::OptionsScene()
 		resolution_dropdown_->MoveToTop(2);
 	}
 
-	vsync_ = Aegis::Application::GetWindow().IsVsync();
-	auto vsync_checkbox_ = ui_layer_->AddWidget<Aegis::Checkbox>("Vsync", Aegis::AABB( 780, 400, 200, 32 ), [](bool vsync) {Aegis::Application::GetWindow().SetVsync(vsync);});
-	auto checked_texture = Aegis::TextureManager::Load("assets/textures/pressedbtn.png");
-	vsync_checkbox_->SetTexture(true, checked_texture);
-	auto back_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 600, 200, 32 ), "Back", [&]() {manager_->PopScene(); });
+	auto vsync_checkbox_ = ui_layer_->AddWidget<Aegis::Checkbox>("Vsync", Aegis::AABB( 780, 400, 200, 32 ));
+	vsync_checkbox_->ConnectSignal("checked", [](){Aegis::Application::GetWindow().SetVsync(true);});
+	vsync_checkbox_->ConnectSignal("unchecked", [](){Aegis::Application::GetWindow().SetVsync(false);});
 
-
+	vsync_checkbox_->SetTexture(true, Aegis::TextureManager::Load("assets/textures/pressedbtn.png"));
+	auto back_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 600, 200, 32 ), "Back");
+	back_button_->ConnectSignal("pressed", [&](){manager_->PopScene();});
 }
 
 OptionsScene::~OptionsScene()
