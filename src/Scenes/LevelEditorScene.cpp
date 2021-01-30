@@ -121,9 +121,9 @@ void LevelEditorScene::Render(float delta_time)
 	Aegis::Renderer2D::SetFont(font_);
 	tile_map_->Render();
 
-	Aegis::DrawQuad(tile_map_->bruce_spawn_index_ * 32, {32, 32}, bruce_tex_);
-	Aegis::DrawQuad(tile_map_->brutus_spawn_index_ * 32, {32, 32}, brutus_tex_);
-	Aegis::DrawQuad(tile_map_->bjorn_spawn_index_ * 32, {32, 32}, bjorn_tex_);
+	Aegis::DrawQuad(tile_map_->bruce_spawn_index_ * 32, {32, 32}, *bruce_tex_);
+	Aegis::DrawQuad(tile_map_->brutus_spawn_index_ * 32, {32, 32}, *brutus_tex_);
+	Aegis::DrawQuad(tile_map_->bjorn_spawn_index_ * 32, {32, 32}, *bjorn_tex_);
 	
 	if (show_error_msg_){
 		Aegis::DrawQuad({200, 300}, {675, 55}, {1.0, 1.0, 1.0, 0.8});

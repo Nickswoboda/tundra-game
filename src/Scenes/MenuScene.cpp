@@ -51,7 +51,7 @@ void MenuScene::Update()
 void MenuScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
-	Aegis::DrawQuad({0.0f, 0.0f}, Aegis::Application::GetWindow().GetSize(), title_background_);
+	Aegis::DrawQuad({0.0f, 0.0f}, Aegis::Application::GetWindow().GetSize(), *title_background_);
 	Aegis::RenderSprite(*title_sprite_);
 	snow_engine_->Render();
 }

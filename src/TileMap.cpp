@@ -78,7 +78,7 @@ void TileMap::Render() const
 {
 	for (int col = 0; col < tiles_.size(); ++col) {
 		for (int row = 0; row < tiles_[col].size(); ++row) {
-			Aegis::DrawQuad({col * 32.0f, row * 32.0f}, tiles_[col][row]->texture_);
+			Aegis::DrawQuad({col * 32.0f, row * 32.0f}, *tiles_[col][row]->texture_);
 		}
 	}
 }
