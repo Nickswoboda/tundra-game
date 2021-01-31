@@ -45,9 +45,13 @@ MenuScene::MenuScene()
 	v_box_->AddWidget(exit_button);
 	
 	new_game_button->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Load("assets/textures/PlayButton.png"));
+	new_game_button->SetStateTexture(Aegis::Button::Hovered, Aegis::TextureManager::Load("assets/textures/play-btn-hovered.png"));
 	level_select_button->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Load("assets/textures/LevelSelectButton.png"));
+	level_select_button->SetStateTexture(Aegis::Button::Hovered, Aegis::TextureManager::Load("assets/textures/level-select-btn-hovered.png"));
 	options_button->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Load("assets/textures/OptionsButton.png"));
+	options_button->SetStateTexture(Aegis::Button::Hovered, Aegis::TextureManager::Load("assets/textures/options-btn-hovered.png"));
 	exit_button->SetStateTexture(Aegis::Button::Normal, Aegis::TextureManager::Load("assets/textures/ExitButton.png"));
+	exit_button->SetStateTexture(Aegis::Button::Hovered, Aegis::TextureManager::Load("assets/textures/exit-btn-hovered.png"));
 	
 	snow_engine_ = std::make_unique<ParticleEngine>(512, Aegis::Vec2(-200, -700), Aegis::Vec2(Aegis::Application::GetWindow().GetSize().x, 0), Aegis::Vec2(0.2, 2), Aegis::Vec2(1, 3));
 	button_hover_sfx_ = std::make_shared<Aegis::SoundEffect>("assets/audio/button-hover.ogg");
