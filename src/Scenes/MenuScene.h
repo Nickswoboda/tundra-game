@@ -22,4 +22,5 @@ public:
 	std::shared_ptr<ParticleEngine> snow_engine_;
 
 	std::shared_ptr<Aegis::SoundEffect> bg_music_;
+	std::shared_ptr<Aegis::SoundEffect> button_hover_sfx_;
 };
