@@ -38,7 +38,7 @@ MenuScene::MenuScene()
 	mute_button->SetTexture(false, Aegis::TextureManager::Load("assets/textures/audioOn.png"));
 	mute_button->SetTexture(true, Aegis::TextureManager::Load("assets/textures/audioOff.png"));
 
-	v_box_ = ui_layer_->AddContainer({0, 170, 1280, 570}, Aegis::Container::Vertical, 10, Aegis::Container::Center);
+	v_box_ = ui_layer_->AddContainer({0, 190, 1280, 570}, Aegis::Container::Vertical, 12, Aegis::Container::Center);
 	v_box_->AddWidget(new_game_button);
 	v_box_->AddWidget(level_select_button);
 	v_box_->AddWidget(options_button);
