@@ -26,10 +26,10 @@ MenuScene::MenuScene()
 	options_button->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene()));});
 	exit_button->ConnectSignal("pressed", []() { Aegis::Application::Quit();});
 
-	new_game_button->ConnectSignal("entered", [&]() {Aegis::AudioPlayer::Play(button_hover_sfx_->source_id_); });
-	level_select_button->ConnectSignal("entered", [&]() {Aegis::AudioPlayer::Play(button_hover_sfx_->source_id_); });
-	options_button->ConnectSignal("entered", [&]() {Aegis::AudioPlayer::Play(button_hover_sfx_->source_id_); });
-	exit_button->ConnectSignal("entered", [&]() {Aegis::AudioPlayer::Play(button_hover_sfx_->source_id_); });
+	new_game_button->ConnectSignal("entered", [&]() {Aegis::AudioPlayer::Play(*button_hover_sfx_); });
+	level_select_button->ConnectSignal("entered", [&]() {Aegis::AudioPlayer::Play(*button_hover_sfx_); });
+	options_button->ConnectSignal("entered", [&]() {Aegis::AudioPlayer::Play(*button_hover_sfx_); });
+	exit_button->ConnectSignal("entered", [&]() {Aegis::AudioPlayer::Play(*button_hover_sfx_); });
 
 	auto mute_button = ui_layer_->AddWidget<Aegis::Checkbox>("", Aegis::AABB(1200, 650, 50, 50));
 	mute_button->ConnectSignal("checked", [](){Aegis::AudioPlayer::SetVolume(0);});
@@ -54,9 +54,9 @@ MenuScene::MenuScene()
 	exit_button->SetStateTexture(Aegis::Button::Hovered, Aegis::TextureManager::Load("assets/textures/exit-btn-hovered.png"));
 	
 	snow_engine_ = std::make_unique<ParticleEngine>(512, Aegis::Vec2(-200, -700), Aegis::Vec2(Aegis::Application::GetWindow().GetSize().x, 0), Aegis::Vec2(0.2, 2), Aegis::Vec2(1, 3));
-	button_hover_sfx_ = std::make_shared<Aegis::SoundEffect>("assets/audio/button-hover.ogg");
+	button_hover_sfx_ = std::make_shared<Aegis::SoundEffect>("assets/audio/button-hover.ogg", 40);
 	bg_music_ = std::make_shared<Aegis::SoundEffect>("assets/audio/bgm.ogg");
-	Aegis::AudioPlayer::Play(bg_music_->source_id_);
+	Aegis::AudioPlayer::Play(*bg_music_);
 }
 
 void MenuScene::Update()
