@@ -32,12 +32,13 @@ public:
 
 	std::shared_ptr<Aegis::Texture> tile_atlas_;
 	int tile_size_;
-	Tile wall_tile_;
-	Tile ice_tile_;
-	Tile ground_tile_;
+	std::unordered_map<char, Tile> tiles_map_;
 	std::vector<std::vector<const Tile*>> tiles_;
 	Aegis::Vec2 bruce_spawn_index_;
 	Aegis::Vec2 bjorn_spawn_index_;
 	Aegis::Vec2 brutus_spawn_index_;
 	Aegis::Vec2 grid_size_;
+
+private:
+	void LoadTiles();
 };

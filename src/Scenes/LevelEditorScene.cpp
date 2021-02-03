@@ -34,9 +34,9 @@ LevelEditorScene::LevelEditorScene(int level)
 	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 40, 70, 64, 64 ), "Ground");  
 	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 110, 70, 64, 64 ), " Ice");  
 	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 180, 70, 64, 64 ), "Wall");  
-	ground_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->ground_tile_);});
-	ice_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->ice_tile_);});
-	wall_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->wall_tile_);});
+	ground_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->tiles_map_['g']);});
+	ice_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->tiles_map_['i']);});
+	wall_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->tiles_map_['w']);});
 
 	tile_text_ = ui_layer_->AddWidget<Aegis::Label>("Tile: None", Aegis::Vec2(40, 144));
 

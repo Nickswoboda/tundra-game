@@ -51,7 +51,7 @@ public:
 	{}
 	void Render(float delta_time) const override
 	{
-		Aegis::DrawQuad(rect_.pos, rect_.size, { 0.5, 0.5, 0.2, 1.0 });
+		Aegis::DrawQuad(rect_.pos, rect_.size, { 0.0, 0.0, 0.0, 1.0 });
 	}
 
 	Aegis::AABB rect_;
@@ -61,7 +61,7 @@ class Player : public GameObject
 {
 public:
 	Player(int x, int y)
-		:GameObject(x,y,32,32, {96, 0}), queued_movement_(-1, 0)
+		:GameObject(x,y,32,32, {0, 96}), queued_movement_(-1, 0)
 	{
 	}
 	void Update() override;
@@ -74,7 +74,7 @@ class Brutus : public GameObject
 {
 public:
 	Brutus(int x, int y)
-		:GameObject(x, y, 32, 32, {128, 0})
+		:GameObject(x, y, 32, 32, {32, 96})
 	{
 		speed_ = .30f;
 		slides_on_ice_ = false;
@@ -86,7 +86,7 @@ class Bjorn : public GameObject
 {
 public:
 	Bjorn(int x, int y)
-		:GameObject(x, y, 32, 32, {160, 0})
+		:GameObject(x, y, 32, 32, {64, 96})
 	{
 		speed_ = .25f;
 
