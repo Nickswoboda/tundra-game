@@ -50,6 +50,7 @@ TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Ae
 TileMap::TileMap(int width, int height, int tile_size, std::shared_ptr<Aegis::Texture> atlas)
 	: tile_atlas_(atlas), tile_size_(tile_size)
 {
+	LoadTiles();
 	brutus_spawn_index_ = {1, 0};
 	bjorn_spawn_index_ = {2, 0};
 	for (int i = 0; i < width; ++i){
@@ -200,9 +201,9 @@ void TileMap::Save(int level_num)
 			}
 
 			auto tile = tiles_[col][row];
-			if (tile->is_solid_) file << '0';
-			else if (tile->is_slippery_) file << '1';
-			else file << ' ';
+			if (tile->is_solid_) file << 'w';
+			else if (tile->is_slippery_) file << 'i';
+			else file << 'g';
 		}
 
 		//don't print newline on last row
@@ -230,5 +231,18 @@ void TileMap::LoadTiles()
 	tiles_map_.emplace('i',Tile(Aegis::SubTexture::Create(tile_atlas_, {32, 32}, {32, 32}), false, true));
 	tiles_map_.emplace('w',Tile(Aegis::SubTexture::Create(tile_atlas_, {96, 64}, {32, 32}), true, false));
 	tiles_map_.emplace('g',Tile(Aegis::SubTexture::Create(tile_atlas_, {128, 64}, {32, 32}), false, false));
+}
 
+void TileMap::Clear()
+{
+	for (auto& row : tiles_)
+	{
+		for (auto& tile : row) {
+			tile = &tiles_map_['w'];
+		}
+	}
+
+	bruce_spawn_index_ = { 0, 0 };
+	brutus_spawn_index_ = { 1, 0 };
+	bjorn_spawn_index_ = { 2, 0 };
 }

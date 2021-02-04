@@ -17,6 +17,7 @@ public:
 	void Save(int level_num = -1);
 
 	void Render() const;
+	void Clear();
 
 	const Tile* GetTileByIndex(int col, int row);
 	const Tile* GetTileByPos(int x_pos, int y_pos);

@@ -1,21 +1,21 @@
-0000000000000000000000000000000
-0 11 11 11 11 111 11 11 11 11 0
-0100100100100100010010010010010
-0100100100100100010010010010010
-0100100 11 00 111 00 11 0010010
-0100100100100000000010010010010
-0100100100100000000010010010010
-0 11 00100100 111 00100100 11 0
-0100000100100100010010010000010
-010000010010010B1010010010000010
-0 11111 11 11 1 1 11 11 11111 0
-010000010010010C1010010010000010
-0100000100100100010010010000010
-0 11 00100100 111 00100100 11 0
-0100100100100000000010010010010
-0100100100100000000010010010010
-0100100 11 00 111 00 11 0010010
-0100100100100100010010010010010
-0100100100100100010010010010010
-0 11 11 11 11 1P11 11 11 11 11 0
-0000000000000000000000000000000
+wwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+wiiiiiigiiiiigiiiiiiiiiiiigiiiw
+wiwwiwwiwwiwwiwwwiwwiwwiwwiwwiw
+wiwwiwwiwwiwwiwwwiwwiwwiwwiwwiw
+wiiigiiiiigiiiiiigiiiiiiiiiiiiw
+wiwwiwwiwwiwwiwwwiwwiwwiwwiwwiw
+wiwwiwwiwwiwwiwwwiwwiwwiwwiwwiw
+wiiigiiiiigiiBiiiiCgiiiiigiiiiigw
+wiwwiwwiwwiwwiwwwiwwiwwiwwiwwiw
+wiwwiwwiwwiwwiwwwiwwiwwiwwiwwiw
+wgiiiiiiiiiiigiiigiiiiiiiiiiigw
+wiwwiwwiwwiwwiwwwiwwiwwiwwiwwiw
+wiwwiwwiwwiwwiwwwiwwiwwiwwiwwiw
+wgiiiiigiiiiigiiiiiigiiiiigiiiw
+wiwwiwwiwwiwwiwwwiwwiwwiwwiwwiw
+wiwwiwwiwwiwwiwwwiwwiwwiwwiwwiw
+wiiiiiiiiiiiigiiiiiiiiiiiigiiiw
+wiwwiwwiwwiwwiwwwiwwiwwiwwiwwiw
+wiwwiwwiwwiwwiwwwiwwiwwiwwiwwiw
+wiiigiiiiiiiiiiiiPgiiiiigiiiiiiw
+wwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
