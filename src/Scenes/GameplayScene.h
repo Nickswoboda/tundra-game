@@ -39,7 +39,7 @@ public:
 	std::vector<Pellet> pellets_;
 	const int max_lives_ = 3;
 	int num_lives_ = 3;
-	std::array<std::shared_ptr<Aegis::TextureWidget>, 3> heart_textures_;
+	std::shared_ptr<Aegis::SubTexture> heart_texture_;
 
 	int score_ = 0;
 	std::shared_ptr<Aegis::Label> score_label_;

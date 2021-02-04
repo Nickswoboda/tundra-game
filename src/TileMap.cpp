@@ -245,4 +245,4 @@ void TileMap::Clear()
 	bruce_spawn_index_ = { 0, 0 };
 	brutus_spawn_index_ = { 1, 0 };
 	bjorn_spawn_index_ = { 2, 0 };
-}
+} 

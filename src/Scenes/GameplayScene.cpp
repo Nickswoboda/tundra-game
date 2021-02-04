@@ -25,9 +25,7 @@ void GameplayScene::Init()
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 
 	auto lives_text = ui_layer_->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(20, 30));
-	for (int i = 0; i < max_lives_; ++i){
-		heart_textures_[i] = ui_layer_->AddWidget<Aegis::TextureWidget>(Aegis::Vec4( 1.0f, 0.0f, 0.0f, 1.0f), Aegis::Vec2( 20.0f + (i * 30), 50), Aegis::Vec2( 25.0f, 25.0f ));
-	}
+	heart_texture_ = Aegis::SubTexture::Create(Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png"), { 96, 112 }, { 16, 16 });
 
 	auto score_text = ui_layer_->AddWidget<Aegis::Label>("Score:", Aegis::Vec2( 20, 80 ));
 	score_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string(score_), Aegis::Vec2( 20, 100 ));
@@ -83,7 +81,7 @@ void GameplayScene::Update()
 	}
 
 	for (auto i = pellets_.begin(); i != pellets_.end();) {
-		if (Aegis::AABBHasCollided(player_.sprite_.rect_, (*i).rect_)) {
+		if (Aegis::AABBHasCollided(player_.sprite_.rect_, (*i).sprite_.rect_)) {
 			i = pellets_.erase(i);
 			IncrementScore(10);
 			if (pellets_.size() == 0) {
@@ -121,13 +119,18 @@ void GameplayScene::Render(float delta_time)
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
 	
 	tile_map_->Render();
+
+	for (auto& pellet : pellets_)
+	{
+		pellet.Render(delta_time);
+	}
+
 	player_.Render(delta_time);
 	brutus_.Render(delta_time);
 	bjorn_.Render(delta_time);
-	
-	for (auto& pellet : pellets_)
-	{
-		pellet.Render(0.0f);
+
+	for (int i = 0; i < num_lives_; ++i) {
+		Aegis::DrawQuad(Aegis::Vec2(-124 + (i*20), 30 ), *heart_texture_);
 	}
 }
 
@@ -285,9 +288,6 @@ void GameplayScene::SetUpLevel()
 	SpawnPellets();
 
 	num_lives_ = 3;
-	for (auto& texture : heart_textures_){
-		texture->visible_ = true;
-	}
 
 	score_ = 0;
 	score_label_->text_ = std::to_string(score_);
@@ -297,7 +297,6 @@ void GameplayScene::SetUpLevel()
 void GameplayScene::RemoveLife()
 {
 	--num_lives_;
-	heart_textures_[num_lives_]->visible_ = false;
 }
 
 void GameplayScene::IncrementScore(int amount)

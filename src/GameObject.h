@@ -47,14 +47,8 @@ class Pellet : public GameObject
 {
 public:
 	Pellet(int x, int y)
-		: GameObject(x, y, 8, 8), rect_(x,y,8,8)
+		: GameObject(x, y, 16, 16, {96, 96})
 	{}
-	void Render(float delta_time) const override
-	{
-		Aegis::DrawQuad(rect_.pos, rect_.size, { 0.0, 0.0, 0.0, 1.0 });
-	}
-
-	Aegis::AABB rect_;
 };
 
 class Player : public GameObject
