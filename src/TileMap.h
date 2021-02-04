@@ -17,6 +17,7 @@ public:
 	void Save(int level_num = -1);
 
 	void Render() const;
+	void Clear();
 
 	const Tile* GetTileByIndex(int col, int row);
 	const Tile* GetTileByPos(int x_pos, int y_pos);
@@ -32,12 +33,13 @@ public:
 
 	std::shared_ptr<Aegis::Texture> tile_atlas_;
 	int tile_size_;
-	Tile wall_tile_;
-	Tile ice_tile_;
-	Tile ground_tile_;
+	std::unordered_map<char, Tile> tiles_map_;
 	std::vector<std::vector<const Tile*>> tiles_;
 	Aegis::Vec2 bruce_spawn_index_;
 	Aegis::Vec2 bjorn_spawn_index_;
 	Aegis::Vec2 brutus_spawn_index_;
 	Aegis::Vec2 grid_size_;
+
+private:
+	void LoadTiles();
 };

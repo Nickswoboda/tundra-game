@@ -6,11 +6,9 @@
 
 #include <algorithm>
 TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Aegis::Texture> atlas)
-	: tile_atlas_(atlas), tile_size_(tile_size),
-	  wall_tile_(Aegis::SubTexture::Create(tile_atlas_, Aegis::Vec2(0.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), true, false),
-	  ice_tile_(Aegis::SubTexture::Create(tile_atlas_, Aegis::Vec2(64.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), false, true),
-	  ground_tile_(Aegis::SubTexture::Create(tile_atlas_, Aegis::Vec2(32.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), false, false)
+	: tile_atlas_(atlas), tile_size_(tile_size)
 {
+	LoadTiles();
 	std::ifstream file(file_path);
 	std::stringstream buffer;
 	buffer << file.rdbuf();
@@ -37,41 +35,33 @@ TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Ae
 			case 'C': {
 				brutus_spawn_index_ = Aegis::Vec2(col, row); break;
 			}
-			case '0': {
-				tiles_[col].push_back(&wall_tile_); ++col; break;
+			default: {
+				if (ch != '\n') {
+					tiles_[col].push_back(&tiles_map_[ch]); ++col;
+				}
 			}
-			case '1': {
-				tiles_[col].push_back(&ice_tile_); ++col; break;
-			}
-			case ' ': {
-				tiles_[col].push_back(&ground_tile_); ++col; break;
-			}
-			
 		}
 	}
+
 	grid_size_.x = tiles_.size();
 	grid_size_.y = tiles_[grid_size_.x - 1].size();
 }
 
 TileMap::TileMap(int width, int height, int tile_size, std::shared_ptr<Aegis::Texture> atlas)
-	: tile_atlas_(atlas), tile_size_(tile_size),
-	  wall_tile_(Aegis::SubTexture::Create(tile_atlas_, Aegis::Vec2(0.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), true, false),
-	  ice_tile_(Aegis::SubTexture::Create(tile_atlas_, Aegis::Vec2(64.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), false, true),
-	  ground_tile_(Aegis::SubTexture::Create(tile_atlas_, Aegis::Vec2(32.0f, 0.0f), Aegis::Vec2(32.0f, 32.0f)), false, false)
+	: tile_atlas_(atlas), tile_size_(tile_size)
 {
+	LoadTiles();
 	brutus_spawn_index_ = {1, 0};
 	bjorn_spawn_index_ = {2, 0};
 	for (int i = 0; i < width; ++i){
 		std::vector<const Tile*> col;
 		for (int j = 0; j < height; ++j){
-			col.push_back(&wall_tile_);
+			col.push_back(&tiles_map_['w']);
 		}
 		tiles_.push_back(col);
 	}
 	grid_size_.x = width;
 	grid_size_.y = height;
-	
-
 }
 
 void TileMap::Render() const
@@ -211,9 +201,9 @@ void TileMap::Save(int level_num)
 			}
 
 			auto tile = tiles_[col][row];
-			if (tile->is_solid_) file << '0';
-			else if (tile->is_slippery_) file << '1';
-			else file << ' ';
+			if (tile->is_solid_) file << 'w';
+			else if (tile->is_slippery_) file << 'i';
+			else file << 'g';
 		}
 
 		//don't print newline on last row
@@ -222,4 +212,37 @@ void TileMap::Save(int level_num)
 		}
 	}
 	file.close();
+}
+
+void TileMap::LoadTiles()
+{
+	tiles_map_.emplace('0',Tile(Aegis::SubTexture::Create(tile_atlas_, {0, 0}, {32, 32}), true, false));
+	tiles_map_.emplace('1',Tile(Aegis::SubTexture::Create(tile_atlas_, {32, 0}, {32, 32}), true, false));
+	tiles_map_.emplace('2',Tile(Aegis::SubTexture::Create(tile_atlas_, {64, 0}, {32, 32}), true, false));
+	tiles_map_.emplace('3',Tile(Aegis::SubTexture::Create(tile_atlas_, {0, 32}, {32, 32}), true, false));
+	tiles_map_.emplace('4',Tile(Aegis::SubTexture::Create(tile_atlas_, {64, 32}, {32, 32}), true, false));
+	tiles_map_.emplace('5',Tile(Aegis::SubTexture::Create(tile_atlas_, {0, 64}, {32, 32}), true, false));
+	tiles_map_.emplace('6',Tile(Aegis::SubTexture::Create(tile_atlas_, {32, 64}, {32, 32}), true, false));
+	tiles_map_.emplace('7',Tile(Aegis::SubTexture::Create(tile_atlas_, {64, 64}, {32, 32}), true, false));
+	tiles_map_.emplace('8', Tile(Aegis::SubTexture::Create(tile_atlas_, { 96, 0 }, { 32, 32 }), true, false));
+	tiles_map_.emplace('9', Tile(Aegis::SubTexture::Create(tile_atlas_, { 128, 0 }, { 32, 32 }), true, false));
+	tiles_map_.emplace('a', Tile(Aegis::SubTexture::Create(tile_atlas_, { 96, 32 }, { 32, 32 }), true, false));
+	tiles_map_.emplace('b', Tile(Aegis::SubTexture::Create(tile_atlas_, { 128, 32 }, { 32, 32 }), true, false));
+	tiles_map_.emplace('i',Tile(Aegis::SubTexture::Create(tile_atlas_, {32, 32}, {32, 32}), false, true));
+	tiles_map_.emplace('w',Tile(Aegis::SubTexture::Create(tile_atlas_, {96, 64}, {32, 32}), true, false));
+	tiles_map_.emplace('g',Tile(Aegis::SubTexture::Create(tile_atlas_, {128, 64}, {32, 32}), false, false));
+}
+
+void TileMap::Clear()
+{
+	for (auto& row : tiles_)
+	{
+		for (auto& tile : row) {
+			tile = &tiles_map_['w'];
+		}
+	}
+
+	bruce_spawn_index_ = { 0, 0 };
+	brutus_spawn_index_ = { 1, 0 };
+	bjorn_spawn_index_ = { 2, 0 };
 }

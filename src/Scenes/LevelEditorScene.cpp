@@ -7,7 +7,7 @@
 #include <fstream>
 
 LevelEditorScene::LevelEditorScene(int level)
-	:level_num_(level)
+	:level_num_(level)                  
 {
 	font_ = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 24);
 	auto tex_atlas = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
@@ -20,23 +20,23 @@ LevelEditorScene::LevelEditorScene(int level)
 		tile_map_ = std::make_unique<TileMap>("assets/levels/level" + std::to_string(level) + ".txt", 32, tex_atlas);
 	}
 
-	bruce_tex_ = Aegis::SubTexture::Create(tex_atlas, Aegis::Vec2(96, 0), Aegis::Vec2(32, 32));
-	brutus_tex_ =  Aegis::SubTexture::Create(tex_atlas, Aegis::Vec2(128, 0), Aegis::Vec2(32, 32));
-	bjorn_tex_ = Aegis::SubTexture::Create(tex_atlas, Aegis::Vec2(160, 0), Aegis::Vec2(32, 32));
+	bruce_tex_ = Aegis::SubTexture::Create(tex_atlas, Aegis::Vec2(0, 96), Aegis::Vec2(32, 32));
+	brutus_tex_ =  Aegis::SubTexture::Create(tex_atlas, Aegis::Vec2(32, 96), Aegis::Vec2(32, 32));
+	bjorn_tex_ = Aegis::SubTexture::Create(tex_atlas, Aegis::Vec2(64, 96), Aegis::Vec2(32, 32));
 
 	//used to center tilemap within window
 	camera_.SetPosition({-270, -24});
 
-	ui_layer_ = std::make_unique<Aegis::UILayer>();
+	ui_layer_ = std::make_unique<Aegis::UILayer>(); 
 	auto ui_font = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 20);
 	ui_layer_->SetFont(ui_font);
 	
 	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 40, 70, 64, 64 ), "Ground");  
 	auto ice_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 110, 70, 64, 64 ), " Ice");  
 	auto wall_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 180, 70, 64, 64 ), "Wall");  
-	ground_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->ground_tile_);});
-	ice_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->ice_tile_);});
-	wall_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->wall_tile_);});
+	ground_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->tiles_map_['g']);});
+	ice_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->tiles_map_['i']);});
+	wall_tile_button->ConnectSignal("pressed", [&](){ChangeSelectedTile(tile_map_->tiles_map_['w']);});
 
 	tile_text_ = ui_layer_->AddWidget<Aegis::Label>("Tile: None", Aegis::Vec2(40, 144));
 
@@ -52,7 +52,7 @@ LevelEditorScene::LevelEditorScene(int level)
 	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 80, 40 ), "Reset");
 	
 	undo_button->ConnectSignal("pressed", [&](){Undo();});
-	reset_button->ConnectSignal("pressed", [&, tex_atlas](){tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas);});
+	reset_button->ConnectSignal("pressed", [&, tex_atlas]() {tile_map_->Clear(); });
 
 	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB(  50, 450, 80, 40  ), "Preview");
 	auto save_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 450, 80, 40 ), "Save");
