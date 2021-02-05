@@ -24,22 +24,21 @@ TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Ae
 		if (tiles_.size() <= col) {
 			tiles_.push_back(std::vector<const Tile*>());
 		}
-		switch (ch)
-		{
-			case 'P': {
-				bruce_spawn_index_ = Aegis::Vec2( col, row ); break;
+
+		if (ch == 's' || ch =='j' || ch == 'p' || ch == 'f'){
+			if (ch == 's'){
+				bruce_spawn_index_ = Aegis::Vec2( col, row ); 
+			} else if (ch == 'j'){
+				bjorn_spawn_index_ = Aegis::Vec2(col, row);
+			} else if (ch == 'p'){
+				brutus_spawn_index_ = Aegis::Vec2(col, row);
+			} else {
+				pellet_spawn_indices_.emplace_back(col, row);
 			}
-			case 'B': {
-				bjorn_spawn_index_ = Aegis::Vec2(col, row); break;
-			}
-			case 'C': {
-				brutus_spawn_index_ = Aegis::Vec2(col, row); break;
-			}
-			default: {
-				if (ch != '\n') {
-					tiles_[col].push_back(&tiles_map_[ch]); ++col;
-				}
-			}
+
+			tiles_[col++].push_back(&tiles_map_['i']);
+		} else if (ch != '\n'){
+			tiles_[col++].push_back(&tiles_map_[ch]);
 		}
 	}
 
@@ -191,19 +190,20 @@ void TileMap::Save(int level_num)
 			auto coord = Aegis::Vec2(col, row);
 
 			if (coord == brutus_spawn_index_) {
-				file << 'C';
+				file << 'p';
 			}
 			else if (coord == bruce_spawn_index_) {
-				file << 'P';
+				file << 's';
 			}
 			else if (coord == bjorn_spawn_index_) {
-				file << 'B';
+				file << 'j';
 			}
-
-			auto tile = tiles_[col][row];
-			if (tile->is_solid_) file << 'w';
-			else if (tile->is_slippery_) file << 'i';
-			else file << 'g';
+			else {
+				auto tile = tiles_[col][row];
+				if (tile->is_solid_) file << 'w';
+				else if (tile->is_slippery_) file << 'i';
+				else file << 'g';
+			}
 		}
 
 		//don't print newline on last row

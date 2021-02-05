@@ -273,12 +273,8 @@ void GameplayScene::SpawnPellets()
 		pellets_.clear();
 	}
 
-	for (int i = 0; i < tile_map_->grid_size_.x; ++i){
-		for (int j = 0; j < tile_map_->grid_size_.y; ++j){
-			if (tile_map_->GetTileByIndex(i, j)->is_slippery_){
-				pellets_.emplace_back(Pellet((i * 32) + 12, (j * 32) + 12));
-			}
-		}
+	for (auto& pos : tile_map_->pellet_spawn_indices_){
+		pellets_.emplace_back(Pellet((pos.x * 32) + 12, (pos.y * 32) + 12));
 	}
 }
 
