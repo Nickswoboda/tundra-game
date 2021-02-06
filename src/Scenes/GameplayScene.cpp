@@ -27,8 +27,9 @@ void GameplayScene::Init()
 	auto lives_text = ui_layer_->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(20, 30));
 	heart_texture_ = Aegis::SubTexture::Create(Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png"), { 96, 112 }, { 16, 16 });
 
-	auto score_text = ui_layer_->AddWidget<Aegis::Label>("Score:", Aegis::Vec2( 20, 80 ));
-	score_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string(score_), Aegis::Vec2( 20, 100 ));
+	total_pellets_ = tile_map_->pellet_spawn_indices_.size();
+	pellet_count_label_ = ui_layer_->AddWidget<Aegis::Label>("", Aegis::Vec2( 40, 84 ));
+	UpdatePelletCount();
 
 	countdown_.Start(2500);
 	countdown_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string((int)countdown_.GetRemainingInSeconds() + 1), Aegis::Vec2(600, 300), Aegis::Vec4(0.0f,0.0f, 0.0f, 1.0f));
@@ -83,7 +84,8 @@ void GameplayScene::Update()
 	for (auto i = pellets_.begin(); i != pellets_.end();) {
 		if (Aegis::AABBHasCollided(player_.sprite_.rect_, (*i).sprite_.rect_)) {
 			i = pellets_.erase(i);
-			IncrementScore(10);
+			++pellets_collected_;
+			UpdatePelletCount();
 			if (pellets_.size() == 0) {
 				player_.animation_.playing_ = false;
 				return;
@@ -131,6 +133,10 @@ void GameplayScene::Render(float delta_time)
 
 	for (int i = 0; i < num_lives_; ++i) {
 		Aegis::DrawQuad(Aegis::Vec2(-124 + (i*20), 30 ), *heart_texture_);
+	}
+	
+	if (!pellets_.empty()){
+		Aegis::DrawQuad(Aegis::Vec2(-124, 60), *pellets_[0].sprite_.texture_);
 	}
 }
 
@@ -285,9 +291,8 @@ void GameplayScene::SetUpLevel()
 
 	num_lives_ = 3;
 
-	score_ = 0;
-	score_label_->text_ = std::to_string(score_);
-
+	pellets_collected_ = 0;
+	UpdatePelletCount();
 }
 
 void GameplayScene::RemoveLife()
@@ -295,9 +300,7 @@ void GameplayScene::RemoveLife()
 	--num_lives_;
 }
 
-void GameplayScene::IncrementScore(int amount)
+void GameplayScene::UpdatePelletCount()
 {
-	score_ += amount;
-
-	score_label_->text_ = std::to_string(score_);
+	pellet_count_label_->text_ = ": " + std::to_string(pellets_collected_) + "/" + std::to_string(total_pellets_);
 }
