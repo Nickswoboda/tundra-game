@@ -34,7 +34,6 @@ MenuScene::MenuScene()
 	auto mute_button = ui_layer_->AddWidget<Aegis::Checkbox>("", Aegis::AABB(1200, 650, 50, 50));
 	mute_button->ConnectSignal("checked", [](){Aegis::AudioPlayer::SetVolume(0);});
 	mute_button->ConnectSignal("unchecked", [](){Aegis::AudioPlayer::SetVolume(100);});
-
 	mute_button->SetTexture(false, Aegis::TextureManager::Load("assets/textures/audioOn.png"));
 	mute_button->SetTexture(true, Aegis::TextureManager::Load("assets/textures/audioOff.png"));
 
@@ -55,7 +54,7 @@ MenuScene::MenuScene()
 	
 	snow_engine_ = std::make_unique<ParticleEngine>(512, Aegis::Vec2(-200, -700), Aegis::Vec2(Aegis::Application::GetWindow().GetSize().x, 0), Aegis::Vec2(0.2, 2), Aegis::Vec2(1, 3));
 	button_hover_sfx_ = std::make_shared<Aegis::SoundEffect>("assets/audio/button-hover.ogg", 40);
-	bg_music_ = std::make_shared<Aegis::SoundEffect>("assets/audio/bgm.ogg");
+	bg_music_ = std::make_shared<Aegis::SoundEffect>("assets/audio/bgm.ogg", 70);
 	Aegis::AudioPlayer::Play(*bg_music_);
 }
 
