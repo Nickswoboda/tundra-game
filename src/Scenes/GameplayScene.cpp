@@ -134,6 +134,7 @@ void GameplayScene::Render(float delta_time)
 	brutus_.Render(delta_time);
 	bjorn_.Render(delta_time);
 
+	Aegis::DrawQuad({ -129, 1 }, { 100, 100 }, { 0.0f, 0.0f, 0.0f, 0.5f });
 	for (int i = 0; i < num_lives_; ++i) {
 		Aegis::DrawQuad(Aegis::Vec2(-124 + (i*20), 30 ), *heart_texture_);
 	}
