@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 #include <algorithm>
 TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Aegis::Texture> atlas)
@@ -37,8 +38,10 @@ TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Ae
 			}
 
 			tiles_[col++].push_back(&tiles_map_['i']);
-		} else if (ch != '\n'){
+		} else if (tiles_map_.count(ch)){
 			tiles_[col++].push_back(&tiles_map_[ch]);
+		} else if (ch != '\n'){
+			std::cout << ch << " is not a recognized tile symbol. File: " << file_path << "\n";
 		}
 	}
 
