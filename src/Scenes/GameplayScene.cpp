@@ -24,7 +24,7 @@ void GameplayScene::Init()
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 
-	auto lives_text = ui_layer_->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(20, 30));
+	ui_layer_->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(20, 30));
 	heart_texture_ = Aegis::SubTexture::Create(Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png"), { 96, 112 }, { 16, 16 });
 
 	total_pellets_ = tile_map_->pellet_spawn_indices_.size();
@@ -41,6 +41,10 @@ void GameplayScene::Init()
 	dialog_->ConnectSignal("rejected", [&](){manager_->PopScene();});
 	dialog_->visible_ = false;
 	SetUpLevel();
+
+	for (auto& pos : tile_map_->pellet_spawn_indices_){
+		pellets_.emplace_back(Pellet((pos.x * 32) + 12, (pos.y * 32) + 12));
+	}
 }
 
 void GameplayScene::Update()
@@ -81,22 +85,19 @@ void GameplayScene::Update()
 		}
 	}
 
-	for (auto i = pellets_.begin(); i != pellets_.end();) {
-		if (Aegis::AABBHasCollided(player_.sprite_.rect_, (*i).sprite_.rect_)) {
-			i = pellets_.erase(i);
+	for (auto& pellet : pellets_){
+		if (pellet.visible_ && Aegis::AABBHasCollided(player_.sprite_.rect_, pellet.sprite_.rect_)) {
+			pellet.visible_ = false;
 			++pellets_collected_;
 			UpdatePelletCount();
-			if (pellets_.size() == 0) {
+
+			if (pellets_collected_ == total_pellets_){
 				player_.animation_.playing_ = false;
-				return;
 			}
 		}
-		else {
-			++i;
-		}
-
 	}
 }
+
 void GameplayScene::OnEvent(Aegis::Event& event)
 {
 	auto key_event = dynamic_cast<Aegis::KeyEvent*>(&event);
@@ -122,9 +123,10 @@ void GameplayScene::Render(float delta_time)
 	
 	tile_map_->Render();
 
-	for (auto& pellet : pellets_)
-	{
-		pellet.Render(delta_time);
+	for (auto& pellet : pellets_) {
+		if (pellet.visible_){
+			pellet.Render(delta_time);
+		}
 	}
 
 	player_.Render(delta_time);
@@ -275,12 +277,8 @@ std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesMoving(const Aegis::Vec2
 
 void GameplayScene::SpawnPellets()
 {
-	if (!pellets_.empty()) {
-		pellets_.clear();
-	}
-
-	for (auto& pos : tile_map_->pellet_spawn_indices_){
-		pellets_.emplace_back(Pellet((pos.x * 32) + 12, (pos.y * 32) + 12));
+	for (auto& pellet : pellets_){
+		pellet.visible_ = true;
 	}
 }
 
