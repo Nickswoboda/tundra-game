@@ -120,7 +120,8 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 void GameplayScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
-	
+	static auto bg_texture = Aegis::TextureManager::Load("assets/textures/tundra-bg-frame.png");
+	Aegis::DrawQuad({ -144.0f, -24.0f }, *bg_texture);
 	tile_map_->Render();
 
 	for (auto& pellet : pellets_) {
@@ -201,13 +202,7 @@ Aegis::Vec2 GameplayScene::GetTargetTileCoordBFS(const Aegis::Vec2& start, const
 		if (current == end) {
 			break;
 		}
-		std::vector<Aegis::Vec2> neighbors;
-		if (slides) {
-			neighbors = GetNeighborTilesSliding(current);
-		}
-		else {
-			neighbors = GetNeighborTilesMoving(current);
-		}
+		std::vector<Aegis::Vec2> neighbors = slides ? GetNeighborTilesSliding(current) : GetNeighborTilesMoving(current);
 
 		for (auto& neighbor : neighbors) {
 			//if not already in list

@@ -50,14 +50,12 @@ LevelEditorScene::LevelEditorScene(int level)
 
 	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 80, 40 ), "Undo");
 	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 80, 40 ), "Reset");
-	
 	undo_button->ConnectSignal("pressed", [&](){Undo();});
 	reset_button->ConnectSignal("pressed", [&, tex_atlas]() {tile_map_->Clear(); });
 
 	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB(  50, 450, 80, 40  ), "Preview");
 	auto save_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 450, 80, 40 ), "Save");
 	auto back_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 70, 500, 125, 40 ), "Exit");  
-
 	preview_button->ConnectSignal("pressed", [&](){PreviewLevel();});
 	save_button->ConnectSignal("pressed", [&](){SaveLevel();});
 	back_button->ConnectSignal("pressed", [&](){manager_->PopScene();});
