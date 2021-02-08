@@ -47,7 +47,7 @@ class Pellet : public GameObject
 {
 public:
 	Pellet(int x, int y)
-		: GameObject(x, y, 16, 16, {96, 96})
+		: GameObject(x, y, 16, 16, {144, 96})
 	{}
 
 	bool visible_;

@@ -40,6 +40,7 @@ public:
 	const int max_lives_ = 3;
 	int num_lives_ = 3;
 	std::shared_ptr<Aegis::SubTexture> heart_texture_;
+	std::shared_ptr<Aegis::SubTexture> empty_heart_texture_;
 
 	int pellets_collected_ = 0;
 	int total_pellets_ = 0;
