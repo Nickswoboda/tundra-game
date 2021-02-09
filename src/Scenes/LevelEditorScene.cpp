@@ -202,23 +202,23 @@ void LevelEditorScene::ChangeSelectedTile(const Tile& tile)
 {
 	selected_tile_ = &tile; 
 	selected_spawn_ = SpawnPoint::None;
-	spawn_text_->text_ = "Spawn: None";
+	spawn_text_->SetText("Spawn: None");
 
-	if (tile.is_solid_) tile_text_->text_ = "Tile: Wall";
-	else if (tile.is_slippery_) tile_text_->text_ = "Tile: Ice";
-	else tile_text_->text_ = "Tile: Ground";
+	if (tile.is_solid_) tile_text_->SetText("Tile: Wall");
+	else if (tile.is_slippery_) tile_text_->SetText("Tile: Ice");
+	else tile_text_->SetText("Tile: Ground");
 }
 
 void LevelEditorScene::ChangeSelectedSpawn(SpawnPoint spawn)
 {
 	selected_spawn_ = spawn; 
 	selected_tile_ = nullptr;
-	tile_text_->text_ = "Tile: None";
+	tile_text_->SetText("Tile: None");
 
 	switch (spawn){
-		case SpawnPoint::Bjorn: spawn_text_->text_ = "Spawn: Bjorn"; break;
-		case SpawnPoint::Bruce: spawn_text_->text_ = "Spawn: Bruce"; break;
-		case SpawnPoint::Brutus: spawn_text_->text_ = "Spawn: Brutus"; break;
+		case SpawnPoint::Bjorn: spawn_text_->SetText("Spawn: Bjorn"); break;
+		case SpawnPoint::Bruce: spawn_text_->SetText("Spawn: Bruce"); break;
+		case SpawnPoint::Brutus: spawn_text_->SetText("Spawn: Brutus"); break;
 		case SpawnPoint::None: break;
 	}
 }

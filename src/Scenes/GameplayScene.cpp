@@ -22,12 +22,21 @@ void GameplayScene::Init()
 {
 	camera_.SetPosition({ -144, -24});
 
+	bg_texture_ = Aegis::TextureManager::Load("assets/textures/tundra-bg-frame.png");
+
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
+	ui_layer_->AddWidget<Aegis::TextureWidget>(Aegis::TextureManager::Load("assets/textures/score-frame.png"), Aegis::Vec2(20, 16));
 
 	ui_layer_->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(34, 30), Aegis::Vec4(0,0,0,1));
 	heart_texture_ = Aegis::SubTexture::Create(Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png"), { 128, 112 }, { 16, 16 });
 	empty_heart_texture_ = Aegis::SubTexture::Create(Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png"), { 128, 96 }, { 16, 16 });
+	
+	for (int i = 0; i < max_lives_; ++i) {
+		heart_widgets_[i] = ui_layer_->AddWidget<Aegis::SubTextureWidget>(heart_texture_, Aegis::Vec2(34 + (i * 20), 54));
+	}
 
+	auto fish_texture_ = Aegis::SubTexture::Create(Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png"), { 96, 96 }, { 32, 32 });
+	ui_layer_->AddWidget<Aegis::SubTextureWidget>(fish_texture_, Aegis::Vec2(49, 74));
 	total_pellets_ = tile_map_->pellet_spawn_indices_.size();
 	pellet_count_label_ = ui_layer_->AddWidget<Aegis::Label>("", Aegis::Vec2( 44, 109 ), Aegis::Vec4(0, 0, 0, 1)); 
 	UpdatePelletCount();
@@ -56,7 +65,7 @@ void GameplayScene::Update()
 	if (!countdown_.stopped_){
 		countdown_.Update();
 		//countdown + 1 so that it goes from 3, 2, 1 instead of 2, 1, 0
-		countdown_label_->text_ = std::to_string((int)countdown_.GetRemainingInSeconds() + 1);
+		countdown_label_->SetText(std::to_string((int)countdown_.GetRemainingInSeconds() + 1));
 
 		if (countdown_.stopped_){
 			countdown_label_->visible_ = false;
@@ -121,8 +130,8 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 void GameplayScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
-	static auto bg_texture = Aegis::TextureManager::Load("assets/textures/tundra-bg-frame.png");
-	Aegis::DrawQuad({ -144.0f, -24.0f }, *bg_texture);
+
+	Aegis::DrawQuad({ -144, -24 }, *bg_texture_);
 	tile_map_->Render();
 
 	for (auto& pellet : pellets_) {
@@ -134,18 +143,6 @@ void GameplayScene::Render(float delta_time)
 	player_.Render(delta_time);
 	brutus_.Render(delta_time);
 	bjorn_.Render(delta_time);
-
-	static auto score_frame = Aegis::TextureManager::Load("assets/textures/score-frame.png");
-	Aegis::DrawQuad({ -124, -8 }, *score_frame);
-	for (int i = 1; i <= num_lives_; ++i) {
-		Aegis::DrawQuad(Aegis::Vec2(-110 + ((i-1)*20), 30 ), *heart_texture_);
-	}
-	for (int i = max_lives_; i > num_lives_; --i) {
-		Aegis::DrawQuad(Aegis::Vec2(-110 + ((i-1) * 20), 30), *empty_heart_texture_);
-	}
-	
-	static auto fish_texture = Aegis::SubTexture::Create(Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png"), { 96, 96 }, { 32, 32 });
-	Aegis::DrawQuad({ -95, 50 }, *fish_texture);
 }
 
 void GameplayScene::HandlePlayerMovement(int key_code)
@@ -296,9 +293,10 @@ void GameplayScene::SetUpLevel()
 void GameplayScene::RemoveLife()
 {
 	--num_lives_;
+	heart_widgets_[num_lives_]->subtexture_ = empty_heart_texture_;
 }
 
 void GameplayScene::UpdatePelletCount()
 {
-	pellet_count_label_->text_ = std::to_string(pellets_collected_) + "/" + std::to_string(total_pellets_);
+	pellet_count_label_->SetText(std::to_string(pellets_collected_) + "/" + std::to_string(total_pellets_));
 }

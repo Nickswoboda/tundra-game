@@ -36,11 +36,13 @@ public:
 	Brutus brutus_;
 	Bjorn bjorn_;
 	std::shared_ptr<TileMap> tile_map_;
+	std::shared_ptr<Aegis::Texture> bg_texture_;
 	std::vector<Pellet> pellets_;
 	const int max_lives_ = 3;
 	int num_lives_ = 3;
 	std::shared_ptr<Aegis::SubTexture> heart_texture_;
 	std::shared_ptr<Aegis::SubTexture> empty_heart_texture_;
+	std::array<std::shared_ptr<Aegis::SubTextureWidget>, 3> heart_widgets_;
 
 	int pellets_collected_ = 0;
 	int total_pellets_ = 0;
