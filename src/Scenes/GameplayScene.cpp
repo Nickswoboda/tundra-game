@@ -25,18 +25,16 @@ void GameplayScene::Init()
 	bg_texture_ = Aegis::TextureManager::Load("assets/textures/tundra-bg-frame.png");
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
-	ui_layer_->AddWidget<Aegis::TextureWidget>(Aegis::TextureManager::Load("assets/textures/score-frame.png"), Aegis::Vec2(20, 16));
+	ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(20, 16), Aegis::TextureManager::Load("assets/textures/score-frame.png"));
 
 	ui_layer_->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(34, 30), Aegis::Vec4(0,0,0,1));
-	heart_texture_ = Aegis::SubTexture::Create(Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png"), { 128, 112 }, { 16, 16 });
-	empty_heart_texture_ = Aegis::SubTexture::Create(Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png"), { 128, 96 }, { 16, 16 });
 	
+	auto sprite_sheet = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
 	for (int i = 0; i < max_lives_; ++i) {
-		heart_widgets_[i] = ui_layer_->AddWidget<Aegis::SubTextureWidget>(heart_texture_, Aegis::Vec2(34 + (i * 20), 54));
+		heart_widgets_[i] = ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(34 + (i * 20), 54), sprite_sheet, Aegis::AABB(128, 112, 16, 16));
 	}
 
-	auto fish_texture_ = Aegis::SubTexture::Create(Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png"), { 96, 96 }, { 32, 32 });
-	ui_layer_->AddWidget<Aegis::SubTextureWidget>(fish_texture_, Aegis::Vec2(49, 74));
+	ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(49, 74), sprite_sheet, Aegis::AABB(96, 96, 32, 32));
 	total_pellets_ = tile_map_->pellet_spawn_indices_.size();
 	pellet_count_label_ = ui_layer_->AddWidget<Aegis::Label>("", Aegis::Vec2( 44, 109 ), Aegis::Vec4(0, 0, 0, 1)); 
 	UpdatePelletCount();
@@ -84,7 +82,7 @@ void GameplayScene::Update()
 		bjorn_.MoveTo(GetEnemyTargetPos(bjorn_));
 	}
 
-	if (Aegis::AABBHasCollided(player_.sprite_.rect_, brutus_.sprite_.rect_) || Aegis::AABBHasCollided(player_.sprite_.rect_, bjorn_.sprite_.rect_)) {
+	if (Aegis::AABBHasCollided(player_.rect_, brutus_.rect_) || Aegis::AABBHasCollided(player_.rect_, bjorn_.rect_)) {
 		RemoveLife();
 		if (num_lives_ == 0){
 			dialog_->visible_ = true;
@@ -96,7 +94,7 @@ void GameplayScene::Update()
 	}
 
 	for (auto& pellet : pellets_){
-		if (pellet.visible_ && Aegis::AABBHasCollided(player_.sprite_.rect_, pellet.sprite_.rect_)) {
+		if (pellet.visible_ && Aegis::AABBHasCollided(player_.rect_, pellet.rect_)) {
 			pellet.visible_ = false;
 			++pellets_collected_;
 			UpdatePelletCount();
@@ -285,6 +283,9 @@ void GameplayScene::SetUpLevel()
 	SpawnPellets();
 
 	num_lives_ = 3;
+	for (auto& heart : heart_widgets_) {
+		heart->sprite_.SetSubTextureRect({ 128, 112, 16, 16 });
+	}
 
 	pellets_collected_ = 0;
 	UpdatePelletCount();
@@ -293,7 +294,7 @@ void GameplayScene::SetUpLevel()
 void GameplayScene::RemoveLife()
 {
 	--num_lives_;
-	heart_widgets_[num_lives_]->subtexture_ = empty_heart_texture_;
+	heart_widgets_[num_lives_]->sprite_.SetSubTextureRect({ 128, 96, 16, 16 });
 }
 
 void GameplayScene::UpdatePelletCount()

@@ -11,10 +11,10 @@ MenuScene::MenuScene()
 {
 	title_background_ = Aegis::TextureManager::Load("assets/textures/TundraBG.png");
 
-	auto title_texture = Aegis::Texture::Create("assets/textures/TundraTitle.png"); 
-	title_sprite_ = std::make_shared<Aegis::Sprite>(Aegis::Vec2(0,50), title_texture->size_, title_texture);
-	Aegis::CenterAABBHorizontally(title_sprite_->rect_, {0, 0, 1280, 720});
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
+
+	auto title_texture = Aegis::Texture::Create("assets/textures/TundraTitle.png");
+	auto title_sprite = ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(0, 50), title_texture);
 
 	auto new_game_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 170, 200, 50 ), "");
 	auto level_select_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 220, 200, 50 ), "");
@@ -37,7 +37,8 @@ MenuScene::MenuScene()
 	mute_button->SetTexture(false, Aegis::TextureManager::Load("assets/textures/audioOn.png"));
 	mute_button->SetTexture(true, Aegis::TextureManager::Load("assets/textures/audioOff.png"));
 
-	v_box_ = ui_layer_->AddContainer({0, 190, 1280, 570}, Aegis::Container::Vertical, 12, Aegis::Container::Center);
+	v_box_ = ui_layer_->AddContainer({0, 50, 1280, 720}, Aegis::Container::Vertical, 12, Aegis::Container::Center);
+	v_box_->AddWidget(title_sprite);
 	v_box_->AddWidget(new_game_button);
 	v_box_->AddWidget(level_select_button);
 	v_box_->AddWidget(options_button);
@@ -67,7 +68,6 @@ void MenuScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
 	Aegis::DrawQuad({0.0f, 0.0f}, Aegis::Application::GetWindow().GetSize(), *title_background_);
-	Aegis::RenderSprite(*title_sprite_);
 	snow_engine_->Render();
 }
 

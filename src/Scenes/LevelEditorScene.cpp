@@ -20,9 +20,9 @@ LevelEditorScene::LevelEditorScene(int level)
 		tile_map_ = std::make_unique<TileMap>("assets/levels/level" + std::to_string(level) + ".txt", 32, tex_atlas);
 	}
 
-	bruce_tex_ = Aegis::SubTexture::Create(tex_atlas, Aegis::Vec2(0, 96), Aegis::Vec2(32, 32));
-	brutus_tex_ =  Aegis::SubTexture::Create(tex_atlas, Aegis::Vec2(32, 96), Aegis::Vec2(32, 32));
-	bjorn_tex_ = Aegis::SubTexture::Create(tex_atlas, Aegis::Vec2(64, 96), Aegis::Vec2(32, 32));
+	bruce_sprite_ = Aegis::Sprite(tex_atlas, { 0, 96, 32, 32 });
+	brutus_sprite_ = Aegis::Sprite(tex_atlas, { 32, 96, 32, 32 });
+	bjorn_sprite_ = Aegis::Sprite(tex_atlas, { 64, 96, 32, 32 });
 
 	//used to center tilemap within window
 	camera_.SetPosition({-270, -24});
@@ -126,9 +126,9 @@ void LevelEditorScene::Render(float delta_time)
 	Aegis::Renderer2D::SetFont(font_);
 	tile_map_->Render();
 
-	Aegis::DrawQuad(tile_map_->bruce_spawn_index_ * 32, {32, 32}, *bruce_tex_);
-	Aegis::DrawQuad(tile_map_->brutus_spawn_index_ * 32, {32, 32}, *brutus_tex_);
-	Aegis::DrawQuad(tile_map_->bjorn_spawn_index_ * 32, {32, 32}, *bjorn_tex_);
+	Aegis::RenderSprite(tile_map_->bruce_spawn_index_ * 32, bruce_sprite_);
+	Aegis::RenderSprite(tile_map_->brutus_spawn_index_ * 32, brutus_sprite_);
+	Aegis::RenderSprite(tile_map_->bjorn_spawn_index_ * 32, bjorn_sprite_);
 	
 	if (show_error_msg_){
 		Aegis::DrawQuad({200, 300}, {675, 55}, {1.0, 1.0, 1.0, 0.8});

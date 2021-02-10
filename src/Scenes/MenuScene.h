@@ -15,8 +15,6 @@ public:
 
 	std::shared_ptr<Aegis::Texture> title_background_;
 
-	std::shared_ptr<Aegis::Sprite> title_sprite_;
-
 	std::shared_ptr<Aegis::Container> v_box_;
 
 	std::shared_ptr<ParticleEngine> snow_engine_;

@@ -70,7 +70,7 @@ void TileMap::Render() const
 {
 	for (int col = 0; col < tiles_.size(); ++col) {
 		for (int row = 0; row < tiles_[col].size(); ++row) {
-			Aegis::DrawQuad({col * 32.0f, row * 32.0f}, *tiles_[col][row]->texture_);
+			Aegis::RenderSprite({col * 32.0f, row * 32.0f}, tiles_[col][row]->sprite_);
 		}
 	}
 }
@@ -219,21 +219,21 @@ void TileMap::Save(int level_num)
 
 void TileMap::LoadTiles()
 {
-	tiles_map_.emplace('0',Tile(Aegis::SubTexture::Create(tile_atlas_, {0, 0}, {32, 32}), true, false));
-	tiles_map_.emplace('1',Tile(Aegis::SubTexture::Create(tile_atlas_, {32, 0}, {32, 32}), true, false));
-	tiles_map_.emplace('2',Tile(Aegis::SubTexture::Create(tile_atlas_, {64, 0}, {32, 32}), true, false));
-	tiles_map_.emplace('3',Tile(Aegis::SubTexture::Create(tile_atlas_, {0, 32}, {32, 32}), true, false));
-	tiles_map_.emplace('4',Tile(Aegis::SubTexture::Create(tile_atlas_, {64, 32}, {32, 32}), true, false));
-	tiles_map_.emplace('5',Tile(Aegis::SubTexture::Create(tile_atlas_, {0, 64}, {32, 32}), true, false));
-	tiles_map_.emplace('6',Tile(Aegis::SubTexture::Create(tile_atlas_, {32, 64}, {32, 32}), true, false));
-	tiles_map_.emplace('7',Tile(Aegis::SubTexture::Create(tile_atlas_, {64, 64}, {32, 32}), true, false));
-	tiles_map_.emplace('8', Tile(Aegis::SubTexture::Create(tile_atlas_, { 96, 0 }, { 32, 32 }), true, false));
-	tiles_map_.emplace('9', Tile(Aegis::SubTexture::Create(tile_atlas_, { 128, 0 }, { 32, 32 }), true, false));
-	tiles_map_.emplace('a', Tile(Aegis::SubTexture::Create(tile_atlas_, { 96, 32 }, { 32, 32 }), true, false));
-	tiles_map_.emplace('b', Tile(Aegis::SubTexture::Create(tile_atlas_, { 128, 32 }, { 32, 32 }), true, false));
-	tiles_map_.emplace('i',Tile(Aegis::SubTexture::Create(tile_atlas_, {32, 32}, {32, 32}), false, true));
-	tiles_map_.emplace('w',Tile(Aegis::SubTexture::Create(tile_atlas_, {96, 64}, {32, 32}), true, false));
-	tiles_map_.emplace('g',Tile(Aegis::SubTexture::Create(tile_atlas_, {128, 64}, {32, 32}), false, false));
+	tiles_map_.emplace('0',Tile(Aegis::Sprite(tile_atlas_, {0, 0, 32, 32}), true, false));
+	tiles_map_.emplace('1',Tile(Aegis::Sprite(tile_atlas_, {32, 0, 32, 32}), true, false));
+	tiles_map_.emplace('2',Tile(Aegis::Sprite(tile_atlas_, {64, 0, 32, 32}), true, false));
+	tiles_map_.emplace('3',Tile(Aegis::Sprite(tile_atlas_, {0, 32, 32, 32}), true, false));
+	tiles_map_.emplace('4',Tile(Aegis::Sprite(tile_atlas_, {64, 32, 32, 32}), true, false));
+	tiles_map_.emplace('5',Tile(Aegis::Sprite(tile_atlas_, {0, 64, 32, 32}), true, false));
+	tiles_map_.emplace('6',Tile(Aegis::Sprite(tile_atlas_, {32, 64, 32, 32}), true, false));
+	tiles_map_.emplace('7',Tile(Aegis::Sprite(tile_atlas_, {64, 64, 32, 32}), true, false));
+	tiles_map_.emplace('8', Tile(Aegis::Sprite(tile_atlas_, { 96, 0, 32, 32 }), true, false));
+	tiles_map_.emplace('9', Tile(Aegis::Sprite(tile_atlas_, { 128, 0, 32, 32 }), true, false));
+	tiles_map_.emplace('a', Tile(Aegis::Sprite(tile_atlas_, { 96, 32, 32, 32 }), true, false));
+	tiles_map_.emplace('b', Tile(Aegis::Sprite(tile_atlas_, { 128, 32, 32, 32 }), true, false));
+	tiles_map_.emplace('i',Tile(Aegis::Sprite(tile_atlas_, {32, 32, 32, 32}), false, true));
+	tiles_map_.emplace('w',Tile(Aegis::Sprite(tile_atlas_, {96, 64, 32, 32}), true, false));
+	tiles_map_.emplace('g',Tile(Aegis::Sprite(tile_atlas_, {128, 64, 32, 32}), false, false));
 }
 
 void TileMap::Clear()
