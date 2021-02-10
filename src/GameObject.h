@@ -21,19 +21,20 @@ public:
 class GameObject
 {
 public:
-	GameObject(float x, float y, float w, float h, Aegis::Vec2 subtex_pos = {0.0f, 0.0f})
-		:sprite_({x,y}, {w, h}, Aegis::Texture::Create("assets/textures/tundra-tile-map.png"), subtex_pos)
+	GameObject(float x, float y, float w, float h, Aegis::AABB subtex_rect)
+		:rect_({ x,y,w, h }), sprite_(Aegis::Texture::Create("assets/textures/tundra-tile-map.png"), subtex_rect)
 	{
 	}
 		
 	virtual void Update();
-	virtual void Render(float delta_time) const {Aegis::RenderSprite(sprite_);}
+	virtual void Render(float delta_time) const {Aegis::RenderSprite(rect_.pos, sprite_);}
 	virtual void SetPosition(Aegis::Vec2 pos);
 	virtual void MoveTo(const Aegis::Vec2 pos);
 	virtual bool IsMoving() { return animation_.playing_;}
 	
 	std::shared_ptr<Aegis::Texture> spirte_sheet_;
 	Animation animation_;
+	Aegis::AABB rect_;
 	Aegis::Sprite sprite_;
 	Aegis::Vec2 grid_index_;
 	Aegis::Vec2 target_grid_index_;
@@ -47,8 +48,8 @@ class Pellet : public GameObject
 {
 public:
 	Pellet(int x, int y)
-		: GameObject(x, y, 16, 16, {144, 96})
-	{}
+		: GameObject(x, y, 16, 16, {96, 96, 32, 32})
+	{sprite_.scale_ = {0.5f, 0.5f};}
 
 	bool visible_;
 };
@@ -57,7 +58,7 @@ class Player : public GameObject
 {
 public:
 	Player(int x, int y)
-		:GameObject(x,y,32,32, {0, 96}), queued_movement_(-1, 0)
+		:GameObject(x,y,32,32, {0, 96, 32, 32}), queued_movement_(-1, 0)
 	{
 	}
 	void Update() override;
@@ -70,7 +71,7 @@ class Brutus : public GameObject
 {
 public:
 	Brutus(int x, int y)
-		:GameObject(x, y, 32, 32, {32, 96})
+		:GameObject(x, y, 32, 32, {32, 96, 32, 32})
 	{
 		speed_ = .30f;
 		slides_on_ice_ = false;
@@ -82,7 +83,7 @@ class Bjorn : public GameObject
 {
 public:
 	Bjorn(int x, int y)
-		:GameObject(x, y, 32, 32, {64, 96})
+		:GameObject(x, y, 32, 32, {64, 96, 32, 32})
 	{
 		speed_ = .25f;
 

@@ -4,12 +4,12 @@ static const int TILE_SIZE = 32;
 
 void GameObject::MoveTo(const Aegis::Vec2 pos)
 {
-	Aegis::Vec2 prev_tile_pos = sprite_.rect_.pos / TILE_SIZE;
+	Aegis::Vec2 prev_tile_pos = rect_.pos / TILE_SIZE;
 	Aegis::Vec2 vec = pos - prev_tile_pos;
 	int num_tiles = sqrt(vec.x * vec.x + vec.y * vec.y);
 	target_grid_index_ = pos;
 
-	animation_.Start(sprite_.rect_.pos, pos * TILE_SIZE, speed_ * num_tiles);
+	animation_.Start(rect_.pos, pos * TILE_SIZE, speed_ * num_tiles);
 }
 
 void Player::MoveTo(const Aegis::Vec2 pos)
@@ -26,9 +26,9 @@ void GameObject::Update()
 {
 	if (animation_.playing_) {
 		animation_.Update();
-		sprite_.rect_.pos = animation_.current_value_;
+		rect_.pos = animation_.current_value_;
 
-		if (sprite_.rect_.pos == target_grid_index_ * TILE_SIZE) {
+		if (rect_.pos == target_grid_index_ * TILE_SIZE) {
 			animation_.Stop();
 			grid_index_ = target_grid_index_;
 		}
@@ -39,9 +39,9 @@ void Player::Update()
 {
 	if (animation_.playing_) {
 		animation_.Update();
-		sprite_.rect_.pos = animation_.current_value_;
+		rect_.pos = animation_.current_value_;
 
-		if (sprite_.rect_.pos == target_grid_index_ * TILE_SIZE) {
+		if (rect_.pos == target_grid_index_ * TILE_SIZE) {
 			animation_.Stop();
 			grid_index_ = target_grid_index_;
 
@@ -55,7 +55,7 @@ void Player::Update()
 
 void GameObject::SetPosition(Aegis::Vec2 pos)
 {
-	sprite_.rect_.pos = pos;
+	rect_.pos = pos;
 	grid_index_ = pos / TILE_SIZE;
 }
 
