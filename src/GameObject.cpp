@@ -9,6 +9,13 @@ void GameObject::MoveTo(const Aegis::Vec2 pos)
 	int num_tiles = sqrt(vec.x * vec.x + vec.y * vec.y);
 	target_grid_index_ = pos;
 
+	if (vec.x < 0) {
+		sprite_.horizontal_flip = true;
+	}
+	else if (vec.x > 0){
+		sprite_.horizontal_flip = false;
+	}
+
 	animation_.Start(rect_.pos, pos * TILE_SIZE, speed_ * num_tiles);
 }
 
@@ -28,8 +35,20 @@ void GameObject::Update()
 		animation_.Update();
 		rect_.pos = animation_.current_value_;
 
+		wiggle_timer_.Update();
+		if (wiggle_timer_.stopped_) {
+			if (sprite_.rotation_ == -22.5f || sprite_.rotation_ == 22.5f) {
+				sprite_.rotation_ = 0.0f;
+			}
+			else {
+				sprite_.rotation_ = sprite_.horizontal_flip ? 22.5f : -22.5f;
+			}
+			wiggle_timer_.Start(speed_ * 1000.0);
+		}
+
 		if (rect_.pos == target_grid_index_ * TILE_SIZE) {
 			animation_.Stop();
+			sprite_.rotation_ = 0;
 			grid_index_ = target_grid_index_;
 		}
 	}
@@ -40,9 +59,20 @@ void Player::Update()
 	if (animation_.playing_) {
 		animation_.Update();
 		rect_.pos = animation_.current_value_;
+		wiggle_timer_.Update();
+		if (wiggle_timer_.stopped_) {
+			if (sprite_.rotation_ == -22.5f || sprite_.rotation_ == 22.5f) {
+				sprite_.rotation_ = 0.0f;
+			}
+			else {
+				sprite_.rotation_ = sprite_.horizontal_flip ? 22.5f : -22.5f;
+			}
+			wiggle_timer_.Start(speed_ * 1000.0);
+		}
 
 		if (rect_.pos == target_grid_index_ * TILE_SIZE) {
 			animation_.Stop();
+			sprite_.rotation_ = 0;
 			grid_index_ = target_grid_index_;
 
 			if (queued_movement_.x != -1) {

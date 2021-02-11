@@ -82,6 +82,7 @@ void GameplayScene::Update()
 		bjorn_.MoveTo(GetEnemyTargetPos(bjorn_));
 	}
 
+
 	if (Aegis::AABBHasCollided(player_.rect_, brutus_.rect_) || Aegis::AABBHasCollided(player_.rect_, bjorn_.rect_)) {
 		RemoveLife();
 		if (num_lives_ == 0){

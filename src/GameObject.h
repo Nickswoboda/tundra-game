@@ -33,6 +33,7 @@ public:
 	virtual bool IsMoving() { return animation_.playing_;}
 	
 	std::shared_ptr<Aegis::Texture> spirte_sheet_;
+	Aegis::Timer wiggle_timer_;
 	Animation animation_;
 	Aegis::AABB rect_;
 	Aegis::Sprite sprite_;
@@ -59,8 +60,7 @@ class Player : public GameObject
 public:
 	Player(int x, int y)
 		:GameObject(x,y,32,32, {0, 96, 32, 32}), queued_movement_(-1, 0)
-	{
-	}
+	{}
 	void Update() override;
 	void MoveTo(const Aegis::Vec2 pos) override;
 
@@ -86,6 +86,5 @@ public:
 		:GameObject(x, y, 32, 32, {64, 96, 32, 32})
 	{
 		speed_ = .25f;
-
 	}
 };
