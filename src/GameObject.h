@@ -27,7 +27,7 @@ public:
 	}
 		
 	virtual void Update();
-	virtual void Render(float delta_time) const {Aegis::RenderSprite(rect_.pos, sprite_);}
+	virtual void Render(float delta_time) const {Aegis::DrawSprite(rect_.pos, sprite_);}
 	virtual void SetPosition(Aegis::Vec2 pos);
 	virtual void MoveTo(const Aegis::Vec2 pos);
 	virtual bool IsMoving() { return animation_.playing_;}

@@ -10,10 +10,10 @@ void GameObject::MoveTo(const Aegis::Vec2 pos)
 	target_grid_index_ = pos;
 
 	if (vec.x < 0) {
-		sprite_.horizontal_flip = true;
+		sprite_.SetHorizontalFlip(true);
 	}
 	else if (vec.x > 0){
-		sprite_.horizontal_flip = false;
+		sprite_.SetHorizontalFlip(false);
 	}
 
 	animation_.Start(rect_.pos, pos * TILE_SIZE, speed_ * num_tiles);
@@ -41,7 +41,7 @@ void GameObject::Update()
 				sprite_.rotation_ = 0.0f;
 			}
 			else {
-				sprite_.rotation_ = sprite_.horizontal_flip ? 22.5f : -22.5f;
+				sprite_.rotation_ = sprite_.GetHorizontalFlip() ? 22.5f : -22.5f;
 			}
 			wiggle_timer_.Start(speed_ * 1000.0);
 		}
@@ -65,7 +65,7 @@ void Player::Update()
 				sprite_.rotation_ = 0.0f;
 			}
 			else {
-				sprite_.rotation_ = sprite_.horizontal_flip ? 22.5f : -22.5f;
+				sprite_.rotation_ = sprite_.GetHorizontalFlip() ? 22.5f : -22.5f;
 			}
 			wiggle_timer_.Start(speed_ * 1000.0);
 		}

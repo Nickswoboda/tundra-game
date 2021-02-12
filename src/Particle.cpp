@@ -36,7 +36,7 @@ void ParticleEngine::Update()
 void ParticleEngine::Render()
 {
 	for (int i = 0; i < num_particles_; ++i){
-			Aegis::DrawQuad(particles_[i].pos_, Aegis::Vec2(particles_[i].size_, particles_[i].size_), *texture_, 1);
+		Aegis::DrawQuad(particles_[i].pos_, Aegis::Vec2(particles_[i].size_, particles_[i].size_), *texture_, { 1.0f, 1.0f, 1.0f, 1.0f },  1);
 	}
 }
 

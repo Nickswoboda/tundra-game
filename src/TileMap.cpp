@@ -70,7 +70,7 @@ void TileMap::Render() const
 {
 	for (int col = 0; col < tiles_.size(); ++col) {
 		for (int row = 0; row < tiles_[col].size(); ++row) {
-			Aegis::RenderSprite({col * 32.0f, row * 32.0f}, tiles_[col][row]->sprite_);
+			Aegis::DrawSprite({col * 32.0f, row * 32.0f}, tiles_[col][row]->sprite_);
 		}
 	}
 }
