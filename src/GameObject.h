@@ -5,42 +5,49 @@
 class Animation
 {
 public:
-	void Start(Aegis::Vec2 start, Aegis::Vec2 end, float duration);
+	Animation(Aegis::Sprite& sprite)
+		: sprite_(sprite) {}
+	void Start(Aegis::Vec2 end, float speed, int num_tiles);
 	void Update();
 	void Stop();
+
+	Aegis::Sprite& sprite_;
+
 	Aegis::Vec2 start_value_;
 	Aegis::Vec2 current_value_;
 	Aegis::Vec2 end_value_;
 	
-	float current_frame = 0;
-	float total_frames = 0;
+	//bears should rotate twice every tile to simulate movement.
+	float percent_to_rotate_at_ = 0;
+	int current_rotations_ = 0;
+	int current_frame_ = 0;
+	int total_frames_ = 0;
 	bool playing_ = false;
-
 };
 
 class GameObject
 {
 public:
 	GameObject(float x, float y, float w, float h, Aegis::AABB subtex_rect)
-		:rect_({ x,y,w, h }), sprite_(Aegis::Texture::Create("assets/textures/tundra-tile-map.png"), subtex_rect)
+		:sprite_(Aegis::Texture::Create("assets/textures/tundra-tile-map.png"), subtex_rect)
 	{
+		sprite_.position_ = { x, y };
 	}
 		
 	virtual void Update();
-	virtual void Render(float delta_time) const {Aegis::DrawSprite(rect_.pos, sprite_);}
+	virtual void Render(float delta_time) const { sprite_.Draw(); }
 	virtual void SetPosition(Aegis::Vec2 pos);
 	virtual void MoveTo(const Aegis::Vec2 pos);
 	virtual bool IsMoving() { return animation_.playing_;}
+
+	Aegis::AABB GetRect() const;
 	
-	std::shared_ptr<Aegis::Texture> spirte_sheet_;
-	Aegis::Timer wiggle_timer_;
-	Animation animation_;
-	Aegis::AABB rect_;
 	Aegis::Sprite sprite_;
+	Animation animation_ = Animation(sprite_);
 	Aegis::Vec2 grid_index_;
 	Aegis::Vec2 target_grid_index_;
 	//time to move 1 tile
-	float speed_ = 0.15f;
+	float speed_ = 0.20f;
 	bool slides_on_ice_ = true;
 
 };
@@ -52,7 +59,7 @@ public:
 		: GameObject(x, y, 16, 16, {96, 96, 32, 32})
 	{sprite_.scale_ = {0.5f, 0.5f};}
 
-	bool visible_;
+	bool visible_ = true;
 };
 
 class Player : public GameObject
