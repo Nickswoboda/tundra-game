@@ -19,6 +19,7 @@ public:
 	void PreviewLevel();
 	void SaveLevel();
 	
+	void UpdateObjectPositions();
 	void Undo();
 
 	//tiles can not be placed while a spawn is selected

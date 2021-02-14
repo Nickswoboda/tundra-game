@@ -83,7 +83,7 @@ void GameplayScene::Update()
 	}
 
 
-	if (Aegis::AABBHasCollided(player_.rect_, brutus_.rect_) || Aegis::AABBHasCollided(player_.rect_, bjorn_.rect_)) {
+	if (Aegis::AABBHasCollided(player_.GetRect(), brutus_.GetRect()) || Aegis::AABBHasCollided(player_.GetRect(), bjorn_.GetRect())) {
 		RemoveLife();
 		if (num_lives_ == 0){
 			dialog_->visible_ = true;
@@ -95,7 +95,7 @@ void GameplayScene::Update()
 	}
 
 	for (auto& pellet : pellets_){
-		if (pellet.visible_ && Aegis::AABBHasCollided(player_.rect_, pellet.rect_)) {
+		if (pellet.visible_ && Aegis::AABBHasCollided(player_.GetRect(), pellet.GetRect())) {
 			pellet.visible_ = false;
 			++pellets_collected_;
 			UpdatePelletCount();

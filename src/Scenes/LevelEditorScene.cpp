@@ -21,8 +21,11 @@ LevelEditorScene::LevelEditorScene(int level)
 	}
 
 	bruce_sprite_ = Aegis::Sprite(tex_atlas, { 0, 96, 32, 32 });
+	bruce_sprite_.position_ = tile_map_->bruce_spawn_index_ * 32;
 	brutus_sprite_ = Aegis::Sprite(tex_atlas, { 32, 96, 32, 32 });
+	brutus_sprite_.position_ = tile_map_->brutus_spawn_index_ * 32;
 	bjorn_sprite_ = Aegis::Sprite(tex_atlas, { 64, 96, 32, 32 });
+	bjorn_sprite_.position_ = tile_map_->bjorn_spawn_index_ * 32;
 
 	//used to center tilemap within window
 	camera_.SetPosition({-270, -24});
@@ -103,6 +106,8 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 						auto command = std::shared_ptr<EditCommand>(new SpawnEditCommand(*tile_map_, selected_spawn_, index));
 						command->Execute();
 						recorded_edits_.push(command);
+
+						UpdateObjectPositions();
 					}
 				}
 			}
@@ -126,9 +131,9 @@ void LevelEditorScene::Render(float delta_time)
 	Aegis::Renderer2D::SetFont(font_);
 	tile_map_->Render();
 
-	Aegis::DrawSprite(tile_map_->bruce_spawn_index_ * 32, bruce_sprite_);
-	Aegis::DrawSprite(tile_map_->brutus_spawn_index_ * 32, brutus_sprite_);
-	Aegis::DrawSprite(tile_map_->bjorn_spawn_index_ * 32, bjorn_sprite_);
+	bruce_sprite_.Draw();
+	brutus_sprite_.Draw();
+	bjorn_sprite_.Draw();
 	
 	if (show_error_msg_){
 		Aegis::DrawQuad({200, 300}, {675, 55}, {1.0, 1.0, 1.0, 0.8});
@@ -195,6 +200,8 @@ void LevelEditorScene::Undo()
 			recorded_commands.pop();
 			
 		}
+
+		UpdateObjectPositions();
 	}
 }
 
@@ -221,4 +228,11 @@ void LevelEditorScene::ChangeSelectedSpawn(SpawnPoint spawn)
 		case SpawnPoint::Brutus: spawn_text_->SetText("Spawn: Brutus"); break;
 		case SpawnPoint::None: break;
 	}
+}
+
+void LevelEditorScene::UpdateObjectPositions()
+{
+	bjorn_sprite_.position_ = tile_map_->bjorn_spawn_index_ * 32;
+	brutus_sprite_.position_ = tile_map_->brutus_spawn_index_ * 32;
+	bruce_sprite_.position_ = tile_map_->bruce_spawn_index_ * 32;
 }
