@@ -20,6 +20,12 @@ GameplayScene::GameplayScene(int level)
 
 void GameplayScene::Init()
 {
+	bg_music_ = std::make_shared<Aegis::SoundEffect>("assets/audio/gameplay-bgm.ogg");
+	Aegis::AudioPlayer::Play(*bg_music_);
+	fish_sfx_ = std::make_shared<Aegis::SoundEffect>("assets/audio/fish-collect-sfx.ogg");
+	death_sfx_ = std::make_shared<Aegis::SoundEffect>("assets/audio/death.ogg");
+	game_over_sfx_ = std::make_shared<Aegis::SoundEffect>("assets/audio/lose.ogg");
+	level_complete_sfx_ = std::make_shared<Aegis::SoundEffect>("assets/audio/level-complete.ogg");
 	camera_.SetPosition({ -144, -24});
 
 	bg_texture_ = Aegis::TextureManager::Load("assets/textures/tundra-bg-frame.png");
@@ -85,23 +91,18 @@ void GameplayScene::Update()
 
 	if (Aegis::AABBHasCollided(player_.GetRect(), brutus_.GetRect()) || Aegis::AABBHasCollided(player_.GetRect(), bjorn_.GetRect())) {
 		RemoveLife();
-		if (num_lives_ == 0){
-			dialog_->visible_ = true;
-			return;
-		}
-		else{
-			ResetObjectPositions();
-		}
 	}
 
 	for (auto& pellet : pellets_){
 		if (pellet.visible_ && Aegis::AABBHasCollided(player_.GetRect(), pellet.GetRect())) {
 			pellet.visible_ = false;
-			++pellets_collected_;
+			Aegis::AudioPlayer::Play(*fish_sfx_);
+			++pellets_collected_; 
 			UpdatePelletCount();
 
 			if (pellets_collected_ == total_pellets_){
 				player_.animation_.playing_ = false;
+				Aegis::AudioPlayer::Play(*level_complete_sfx_);
 			}
 		}
 	}
@@ -295,7 +296,17 @@ void GameplayScene::SetUpLevel()
 void GameplayScene::RemoveLife()
 {
 	--num_lives_;
+
 	heart_widgets_[num_lives_]->sprite_.SetSubTextureRect({ 128, 96, 16, 16 });
+	if (num_lives_ == 0) {
+		dialog_->visible_ = true;
+		Aegis::AudioPlayer::Play(*game_over_sfx_);
+		return;
+	}
+	else {
+		Aegis::AudioPlayer::Play(*death_sfx_);
+		ResetObjectPositions();
+	}
 }
 
 void GameplayScene::UpdatePelletCount()

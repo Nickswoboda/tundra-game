@@ -5,13 +5,20 @@
 class Animation
 {
 public:
-	Animation(Aegis::Sprite& sprite)
-		: sprite_(sprite) {}
+	Animation(Aegis::Sprite& sprite, const std::string& sfx_path = "")
+		: sprite_(sprite)
+	{
+	}
 	void Start(Aegis::Vec2 end, float speed, int num_tiles);
 	void Update();
 	void Stop();
+	void SetSfx(const std::string& path)
+	{
+		sfx_ = std::make_shared<Aegis::SoundEffect>(path);
+	}
 
 	Aegis::Sprite& sprite_;
+	std::shared_ptr<Aegis::SoundEffect> sfx_;
 
 	Aegis::Vec2 start_value_;
 	Aegis::Vec2 current_value_;
@@ -56,8 +63,10 @@ class Pellet : public GameObject
 {
 public:
 	Pellet(int x, int y)
-		: GameObject(x, y, 16, 16, {96, 96, 32, 32})
-	{sprite_.scale_ = {0.5f, 0.5f};}
+		: GameObject(x, y, 16, 16, { 96, 96, 32, 32 })
+	{
+		sprite_.scale_ = { 0.5f, 0.5f };
+	}
 
 	bool visible_ = true;
 };
@@ -67,7 +76,9 @@ class Player : public GameObject
 public:
 	Player(int x, int y)
 		:GameObject(x,y,32,32, {0, 96, 32, 32}), queued_movement_(-1, 0)
-	{}
+	{
+		animation_.SetSfx("assets/audio/bruce-footsteps.ogg");
+	}
 	void Update() override;
 	void MoveTo(const Aegis::Vec2 pos) override;
 
@@ -82,8 +93,8 @@ public:
 	{
 		speed_ = .30f;
 		slides_on_ice_ = false;
+		animation_.SetSfx("assets/audio/brutus-footsteps.ogg"); 
 	}
-
 };
 
 class Bjorn : public GameObject

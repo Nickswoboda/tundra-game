@@ -21,7 +21,7 @@ MenuScene::MenuScene()
 	auto options_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 230, 200, 50 ), "");
 	auto exit_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 270, 200, 50 ), "");
 
-	new_game_button->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(1)));});
+	new_game_button->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(1))); bg_music_->Stop(); });
 	level_select_button->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new LevelSelectScene()));});
 	options_button->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene()));});
 	exit_button->ConnectSignal("pressed", []() { Aegis::Application::Quit();});
@@ -55,8 +55,8 @@ MenuScene::MenuScene()
 	
 	snow_engine_ = std::make_unique<ParticleEngine>(512, Aegis::Vec2(-200, -700), Aegis::Vec2(Aegis::Application::GetWindow().GetSize().x, 0), Aegis::Vec2(0.2, 2), Aegis::Vec2(1, 3));
 	button_hover_sfx_ = std::make_shared<Aegis::SoundEffect>("assets/audio/button-hover.ogg", 40);
-	bg_music_ = std::make_shared<Aegis::SoundEffect>("assets/audio/bgm.ogg", 70);
-	Aegis::AudioPlayer::Play(*bg_music_);
+	bg_music_ = std::make_shared<Aegis::SoundEffect>("assets/audio/menu-bgm.ogg", 100);
+	Aegis::AudioPlayer::Play(*bg_music_, 100);
 }
 
 void MenuScene::Update()

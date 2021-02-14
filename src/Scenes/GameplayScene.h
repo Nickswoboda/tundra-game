@@ -48,4 +48,10 @@ public:
 	Aegis::Timer countdown_;
 	std::shared_ptr<Aegis::Label> countdown_label_;
 	std::shared_ptr<Aegis::Dialog> dialog_;
+
+	std::shared_ptr<Aegis::SoundEffect> bg_music_;
+	std::shared_ptr<Aegis::SoundEffect> fish_sfx_;
+	std::shared_ptr<Aegis::SoundEffect> death_sfx_;
+	std::shared_ptr<Aegis::SoundEffect> game_over_sfx_;
+	std::shared_ptr<Aegis::SoundEffect> level_complete_sfx_;
 };
