@@ -49,9 +49,9 @@ public:
 	std::shared_ptr<Aegis::Label> countdown_label_;
 	std::shared_ptr<Aegis::Dialog> dialog_;
 
-	std::shared_ptr<Aegis::SoundEffect> bg_music_;
-	std::shared_ptr<Aegis::SoundEffect> fish_sfx_;
-	std::shared_ptr<Aegis::SoundEffect> death_sfx_;
-	std::shared_ptr<Aegis::SoundEffect> game_over_sfx_;
-	std::shared_ptr<Aegis::SoundEffect> level_complete_sfx_;
+	Aegis::SoundID bg_music_;
+	Aegis::SoundID fish_sfx_;
+	Aegis::SoundID death_sfx_;
+	Aegis::SoundID game_over_sfx_;
+	Aegis::SoundID level_complete_sfx_;
 };

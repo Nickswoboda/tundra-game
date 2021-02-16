@@ -20,12 +20,13 @@ GameplayScene::GameplayScene(int level)
 
 void GameplayScene::Init()
 {
-	bg_music_ = std::make_shared<Aegis::SoundEffect>("assets/audio/gameplay-bgm.ogg");
-	Aegis::AudioPlayer::Play(*bg_music_);
-	fish_sfx_ = std::make_shared<Aegis::SoundEffect>("assets/audio/fish-collect-sfx.ogg");
-	death_sfx_ = std::make_shared<Aegis::SoundEffect>("assets/audio/death.ogg");
-	game_over_sfx_ = std::make_shared<Aegis::SoundEffect>("assets/audio/lose.ogg");
-	level_complete_sfx_ = std::make_shared<Aegis::SoundEffect>("assets/audio/level-complete.ogg");
+	bg_music_ = Aegis::AudioPlayer::LoadSound("assets/audio/gameplay-bgm1.ogg", true, true);
+	fish_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/fish-collect-sfx.ogg");
+	death_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/death.ogg");
+	game_over_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/lose.ogg");
+	level_complete_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/level-complete.ogg");
+
+	Aegis::AudioPlayer::PlaySound(bg_music_, 90);
 	camera_.SetPosition({ -144, -24});
 
 	bg_texture_ = Aegis::TextureManager::Load("assets/textures/tundra-bg-frame.png");
@@ -96,13 +97,13 @@ void GameplayScene::Update()
 	for (auto& pellet : pellets_){
 		if (pellet.visible_ && Aegis::AABBHasCollided(player_.GetRect(), pellet.GetRect())) {
 			pellet.visible_ = false;
-			Aegis::AudioPlayer::Play(*fish_sfx_);
+			Aegis::AudioPlayer::PlaySound(fish_sfx_, 80);
 			++pellets_collected_; 
 			UpdatePelletCount();
 
 			if (pellets_collected_ == total_pellets_){
 				player_.animation_.playing_ = false;
-				Aegis::AudioPlayer::Play(*level_complete_sfx_);
+				Aegis::AudioPlayer::PlaySound(level_complete_sfx_);
 			}
 		}
 	}
@@ -300,11 +301,11 @@ void GameplayScene::RemoveLife()
 	heart_widgets_[num_lives_]->sprite_.SetSubTextureRect({ 128, 96, 16, 16 });
 	if (num_lives_ == 0) {
 		dialog_->visible_ = true;
-		Aegis::AudioPlayer::Play(*game_over_sfx_);
+		Aegis::AudioPlayer::PlaySound(game_over_sfx_);
 		return;
 	}
 	else {
-		Aegis::AudioPlayer::Play(*death_sfx_);
+		Aegis::AudioPlayer::PlaySound(death_sfx_);
 		ResetObjectPositions();
 	}
 }

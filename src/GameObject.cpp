@@ -87,8 +87,8 @@ void Animation::Update()
 		if (rotations > current_rotations_) {
 			sprite_.rotation_ = sprite_.rotation_ == 0 ? (sprite_.GetHorizontalFlip() ? 22.5f : -22.5f) : 0;
 			++current_rotations_;
-			if (sfx_) {
-				Aegis::AudioPlayer::Play(*sfx_);
+			if (sfx_ != -1) {
+				Aegis::AudioPlayer::PlaySound(sfx_);
 			}
 		}
 	}
@@ -99,7 +99,4 @@ void Animation::Stop()
 	playing_ = false;
 	current_frame_ = 0;
 	sprite_.rotation_ = 0;
-	if (sfx_) {
-		sfx_->Stop();
-	}
 }

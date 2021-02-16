@@ -14,11 +14,11 @@ public:
 	void Stop();
 	void SetSfx(const std::string& path)
 	{
-		sfx_ = std::make_shared<Aegis::SoundEffect>(path);
+		sfx_ = Aegis::AudioPlayer::LoadSound(path);
 	}
 
 	Aegis::Sprite& sprite_;
-	std::shared_ptr<Aegis::SoundEffect> sfx_;
+	Aegis::SoundID sfx_ = -1;
 
 	Aegis::Vec2 start_value_;
 	Aegis::Vec2 current_value_;
