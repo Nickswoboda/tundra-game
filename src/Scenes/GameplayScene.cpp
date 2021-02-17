@@ -18,6 +18,11 @@ GameplayScene::GameplayScene(int level)
 	Init();
 }
 
+GameplayScene::~GameplayScene()
+{
+	Aegis::AudioPlayer::StopSound(bg_music_);
+}
+
 void GameplayScene::Init()
 {
 	bg_music_ = Aegis::AudioPlayer::LoadSound("assets/audio/gameplay-bgm1.ogg", true, true);
@@ -168,7 +173,12 @@ void GameplayScene::HandlePlayerMovement(int key_code)
 
 Aegis::Vec2 GameplayScene::GetEnemyTargetPos(GameObject& obj)
 {
-	return GetTargetTileCoordBFS(obj.grid_index_, player_.grid_index_, obj.slides_on_ice_);
+	if (obj.slides_on_ice_) {
+		return GetTargetTileCoordBFS(obj.grid_index_, player_.target_grid_index_, obj.slides_on_ice_);
+	}
+	else {
+		return GetTargetTileCoordBFS(obj.grid_index_, player_.grid_index_, obj.slides_on_ice_);
+	}
 }
 
 Aegis::Vec2 GameplayScene::GetSlidingTargetTile(const Aegis::Vec2& start, const Aegis::Vec2& dir) const
@@ -243,6 +253,7 @@ void GameplayScene::ResetObjectPositions()
 	player_.animation_.Stop();
 	brutus_.animation_.Stop();
 	bjorn_.animation_.Stop();
+	player_.target_grid_index_ = player_.grid_index_;
 
 	countdown_label_->visible_ = true;
 	countdown_.Start(3000);

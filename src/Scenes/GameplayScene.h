@@ -9,6 +9,7 @@ public:
 
 	GameplayScene(int level);
 	GameplayScene(std::shared_ptr<TileMap> tile_map);
+	~GameplayScene();
 
 	void Init();
 
