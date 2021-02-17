@@ -25,7 +25,7 @@ GameplayScene::~GameplayScene()
 
 void GameplayScene::Init()
 {
-	bg_music_ = Aegis::AudioPlayer::LoadSound("assets/audio/gameplay-bgm1.ogg", true, true);
+	bg_music_ = Aegis::AudioPlayer::LoadSound("assets/audio/gameplay-bgm.ogg", true, true);
 	fish_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/fish-collect-sfx.ogg");
 	death_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/death.ogg");
 	game_over_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/lose.ogg");
@@ -248,12 +248,12 @@ void GameplayScene::ResetObjectPositions()
 	SetObjectOnGrid(player_, tile_map_->bruce_spawn_index_);
 	SetObjectOnGrid(brutus_, tile_map_->brutus_spawn_index_);
 	SetObjectOnGrid(bjorn_, tile_map_->bjorn_spawn_index_);
+	player_.target_grid_index_ = player_.grid_index_;
 	GetEnemyTargetPos(brutus_);
 	GetEnemyTargetPos(bjorn_);
 	player_.animation_.Stop();
 	brutus_.animation_.Stop();
 	bjorn_.animation_.Stop();
-	player_.target_grid_index_ = player_.grid_index_;
 
 	countdown_label_->visible_ = true;
 	countdown_.Start(3000);
