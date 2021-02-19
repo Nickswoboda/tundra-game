@@ -1,4 +1,5 @@
 #include "GameplayScene.h"
+#include "OptionsScene.h"
 
 #include <fstream>
 #include <iostream>
@@ -37,6 +38,11 @@ void GameplayScene::Init()
 	bg_texture_ = Aegis::TextureManager::Load("assets/textures/tundra-bg-frame.png");
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
+	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(Aegis::AABB{400, 400, 400, 400});
+	pause_menu_->continue_button_->ConnectSignal("pressed", [&]() {Pause(false); });
+	pause_menu_->retry_button_->ConnectSignal("pressed", [&]() {SetUpLevel(); Pause(false); });
+	pause_menu_->options_button_->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene())); });
+	pause_menu_->quit_button_->ConnectSignal("pressed", [&]() {manager_->PopScene(); });
 	ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(20, 16), Aegis::TextureManager::Load("assets/textures/score-frame.png"));
 
 	ui_layer_->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(34, 30), Aegis::Vec4(0,0,0,1));
@@ -69,9 +75,7 @@ void GameplayScene::Init()
 
 void GameplayScene::Update()
 {
-	if (dialog_->visible_){
-		return;
-	}
+
 	if (!countdown_.stopped_){
 		countdown_.Update();
 		//countdown + 1 so that it goes from 3, 2, 1 instead of 2, 1, 0
@@ -79,9 +83,13 @@ void GameplayScene::Update()
 
 		if (countdown_.stopped_){
 			countdown_label_->visible_ = false;
+			paused_ = false;
 		}
 		return;
 	}
+
+	if (paused_) return;
+
 	player_.Update();
 
 	brutus_.Update();
@@ -121,8 +129,7 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 	if (key_event && (key_event->action_ == AE_BUTTON_PRESS || key_event->action_ == AE_BUTTON_REPEAT)) {
 		auto key = key_event->key_;
 		if (key == AE_KEY_ESCAPE) {
-			manager_->PopScene();
-			return;
+			Pause(!paused_);
 		}
 		if (key == AE_KEY_K) {
 			SetUpLevel();
@@ -131,6 +138,12 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 			HandlePlayerMovement(key);
 		}
 	}
+}
+
+void GameplayScene::Pause(bool pause)
+{
+	paused_ = pause;
+	pause_menu_->visible_ = pause;
 }
 
 void GameplayScene::Render(float delta_time)
@@ -313,6 +326,7 @@ void GameplayScene::RemoveLife()
 	heart_widgets_[num_lives_]->sprite_.SetSubTextureRect({ 128, 96, 16, 16 });
 	if (num_lives_ == 0) {
 		dialog_->visible_ = true;
+		paused_ = true;
 		Aegis::AudioPlayer::PlaySound(game_over_sfx_);
 		return;
 	}

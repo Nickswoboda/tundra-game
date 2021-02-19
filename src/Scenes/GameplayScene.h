@@ -1,5 +1,7 @@
 #include "../GameObject.h"
 #include "../TileMap.h" 
+#include "../PauseMenu.h"
+
 #include <stack>
 #include <memory>
 
@@ -16,6 +18,8 @@ public:
 	void Update() override;
 	void Render(float delta_time) override;
 	void OnEvent(Aegis::Event& event) override;
+	
+	void Pause(bool pause);
 
 	void HandlePlayerMovement(int key_code);
 	Aegis::Vec2 GetEnemyTargetPos(GameObject& obj);
@@ -50,9 +54,13 @@ public:
 	std::shared_ptr<Aegis::Label> countdown_label_;
 	std::shared_ptr<Aegis::Dialog> dialog_;
 
+	std::shared_ptr<PauseMenu> pause_menu_;
+	bool paused_ = true;
+
 	Aegis::SoundID bg_music_;
 	Aegis::SoundID fish_sfx_;
 	Aegis::SoundID death_sfx_;
 	Aegis::SoundID game_over_sfx_;
 	Aegis::SoundID level_complete_sfx_;
+
 };

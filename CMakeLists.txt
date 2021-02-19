@@ -9,6 +9,7 @@ add_executable (Tundra
 	"src/Particle.cpp"
 	"src/GameObject.cpp"
 	"src/EditCommand.cpp"
+	"src/PauseMenu.cpp"
 	"src/Scenes/MenuScene.cpp"
 	"src/Scenes/OptionsScene.cpp" 
 	"src/Scenes/GameplayScene.cpp" 
