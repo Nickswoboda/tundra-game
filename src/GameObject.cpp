@@ -24,13 +24,7 @@ void Player::MoveTo(const Aegis::Vec2 pos)
 
 void GameObject::Update()
 {
-	if (animation_.playing_) {
-		animation_.Update();
-
-		if (!animation_.playing_){
-			grid_index_ = target_grid_index_;
-		}
-	}
+	animation_.Update();
 }
 
 void Player::Update()
@@ -47,7 +41,6 @@ void Player::Update()
 void GameObject::SetPosition(Aegis::Vec2 pos)
 {
 	sprite_.position_ = pos;
-	grid_index_ = pos / TILE_SIZE;
 }
 
 Aegis::AABB GameObject::GetRect() const
@@ -74,6 +67,8 @@ void Animation::Start(Aegis::Vec2 end, float speed, int num_tiles)
 
 void Animation::Update()
 {
+	if (!playing_) return;
+
 	float percentage = current_frame_ / (float)total_frames_;
 	++current_frame_;
 	current_value_ = Aegis::LERP(start_value_, end_value_, percentage);

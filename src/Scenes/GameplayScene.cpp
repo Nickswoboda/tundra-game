@@ -167,17 +167,17 @@ void GameplayScene::HandlePlayerMovement(int key_code)
 		player_.MoveTo(GetSlidingTargetTile(player_.target_grid_index_, dir));
 	}
 	else{
-		player_.MoveTo(GetSlidingTargetTile(player_.grid_index_, dir));
+		player_.MoveTo(GetSlidingTargetTile(player_.GetGridIndex(), dir));
 	}
 }
 
 Aegis::Vec2 GameplayScene::GetEnemyTargetPos(GameObject& obj)
 {
 	if (obj.slides_on_ice_) {
-		return GetTargetTileCoordBFS(obj.grid_index_, player_.target_grid_index_, obj.slides_on_ice_);
+		return GetTargetTileCoordBFS(obj.GetGridIndex(), player_.target_grid_index_, obj.slides_on_ice_);
 	}
 	else {
-		return GetTargetTileCoordBFS(obj.grid_index_, player_.grid_index_, obj.slides_on_ice_);
+		return GetTargetTileCoordBFS(obj.GetGridIndex(), player_.GetGridIndex(), obj.slides_on_ice_);
 	}
 }
 
@@ -248,7 +248,8 @@ void GameplayScene::ResetObjectPositions()
 	SetObjectOnGrid(player_, tile_map_->bruce_spawn_index_);
 	SetObjectOnGrid(brutus_, tile_map_->brutus_spawn_index_);
 	SetObjectOnGrid(bjorn_, tile_map_->bjorn_spawn_index_);
-	player_.target_grid_index_ = player_.grid_index_;
+	player_.target_grid_index_ = player_.GetGridIndex();
+	player_.queued_movement_ = {-1, -1};
 	GetEnemyTargetPos(brutus_);
 	GetEnemyTargetPos(bjorn_);
 	player_.animation_.Stop();

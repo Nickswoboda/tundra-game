@@ -45,18 +45,16 @@ public:
 	virtual void Render(float delta_time) const { sprite_.Draw(); }
 	virtual void SetPosition(Aegis::Vec2 pos);
 	virtual void MoveTo(const Aegis::Vec2 pos);
-	virtual bool IsMoving() { return animation_.playing_;}
-
+	bool IsMoving() const { return animation_.playing_;}
+	Aegis::Vec2 GetGridIndex() const {return sprite_.position_ / 32;}
 	Aegis::AABB GetRect() const;
 	
 	Aegis::Sprite sprite_;
 	Animation animation_ = Animation(sprite_);
-	Aegis::Vec2 grid_index_;
 	Aegis::Vec2 target_grid_index_;
 	//time to move 1 tile
 	float speed_ = 0.20f;
 	bool slides_on_ice_ = true;
-
 };
 
 class Pellet : public GameObject
