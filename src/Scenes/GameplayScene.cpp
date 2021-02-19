@@ -38,11 +38,7 @@ void GameplayScene::Init()
 	bg_texture_ = Aegis::TextureManager::Load("assets/textures/tundra-bg-frame.png");
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
-	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(Aegis::AABB{400, 400, 400, 400});
-	pause_menu_->continue_button_->ConnectSignal("pressed", [&]() {Pause(false); });
-	pause_menu_->retry_button_->ConnectSignal("pressed", [&]() {SetUpLevel(); Pause(false); });
-	pause_menu_->options_button_->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene())); });
-	pause_menu_->quit_button_->ConnectSignal("pressed", [&]() {manager_->PopScene(); });
+
 	ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(20, 16), Aegis::TextureManager::Load("assets/textures/score-frame.png"));
 
 	ui_layer_->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(34, 30), Aegis::Vec4(0,0,0,1));
@@ -62,6 +58,12 @@ void GameplayScene::Init()
 	auto countdown_font = Aegis::FontManager::Load("assets/fonts/Roboto-Regular.ttf", 128);
 	countdown_label_->SetFont(countdown_font);
 
+	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(Aegis::AABB{ 400, 400, 400, 400 });
+	pause_menu_->continue_button_->ConnectSignal("pressed", [&]() {Pause(false); });
+	pause_menu_->retry_button_->ConnectSignal("pressed", [&]() {SetUpLevel(); Pause(false); });
+	pause_menu_->options_button_->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene())); });
+	pause_menu_->quit_button_->ConnectSignal("pressed", [&]() {manager_->PopScene(); });
+
 	dialog_ = ui_layer_->AddWidget<Aegis::Dialog>("You lose. Try Again?", Aegis::Vec2(400, 200), Aegis::Vec2(300, 300));
 	dialog_->ConnectSignal("accepted", [&](){SetUpLevel(); dialog_->visible_ = false;});
 	dialog_->ConnectSignal("rejected", [&](){manager_->PopScene();});
@@ -75,6 +77,7 @@ void GameplayScene::Init()
 
 void GameplayScene::Update()
 {
+	if (paused_) return;
 
 	if (!countdown_.stopped_){
 		countdown_.Update();
@@ -88,7 +91,6 @@ void GameplayScene::Update()
 		return;
 	}
 
-	if (paused_) return;
 
 	player_.Update();
 

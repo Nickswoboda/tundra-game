@@ -55,7 +55,7 @@ public:
 	std::shared_ptr<Aegis::Dialog> dialog_;
 
 	std::shared_ptr<PauseMenu> pause_menu_;
-	bool paused_ = true;
+	bool paused_ = false;
 
 	Aegis::SoundID bg_music_;
 	Aegis::SoundID fish_sfx_;
