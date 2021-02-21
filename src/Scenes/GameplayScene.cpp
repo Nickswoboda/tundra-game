@@ -13,8 +13,9 @@ GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
 GameplayScene::GameplayScene(int level)
 	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
 {
-	auto atlas = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
-	tile_map_ = std::make_shared<TileMap>("assets/levels/level" + std::to_string(level) + ".txt", 32, atlas);
+	auto atlas = Aegis::TextureManager::Load("assets/textures/tile_map.png");
+	std::string level_file = "assets/levels/level_" + std::to_string(level) + ".txt";
+	tile_map_ = std::make_shared<TileMap>(level_file, 32, atlas);
 
 	Init();
 }
@@ -26,42 +27,35 @@ GameplayScene::~GameplayScene()
 
 void GameplayScene::Init()
 {
-	bg_music_ = Aegis::AudioPlayer::LoadSound("assets/audio/gameplay-bgm.ogg", true, true);
-	fish_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/fish-collect-sfx.ogg");
+	bg_music_ = Aegis::AudioPlayer::LoadSound("assets/audio/gameplay_bgm.ogg", true, true);
+	fish_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/fish_collect.ogg");
 	death_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/death.ogg");
 	game_over_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/lose.ogg");
-	level_complete_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/level-complete.ogg");
+	level_complete_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/level_complete.ogg");
 
 	Aegis::AudioPlayer::PlaySound(bg_music_, 90);
 	camera_.SetPosition({ -144, -24});
 
-	bg_texture_ = Aegis::TextureManager::Load("assets/textures/tundra-bg-frame.png");
-	auto sprite_sheet = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
+	bg_texture_ = Aegis::TextureManager::Load("assets/textures/frame_bg.png");
+	auto sprite_sheet = Aegis::TextureManager::Load("assets/textures/tile_map.png");
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 
 	//Scoreboard
-	ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(20, 16), Aegis::TextureManager::Load("assets/textures/score-frame.png"));
-	auto scoreboard_container = ui_layer_->AddContainer({20, 16, 98, 128}, Aegis::Container::Vertical, 4, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
-	auto lives_label = ui_layer_->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(), Aegis::Vec4(0,0,0,1));
-	scoreboard_container->AddWidget(lives_label);
-	auto heart_container = std::shared_ptr<Aegis::Container>(new Aegis::Container({ 0, 0, 98, 26 }, Aegis::Container::Horizontal, 4, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter));
+	ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(20, 16), Aegis::TextureManager::Load("assets/textures/score_frame.png"));
+	auto scoreboard_container = ui_layer_->AddWidget<Aegis::Container>(Aegis::AABB(20, 16, 98, 128), Aegis::Container::Vertical, 4, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
+	scoreboard_container->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(), Aegis::Vec4(0,0,0,1));
+	auto heart_container = scoreboard_container->AddWidget<Aegis::Container>(Aegis::AABB( 0, 0, 98, 26 ), Aegis::Container::Horizontal, 4, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
 	for (int i = 0; i < max_lives_; ++i) {
-		heart_widgets_[i] = ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(128, 112, 16, 16));
-		heart_container->AddWidget(heart_widgets_[i]);
+		heart_widgets_[i] = heart_container->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(128, 112, 16, 16));
 	}
-	scoreboard_container->AddWidget(heart_container);
-
-	auto fish_sprite = ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(96, 96, 32, 32));
 	total_pellets_ = tile_map_->pellet_spawn_indices_.size();
-	pellet_count_label_ = ui_layer_->AddWidget<Aegis::Label>("", Aegis::Vec2(), Aegis::Vec4(0, 0, 0, 1)); 
-	UpdatePelletCount();
-	scoreboard_container->AddWidget(fish_sprite);
-	scoreboard_container->AddWidget(pellet_count_label_);
+	scoreboard_container->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(96, 96, 32, 32));
+	pellet_count_label_ = scoreboard_container->AddWidget<Aegis::Label>(std::to_string(pellets_collected_) + "/" + std::to_string(total_pellets_), Aegis::Vec2(), Aegis::Vec4(0, 0, 0, 1));
 
 	countdown_.Start(2500);
 	countdown_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string((int)countdown_.GetRemainingInSeconds() + 1), Aegis::Vec2(600, 300), Aegis::Vec4(0.0f,0.0f, 0.0f, 1.0f));
-	auto countdown_font = Aegis::FontManager::Load("assets/fonts/Roboto-Regular.ttf", 128);
+	auto countdown_font = Aegis::FontManager::Load("assets/fonts/roboto_regular.ttf", 128);
 	countdown_label_->SetFont(countdown_font);
 
 	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(Aegis::AABB{ 400, 400, 400, 400 });
@@ -111,8 +105,9 @@ void GameplayScene::Update()
 	}
 
 
-	if (Aegis::AABBHasCollided(player_.GetRect(), brutus_.GetRect()) || Aegis::AABBHasCollided(player_.GetRect(), bjorn_.GetRect())) {
-		RemoveLife();
+	if (Aegis::AABBHasCollided(player_.GetRect(), brutus_.GetRect()) 
+		|| Aegis::AABBHasCollided(player_.GetRect(), bjorn_.GetRect())) {
+			RemoveLife();
 	}
 
 	for (auto& pellet : pellets_){

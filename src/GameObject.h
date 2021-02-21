@@ -36,7 +36,7 @@ class GameObject
 {
 public:
 	GameObject(float x, float y, float w, float h, Aegis::AABB subtex_rect)
-		:sprite_(Aegis::Texture::Create("assets/textures/tundra-tile-map.png"), subtex_rect)
+		:sprite_(Aegis::Texture::Create("assets/textures/tile_map.png"), subtex_rect)
 	{
 		sprite_.position_ = { x, y };
 	}
@@ -75,7 +75,7 @@ public:
 	Player(int x, int y)
 		:GameObject(x,y,32,32, {0, 96, 32, 32}), queued_movement_(-1, 0)
 	{
-		animation_.SetSfx("assets/audio/bruce-footsteps.ogg");
+		animation_.SetSfx("assets/audio/bruce_footsteps.ogg");
 	}
 	void Update() override;
 	void MoveTo(const Aegis::Vec2 pos) override;
@@ -91,7 +91,7 @@ public:
 	{
 		speed_ = .30f;
 		slides_on_ice_ = false;
-		animation_.SetSfx("assets/audio/brutus-footsteps.ogg"); 
+		animation_.SetSfx("assets/audio/brutus_footsteps.ogg"); 
 	}
 };
 

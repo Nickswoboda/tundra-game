@@ -2,8 +2,8 @@
 
 OptionsScene::OptionsScene()
 {
-	title_font_ = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 64);
-	button_font_ = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 32);
+	title_font_ = Aegis::FontManager::Load("assets/fonts/worksans_regular.ttf", 64);
+	button_font_ = Aegis::FontManager::Load("assets/fonts/worksans_regular.ttf", 32);
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 	ui_layer_->SetFont(button_font_);
@@ -31,7 +31,6 @@ OptionsScene::OptionsScene()
 	vsync_checkbox_->ConnectSignal("checked", [](){Aegis::Application::GetWindow().SetVsync(true);});
 	vsync_checkbox_->ConnectSignal("unchecked", [](){Aegis::Application::GetWindow().SetVsync(false);});
 
-	vsync_checkbox_->SetTexture(true, Aegis::TextureManager::Load("assets/textures/pressedbtn.png"));
 	auto back_button_ = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 600, 200, 32 ), "Back");
 	back_button_->ConnectSignal("pressed", [&](){manager_->PopScene();});
 }

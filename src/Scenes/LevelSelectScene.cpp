@@ -6,8 +6,8 @@
 #include <filesystem>
 LevelSelectScene::LevelSelectScene()
 {
-	title_font_ = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 64);
-	button_font_ = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 32);
+	title_font_ = Aegis::FontManager::Load("assets/fonts/worksans_regular.ttf", 64);
+	button_font_ = Aegis::FontManager::Load("assets/fonts/worksans_regular.ttf", 32);
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 	ui_layer_->SetFont(button_font_);
@@ -25,7 +25,7 @@ LevelSelectScene::LevelSelectScene()
 	int level = 1;
 	int x_pos = 500;
 	int y_pos = 200;
-	while (std::filesystem::exists("assets/levels/level" + std::to_string(level) + ".txt")){
+	while (std::filesystem::exists("assets/levels/level_" + std::to_string(level) + ".txt")){
 		auto button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB(x_pos, y_pos, 64, 64), std::to_string(level));
 		button->ConnectSignal("pressed", [&, level]() { selected_level_ = level;});
 		button->ConnectSignal("double pressed", [&, level]() {manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(level)));});

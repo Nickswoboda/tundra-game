@@ -9,15 +9,15 @@
 LevelEditorScene::LevelEditorScene(int level)
 	:level_num_(level)                  
 {
-	font_ = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 24);
-	auto tex_atlas = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
+	font_ = Aegis::FontManager::Load("assets/fonts/worksans_regular.ttf", 24);
+	auto tex_atlas = Aegis::TextureManager::Load("assets/textures/tile_map.png");
 
 	if (level == -1){
 		//create empty level
 		tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas); 
 	}
 	else{
-		tile_map_ = std::make_unique<TileMap>("assets/levels/level" + std::to_string(level) + ".txt", 32, tex_atlas);
+		tile_map_ = std::make_unique<TileMap>("assets/levels/level_" + std::to_string(level) + ".txt", 32, tex_atlas);
 	}
 
 	bruce_sprite_ = Aegis::Sprite(tex_atlas, { 0, 96, 32, 32 });
@@ -31,7 +31,7 @@ LevelEditorScene::LevelEditorScene(int level)
 	camera_.SetPosition({-270, -24});
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>(); 
-	auto ui_font = Aegis::FontManager::Load("assets/fonts/WorkSans-Regular.ttf", 20);
+	auto ui_font = Aegis::FontManager::Load("assets/fonts/worksans_regular.ttf", 20);
 	ui_layer_->SetFont(ui_font);
 	
 	auto ground_tile_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 40, 70, 64, 64 ), "Ground");  

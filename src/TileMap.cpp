@@ -174,15 +174,15 @@ Aegis::Vec2 TileMap::GetGridIndexByPos(const Aegis::Vec2& pos) const
 
 void TileMap::Save(int level_num)
 {
-	std::string new_file_path = "assets/levels/level" + std::to_string(level_num) + ".txt";
+	std::string new_file_path = "assets/levels/level_" + std::to_string(level_num) + ".txt";
 
 	if (level_num == -1){
 		level_num = 1;
-		new_file_path = "assets/levels/level" + std::to_string(level_num) + ".txt";
+		new_file_path = "assets/levels/level_" + std::to_string(level_num) + ".txt";
 
 		while (std::filesystem::exists(new_file_path)) {
 			++level_num;
-			new_file_path = "assets/levels/level" + std::to_string(level_num) + ".txt";
+			new_file_path = "assets/levels/level_" + std::to_string(level_num) + ".txt";
 		}
 	}
 
