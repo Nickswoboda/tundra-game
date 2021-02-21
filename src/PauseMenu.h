@@ -7,7 +7,7 @@ class PauseMenu : public Aegis::Widget
 public:
 	PauseMenu(Aegis::AABB rect);
 	void OnEvent(Aegis::Event& event) override;
-	void Render() override;
+	void Render() const override;
 
 	std::shared_ptr<Aegis::Container> v_box_;
 

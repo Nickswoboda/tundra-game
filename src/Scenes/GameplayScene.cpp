@@ -36,22 +36,28 @@ void GameplayScene::Init()
 	camera_.SetPosition({ -144, -24});
 
 	bg_texture_ = Aegis::TextureManager::Load("assets/textures/tundra-bg-frame.png");
+	auto sprite_sheet = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 
+	//Scoreboard
 	ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(20, 16), Aegis::TextureManager::Load("assets/textures/score-frame.png"));
-
-	ui_layer_->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(34, 30), Aegis::Vec4(0,0,0,1));
-	
-	auto sprite_sheet = Aegis::TextureManager::Load("assets/textures/tundra-tile-map.png");
+	auto scoreboard_container = ui_layer_->AddContainer({20, 16, 98, 128}, Aegis::Container::Vertical, 4, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
+	auto lives_label = ui_layer_->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(), Aegis::Vec4(0,0,0,1));
+	scoreboard_container->AddWidget(lives_label);
+	auto heart_container = std::shared_ptr<Aegis::Container>(new Aegis::Container({ 0, 0, 98, 26 }, Aegis::Container::Horizontal, 4, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter));
 	for (int i = 0; i < max_lives_; ++i) {
-		heart_widgets_[i] = ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(34 + (i * 20), 54), sprite_sheet, Aegis::AABB(128, 112, 16, 16));
+		heart_widgets_[i] = ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(128, 112, 16, 16));
+		heart_container->AddWidget(heart_widgets_[i]);
 	}
+	scoreboard_container->AddWidget(heart_container);
 
-	ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(49, 74), sprite_sheet, Aegis::AABB(96, 96, 32, 32));
+	auto fish_sprite = ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(96, 96, 32, 32));
 	total_pellets_ = tile_map_->pellet_spawn_indices_.size();
-	pellet_count_label_ = ui_layer_->AddWidget<Aegis::Label>("", Aegis::Vec2( 44, 109 ), Aegis::Vec4(0, 0, 0, 1)); 
+	pellet_count_label_ = ui_layer_->AddWidget<Aegis::Label>("", Aegis::Vec2(), Aegis::Vec4(0, 0, 0, 1)); 
 	UpdatePelletCount();
+	scoreboard_container->AddWidget(fish_sprite);
+	scoreboard_container->AddWidget(pellet_count_label_);
 
 	countdown_.Start(2500);
 	countdown_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string((int)countdown_.GetRemainingInSeconds() + 1), Aegis::Vec2(600, 300), Aegis::Vec4(0.0f,0.0f, 0.0f, 1.0f));
