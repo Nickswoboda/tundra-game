@@ -1,5 +1,6 @@
 #include "GameplayScene.h"
 #include "OptionsScene.h"
+#include "LevelSelectScene.h"
 
 #include <fstream>
 #include <iostream>
@@ -11,7 +12,7 @@ GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
 	Init();
 }
 GameplayScene::GameplayScene(int level)
-	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0)
+	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0), level_(level)
 {
 	auto atlas = Aegis::TextureManager::Load("assets/textures/tile_map.png");
 	std::string level_file = "assets/levels/level_" + std::to_string(level) + ".txt";
@@ -25,8 +26,21 @@ GameplayScene::~GameplayScene()
 	Aegis::AudioPlayer::StopSound(bg_music_);
 }
 
+int GetNumLevels()
+{
+	int levels = 0;
+	std::string level_file = "assets/levels/level_" + std::to_string(levels+1) + ".txt";
+	while (std::filesystem::exists(level_file)) {
+		++levels;
+		level_file = "assets/levels/level_" + std::to_string(levels+1) + ".txt";
+	}
+	
+	return levels;
+}
+
 void GameplayScene::Init()
 {
+	num_levels_ = GetNumLevels();
 	bg_music_ = Aegis::AudioPlayer::LoadSound("assets/audio/gameplay_bgm.ogg", true, true);
 	fish_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/fish_collect.ogg");
 	death_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/death.ogg");
@@ -64,10 +78,22 @@ void GameplayScene::Init()
 	pause_menu_->options_button_->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene())); });
 	pause_menu_->quit_button_->ConnectSignal("pressed", [&]() {manager_->PopScene(); });
 
-	dialog_ = ui_layer_->AddWidget<Aegis::Dialog>("You lose. Try Again?", Aegis::Vec2(400, 200), Aegis::Vec2(300, 300));
-	dialog_->ConnectSignal("accepted", [&](){SetUpLevel(); dialog_->visible_ = false;});
-	dialog_->ConnectSignal("rejected", [&](){manager_->PopScene();});
-	dialog_->visible_ = false;
+	game_over_dialog_ = ui_layer_->AddWidget<Aegis::Dialog>("You lose. Try Again?", Aegis::AABB(400, 200, 300, 300));
+	game_over_dialog_->ConnectSignal("accepted", [&](){SetUpLevel();});
+	game_over_dialog_->ConnectSignal("rejected", [&](){manager_->PopScene();});
+
+	level_complete_dialog_ = ui_layer_->AddWidget<Aegis::Dialog>("Congratulations, you won!", Aegis::AABB(400, 200, 300, 300));
+	level_complete_dialog_->ConnectSignal("accepted", [&]() {manager_->ReplaceScene(std::make_unique<GameplayScene>(level_+1));});
+	level_complete_dialog_->ConnectSignal("rejected", [&]() {manager_->PopScene(); });
+	level_complete_dialog_->accept_button_->text_ = "Next Level";
+	level_complete_dialog_->reject_button_->text_ = "Main Menu";
+
+	game_complete_dialog_ = ui_layer_->AddWidget<Aegis::Dialog>("Congratulations! You beat the game!", Aegis::AABB(400, 200, 300, 300));
+	game_complete_dialog_->ConnectSignal("accepted", [&]() {manager_->ReplaceScene(std::make_unique<LevelSelectScene>()); });
+	game_complete_dialog_->ConnectSignal("rejected", [&]() {manager_->PopScene(); });
+	game_complete_dialog_->accept_button_->text_ = "Level Select";
+	game_complete_dialog_->reject_button_->text_ = "Main Menu";
+
 	SetUpLevel();
 
 	for (auto& pos : tile_map_->pellet_spawn_indices_){
@@ -86,7 +112,6 @@ void GameplayScene::Update()
 
 		if (countdown_.stopped_){
 			countdown_label_->visible_ = false;
-			paused_ = false;
 		}
 		return;
 	}
@@ -118,8 +143,14 @@ void GameplayScene::Update()
 			UpdatePelletCount();
 
 			if (pellets_collected_ == total_pellets_){
-				player_.animation_.playing_ = false;
+				paused_ = true;
 				Aegis::AudioPlayer::PlaySound(level_complete_sfx_);
+				if (level_ == num_levels_) {
+					game_complete_dialog_->visible_ = true;
+				}
+				else {
+					level_complete_dialog_->visible_ = true;
+				}
 			}
 		}
 	}
@@ -320,6 +351,7 @@ void GameplayScene::SetUpLevel()
 
 	pellets_collected_ = 0;
 	UpdatePelletCount();
+	paused_ = false;
 }
 
 void GameplayScene::RemoveLife()
@@ -328,7 +360,7 @@ void GameplayScene::RemoveLife()
 
 	heart_widgets_[num_lives_]->sprite_.SetSubTextureRect({ 128, 96, 16, 16 });
 	if (num_lives_ == 0) {
-		dialog_->visible_ = true;
+		game_over_dialog_->visible_ = true;
 		paused_ = true;
 		Aegis::AudioPlayer::PlaySound(game_over_sfx_);
 		return;

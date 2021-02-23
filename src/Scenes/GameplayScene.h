@@ -40,6 +40,9 @@ public:
 	Player player_;
 	Brutus brutus_;
 	Bjorn bjorn_;
+
+	int level_ = 0;
+	int num_levels_ = 0;
 	std::shared_ptr<TileMap> tile_map_;
 	std::shared_ptr<Aegis::Texture> bg_texture_;
 	std::vector<Pellet> pellets_;
@@ -52,7 +55,10 @@ public:
 	std::shared_ptr<Aegis::Label> pellet_count_label_;
 	Aegis::Timer countdown_;
 	std::shared_ptr<Aegis::Label> countdown_label_;
-	std::shared_ptr<Aegis::Dialog> dialog_;
+
+	std::shared_ptr<Aegis::Dialog> game_over_dialog_;
+	std::shared_ptr<Aegis::Dialog> level_complete_dialog_;
+	std::shared_ptr<Aegis::Dialog> game_complete_dialog_;
 
 	std::shared_ptr<PauseMenu> pause_menu_;
 	bool paused_ = false;
