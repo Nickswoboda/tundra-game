@@ -79,20 +79,17 @@ void GameplayScene::Init()
 	pause_menu_->quit_button_->ConnectSignal("pressed", [&]() {manager_->PopScene(); });
 
 	game_over_dialog_ = ui_layer_->AddWidget<Aegis::Dialog>("You lose. Try Again?", Aegis::AABB(400, 200, 300, 300));
-	game_over_dialog_->ConnectSignal("accepted", [&](){SetUpLevel();});
-	game_over_dialog_->ConnectSignal("rejected", [&](){manager_->PopScene();});
+	game_over_dialog_->AddButton("Retry", [&]() {SetUpLevel(); });
+	game_over_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
 
 	level_complete_dialog_ = ui_layer_->AddWidget<Aegis::Dialog>("Congratulations, you won!", Aegis::AABB(400, 200, 300, 300));
-	level_complete_dialog_->ConnectSignal("accepted", [&]() {manager_->ReplaceScene(std::make_unique<GameplayScene>(level_+1));});
-	level_complete_dialog_->ConnectSignal("rejected", [&]() {manager_->PopScene(); });
-	level_complete_dialog_->accept_button_->text_ = "Next Level";
-	level_complete_dialog_->reject_button_->text_ = "Main Menu";
+	level_complete_dialog_->AddButton("Next Level", [&]() {manager_->ReplaceScene(std::make_unique<GameplayScene>(level_ + 1)); });
+	level_complete_dialog_->AddButton("Replay Level", [&]() {SetUpLevel(); });
+	level_complete_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
 
 	game_complete_dialog_ = ui_layer_->AddWidget<Aegis::Dialog>("Congratulations! You beat the game!", Aegis::AABB(400, 200, 300, 300));
-	game_complete_dialog_->ConnectSignal("accepted", [&]() {manager_->ReplaceScene(std::make_unique<LevelSelectScene>()); });
-	game_complete_dialog_->ConnectSignal("rejected", [&]() {manager_->PopScene(); });
-	game_complete_dialog_->accept_button_->text_ = "Level Select";
-	game_complete_dialog_->reject_button_->text_ = "Main Menu";
+	game_complete_dialog_->AddButton("Level Select", [&]() {manager_->ReplaceScene(std::make_unique<LevelSelectScene>()); });
+	game_complete_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
 
 	SetUpLevel();
 
