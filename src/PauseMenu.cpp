@@ -34,6 +34,7 @@ void PauseMenu::Render() const
 
 void PauseMenu::OnEvent(Aegis::Event& event)
 {
+	if (!visible_) return;
 	continue_button_->OnEvent(event);
 	retry_button_->OnEvent(event);
 	options_button_->OnEvent(event);
