@@ -1,6 +1,7 @@
 #include "../GameObject.h"
 #include "../TileMap.h" 
 #include "../PauseMenu.h"
+#include "../ScoreCard.h"
 
 #include <stack>
 #include <memory>
@@ -57,8 +58,8 @@ public:
 	std::shared_ptr<Aegis::Label> countdown_label_;
 
 	std::shared_ptr<Aegis::Dialog> game_over_dialog_;
-	std::shared_ptr<Aegis::Dialog> level_complete_dialog_;
-	std::shared_ptr<Aegis::Dialog> game_complete_dialog_;
+	std::shared_ptr<ScoreCard> level_complete_dialog_;
+	std::shared_ptr<ScoreCard> game_complete_dialog_;
 
 	std::shared_ptr<PauseMenu> pause_menu_;
 	bool paused_ = false;
