@@ -72,7 +72,7 @@ void GameplayScene::Init()
 	auto countdown_font = Aegis::FontManager::Load("assets/fonts/roboto_regular.ttf", 128);
 	countdown_label_->SetFont(countdown_font);
 
-	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(Aegis::AABB{ 400, 400, 400, 400 });
+	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(Aegis::AABB{ 400, 400, 240, 350 });
 	pause_menu_->continue_button_->ConnectSignal("pressed", [&]() {Pause(false); });
 	pause_menu_->retry_button_->ConnectSignal("pressed", [&]() {SetUpLevel(); Pause(false); });
 	pause_menu_->options_button_->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene())); });
@@ -86,7 +86,6 @@ void GameplayScene::Init()
 	level_complete_dialog_->AddButton("Next Level", [&]() {manager_->ReplaceScene(std::make_unique<GameplayScene>(level_ + 1)); });
 	level_complete_dialog_->AddButton("Replay Level", [&]() {SetUpLevel(); });
 	level_complete_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
-	level_complete_dialog_->Show(1.0022, 2);
 
 	game_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations! You beat the game!", Aegis::AABB(400, 200, 300, 300));
 	game_complete_dialog_->AddButton("Level Select", [&]() {manager_->ReplaceScene(std::make_unique<LevelSelectScene>()); });

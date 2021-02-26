@@ -7,11 +7,11 @@ ScoreCard::ScoreCard(const std::string& label, const Aegis::AABB& rect)
 	int y_pos = rect_.pos.y + (rect_.size.y / 3);
 	score_container_ = std::make_unique<Aegis::Container>(Aegis::AABB(x_pos,y_pos,rect_.size.x, rect_.size.y / 3), Aegis::Container::Vertical, 5, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter); 
 	time_label_ = score_container_->AddWidget<Aegis::Label>("", Aegis::Vec2(0,0));
-	auto star_container = score_container_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 100, 50), Aegis::Container::Horizontal, 5, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
+	auto star_container = score_container_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 200, 50), Aegis::Container::Horizontal, 5, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
 
 	auto sprite_sheet = Aegis::TextureManager::Load("assets/textures/tile_map.png");
 	for (int i = 0; i < 3; ++i){
-		star_sprites_[i] = star_container->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(128, 112, 16, 16));
+		star_sprites_[i] = star_container->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(0, 128, 32, 32));
 	}
 }
 
@@ -36,9 +36,9 @@ void ScoreCard::Show(double time, int stars)
 {
 	for (int i = 0; i < 3; ++i){
 		if (i < stars){
-			star_sprites_[i]->sprite_.SetSubTextureRect({128, 112, 16, 16});
+			star_sprites_[i]->sprite_.SetSubTextureRect({0, 128, 32, 32});
 		} else {
-			star_sprites_[i]->sprite_.SetSubTextureRect({128, 96, 16, 16});
+			star_sprites_[i]->sprite_.SetSubTextureRect({32, 128, 32, 32});
 		}
 	}
 	time_label_->SetText(std::to_string(time));
