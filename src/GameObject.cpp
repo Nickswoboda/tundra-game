@@ -69,15 +69,17 @@ void Animation::Update()
 {
 	if (!playing_) return;
 
-	float percentage = current_frame_ / (float)total_frames_;
-	++current_frame_;
-	current_value_ = Aegis::LERP(start_value_, end_value_, percentage);
-	sprite_.position_ = current_value_;
-
-	if (current_value_ == end_value_) {
+	if (current_frame_ == total_frames_) {
+		sprite_.position_ = end_value_;
 		Stop();
 	}
 	else {
+		float percentage = current_frame_ / (float)total_frames_;
+		++current_frame_;
+		current_value_ = Aegis::LERP(start_value_, end_value_, percentage);
+		float eps = 0.05f;
+		sprite_.position_ = Aegis::Vec2(static_cast<int>(current_value_.x + eps), static_cast<int>(current_value_.y + eps));
+
 		int rotations = percentage / percent_to_rotate_at_;
 		if (rotations > current_rotations_) {
 			sprite_.rotation_ = sprite_.rotation_ == 0 ? (sprite_.GetHorizontalFlip() ? 22.5f : -22.5f) : 0;
