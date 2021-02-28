@@ -21,6 +21,12 @@ PauseMenu::PauseMenu(Aegis::AABB rect)
 	quit_button_ = std::make_shared<Aegis::Button>(Aegis::AABB(0, 0, 200, 50), "");
 	quit_button_->SetStateTexture(Aegis::Button::Normal, Aegis::Texture::Create("assets/textures/quit_btn.png"));
 	quit_button_->SetStateTexture(Aegis::Button::Hovered, Aegis::Texture::Create("assets/textures/quit_btn_hovered.png"));
+	
+	auto id = Aegis::AudioPlayer::LoadSound("assets/audio/button_hover.ogg");
+	continue_button_->ConnectSignal("entered", [id](){Aegis::AudioPlayer::PlaySound(id, 40);});
+	retry_button_->ConnectSignal("entered", [id](){Aegis::AudioPlayer::PlaySound(id, 40);});
+	options_button_->ConnectSignal("entered", [id](){Aegis::AudioPlayer::PlaySound(id, 40);});
+	quit_button_->ConnectSignal("entered", [id](){Aegis::AudioPlayer::PlaySound(id, 40);});
 
 	v_box_->AddWidget(continue_button_);
 	v_box_->AddWidget(retry_button_);
