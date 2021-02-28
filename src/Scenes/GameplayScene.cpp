@@ -67,14 +67,15 @@ void GameplayScene::Init()
 	scoreboard_container->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(96, 96, 32, 32));
 	pellet_count_label_ = scoreboard_container->AddWidget<Aegis::Label>(std::to_string(pellets_collected_) + "/" + std::to_string(total_pellets_), Aegis::Vec2(), Aegis::Vec4(0, 0, 0, 1));
 
+	countdown_.ConnectSignal("done", [&]() {countdown_label_->visible_ = false; stopwatch_.Start(); });
 	countdown_.Start(2500);
-	countdown_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string((int)countdown_.GetRemainingInSeconds() + 1), Aegis::Vec2(600, 300), Aegis::Vec4(0.0f,0.0f, 0.0f, 1.0f));
+	countdown_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string((int)countdown_.GetTimeInSeconds() + 1), Aegis::Vec2(600, 300), Aegis::Vec4(0.0f,0.0f, 0.0f, 1.0f));
 	auto countdown_font = Aegis::FontManager::Load("assets/fonts/roboto_regular.ttf", 128);
 	countdown_label_->SetFont(countdown_font);
 
 	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(Aegis::AABB{ 400, 400, 240, 350 });
-	pause_menu_->continue_button_->ConnectSignal("pressed", [&]() {Pause(false); });
-	pause_menu_->retry_button_->ConnectSignal("pressed", [&]() {SetUpLevel(); Pause(false); });
+	pause_menu_->continue_button_->ConnectSignal("pressed", [&]() {Resume(); });
+	pause_menu_->retry_button_->ConnectSignal("pressed", [&]() {SetUpLevel(); Resume(); });
 	pause_menu_->options_button_->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene())); });
 	pause_menu_->quit_button_->ConnectSignal("pressed", [&]() {manager_->PopScene(); });
 
@@ -92,7 +93,6 @@ void GameplayScene::Init()
 	game_complete_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
 
 	SetUpLevel();
-
 	for (auto& pos : tile_map_->pellet_spawn_indices_){
 		pellets_.emplace_back(Pellet((pos.x * 32) + 12, (pos.y * 32) + 12));
 	}
@@ -102,18 +102,14 @@ void GameplayScene::Update()
 {
 	if (paused_) return;
 
-	if (!countdown_.stopped_){
+	if (!countdown_.IsStopped()){
 		countdown_.Update();
 		//countdown + 1 so that it goes from 3, 2, 1 instead of 2, 1, 0
-		countdown_label_->SetText(std::to_string((int)countdown_.GetRemainingInSeconds() + 1));
-
-		if (countdown_.stopped_){
-			countdown_label_->visible_ = false;
-		}
+		countdown_label_->SetText(std::to_string((int)countdown_.GetTimeInSeconds() + 1));
 		return;
 	}
 
-
+	stopwatch_.Update();
 	player_.Update();
 
 	brutus_.Update();
@@ -143,10 +139,10 @@ void GameplayScene::Update()
 				paused_ = true;
 				Aegis::AudioPlayer::PlaySound(level_complete_sfx_);
 				if (level_ == num_levels_) {
-					game_complete_dialog_->visible_ = true;
+					game_complete_dialog_->Show(stopwatch_.GetTimeInSeconds(), 2);
 				}
 				else {
-					level_complete_dialog_->visible_ = true;
+					level_complete_dialog_->Show(stopwatch_.GetTimeInSeconds(), 2);
 				}
 			}
 		}
@@ -160,7 +156,7 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 	if (key_event && (key_event->action_ == AE_BUTTON_PRESS || key_event->action_ == AE_BUTTON_REPEAT)) {
 		auto key = key_event->key_;
 		if (key == AE_KEY_ESCAPE) {
-			Pause(!paused_);
+			Pause();
 		}
 		if (key == AE_KEY_K) {
 			SetUpLevel();
@@ -171,10 +167,20 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 	}
 }
 
-void GameplayScene::Pause(bool pause)
+void GameplayScene::Pause()
 {
-	paused_ = pause;
-	pause_menu_->visible_ = pause;
+	countdown_.Stop();
+	stopwatch_.Stop();
+	paused_ = true;
+	pause_menu_->visible_ = true;
+}
+
+void GameplayScene::Resume()
+{
+	countdown_.Resume();
+	stopwatch_.Start();
+	paused_ = false;
+	pause_menu_->visible_ = false;
 }
 
 void GameplayScene::Render(float delta_time)
@@ -302,6 +308,7 @@ void GameplayScene::ResetObjectPositions()
 
 	countdown_label_->visible_ = true;
 	countdown_.Start(3000);
+	stopwatch_.Stop();
 }
 
 std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesSliding(const Aegis::Vec2& tile) const
@@ -338,6 +345,7 @@ void GameplayScene::SpawnPellets()
 
 void GameplayScene::SetUpLevel()
 {
+	stopwatch_.Restart();
 	ResetObjectPositions();
 	SpawnPellets();
 

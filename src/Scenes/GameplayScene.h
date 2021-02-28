@@ -20,7 +20,8 @@ public:
 	void Render(float delta_time) override;
 	void OnEvent(Aegis::Event& event) override;
 	
-	void Pause(bool pause);
+	void Pause();
+	void Resume();
 
 	void HandlePlayerMovement(int key_code);
 	Aegis::Vec2 GetEnemyTargetPos(GameObject& obj);
@@ -54,6 +55,7 @@ public:
 	int pellets_collected_ = 0;
 	int total_pellets_ = 0;
 	std::shared_ptr<Aegis::Label> pellet_count_label_;
+	Aegis::StopWatch stopwatch_;
 	Aegis::Timer countdown_;
 	std::shared_ptr<Aegis::Label> countdown_label_;
 
