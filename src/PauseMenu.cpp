@@ -9,16 +9,16 @@ PauseMenu::PauseMenu(Aegis::AABB rect)
 	Aegis::CenterAABBVertically(rect_, window_size);
 	v_box_ = std::make_shared<Aegis::Container>(Aegis::AABB(rect_.pos.x, rect_.pos.y + 50, rect_.size.x, rect_.size.y - 50), Aegis::Container::Vertical, 10, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
 
-	continue_button_ = std::make_shared<Aegis::Button>(Aegis::AABB(0,0, 200, 50), "");
+	continue_button_ = std::make_shared<Aegis::Button>(Aegis::AABB(0,0, 200, 50));
 	continue_button_->SetStateTexture(Aegis::Button::Normal, Aegis::Texture::Create("assets/textures/resume_btn.png"));
 	continue_button_->SetStateTexture(Aegis::Button::Hovered, Aegis::Texture::Create("assets/textures/resume_btn_hovered.png"));
-	retry_button_ = std::make_shared<Aegis::Button>(Aegis::AABB(0, 0, 200, 50), "");
+	retry_button_ = std::make_shared<Aegis::Button>(Aegis::AABB(0, 0, 200, 50));
 	retry_button_->SetStateTexture(Aegis::Button::Normal, Aegis::Texture::Create("assets/textures/restart_btn.png"));
 	retry_button_->SetStateTexture(Aegis::Button::Hovered, Aegis::Texture::Create("assets/textures/restart_btn_hovered.png"));
-	options_button_ = std::make_shared<Aegis::Button>(Aegis::AABB(0, 0, 200, 50), "");
+	options_button_ = std::make_shared<Aegis::Button>(Aegis::AABB(0, 0, 200, 50));
 	options_button_->SetStateTexture(Aegis::Button::Normal, Aegis::Texture::Create("assets/textures/options_btn.png"));
 	options_button_->SetStateTexture(Aegis::Button::Hovered, Aegis::Texture::Create("assets/textures/options_btn_hovered.png")); 
-	quit_button_ = std::make_shared<Aegis::Button>(Aegis::AABB(0, 0, 200, 50), "");
+	quit_button_ = std::make_shared<Aegis::Button>(Aegis::AABB(0, 0, 200, 50));
 	quit_button_->SetStateTexture(Aegis::Button::Normal, Aegis::Texture::Create("assets/textures/quit_btn.png"));
 	quit_button_->SetStateTexture(Aegis::Button::Hovered, Aegis::Texture::Create("assets/textures/quit_btn_hovered.png"));
 	

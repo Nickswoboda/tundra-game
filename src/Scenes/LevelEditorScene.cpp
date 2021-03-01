@@ -169,7 +169,7 @@ bool LevelEditorScene::IsLevelValid()
 void LevelEditorScene::PreviewLevel()
 {
 	if (IsLevelValid()){
-		manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(tile_map_)));
+		manager_->PushScene<GameplayScene>(tile_map_);
 	}
 	else{
 		show_error_msg_ = true;

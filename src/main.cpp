@@ -5,6 +5,5 @@ int main()
 {
 	Aegis::Application::CreateWindow("Tundra", 1280, 720, Aegis::WindowFlag_Centered);
 	Aegis::Application::ShowFrameTime(true);
-	Aegis::Application::PushScene(std::unique_ptr<Aegis::Scene>(new MenuScene()));
-	Aegis::Application::Run();
+	Aegis::Application::Start(std::make_unique<MenuScene>());
 }

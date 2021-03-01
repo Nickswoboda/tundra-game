@@ -17,14 +17,14 @@ MenuScene::MenuScene()
 	auto title_texture = Aegis::Texture::Create("assets/textures/title.png");
 	auto title_sprite = v_box_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(0, 50), title_texture);
 
-	auto new_game_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 170, 200, 50 ), "");
-	auto level_select_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 220, 200, 50 ), "");
-	auto options_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 230, 200, 50 ), "");
-	auto exit_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 270, 200, 50 ), "");
+	auto new_game_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 170, 200, 50 ));
+	auto level_select_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 220, 200, 50 ));
+	auto options_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 230, 200, 50 ));
+	auto exit_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 270, 200, 50 ));
 
-	new_game_button->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new GameplayScene(1))); Aegis::AudioPlayer::StopSound(bg_music_); });
-	level_select_button->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new LevelSelectScene()));});
-	options_button->ConnectSignal("pressed", [&]() {manager_->PushScene(std::unique_ptr<Scene>(new OptionsScene()));});
+	new_game_button->ConnectSignal("pressed", [&]() {manager_->PushScene<GameplayScene>(1); Aegis::AudioPlayer::StopSound(bg_music_); });
+	level_select_button->ConnectSignal("pressed", [&]() {manager_->PushScene<LevelSelectScene>();});
+	options_button->ConnectSignal("pressed", [&]() {manager_->PushScene<OptionsScene>();});
 	exit_button->ConnectSignal("pressed", []() { Aegis::Application::Quit();});
 
 	new_game_button->ConnectSignal("entered", [&]() {Aegis::AudioPlayer::PlaySound(button_hover_sfx_, 40); });
