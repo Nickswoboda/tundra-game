@@ -11,6 +11,7 @@ add_executable (Tundra
 	"src/EditCommand.cpp"
 	"src/PauseMenu.cpp"
 	"src/ScoreCard.cpp"
+	"src/GameData.cpp"
 	"src/Scenes/MenuScene.cpp"
 	"src/Scenes/OptionsScene.cpp" 
 	"src/Scenes/GameplayScene.cpp" 

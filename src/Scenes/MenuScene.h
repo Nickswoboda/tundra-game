@@ -4,10 +4,12 @@
 
 #include "../Particle.h"
 
+class GameData;
+
 class MenuScene : public Aegis::Scene
 {
 public:
-	MenuScene();
+	MenuScene(GameData& game_data);
 
 	void Update() override;
 	void Render(float delta_time) override;
@@ -21,4 +23,6 @@ public:
 
 	Aegis::SoundID bg_music_;
 	Aegis::SoundID button_hover_sfx_;
+
+	GameData& game_data_;
 };

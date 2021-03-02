@@ -6,8 +6,8 @@
 #include <iostream>
 #include <fstream>
 
-LevelEditorScene::LevelEditorScene(int level)
-	:level_num_(level)                  
+LevelEditorScene::LevelEditorScene(GameData& game_data, int level)
+	:level_num_(level), game_data_(game_data)
 {
 	font_ = Aegis::FontManager::Load("assets/fonts/worksans_regular.ttf", 24);
 	auto tex_atlas = Aegis::TextureManager::Load("assets/textures/tile_map.png");
@@ -169,7 +169,7 @@ bool LevelEditorScene::IsLevelValid()
 void LevelEditorScene::PreviewLevel()
 {
 	if (IsLevelValid()){
-		manager_->PushScene<GameplayScene>(tile_map_);
+		manager_->PushScene<GameplayScene>(tile_map_, game_data_);
 	}
 	else{
 		show_error_msg_ = true;

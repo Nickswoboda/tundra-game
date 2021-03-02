@@ -6,13 +6,13 @@
 #include <iostream>
 #include <filesystem>
 
-GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map)
-	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0), tile_map_(tile_map)
+GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map, GameData& game_data)
+	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0), tile_map_(tile_map), game_data_(game_data)
 {
 	Init();
 }
-GameplayScene::GameplayScene(int level)
-	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0), level_(level)
+GameplayScene::GameplayScene(int level, GameData& game_data)
+	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0), level_(level), game_data_(game_data)
 {
 	auto atlas = Aegis::TextureManager::Load("assets/textures/tile_map.png");
 	std::string level_file = "assets/levels/level_" + std::to_string(level) + ".txt";
@@ -26,21 +26,8 @@ GameplayScene::~GameplayScene()
 	Aegis::AudioPlayer::StopSound(bg_music_);
 }
 
-int GetNumLevels()
-{
-	int levels = 0;
-	std::string level_file = "assets/levels/level_" + std::to_string(levels+1) + ".txt";
-	while (std::filesystem::exists(level_file)) {
-		++levels;
-		level_file = "assets/levels/level_" + std::to_string(levels+1) + ".txt";
-	}
-	
-	return levels;
-}
-
 void GameplayScene::Init()
 {
-	num_levels_ = GetNumLevels();
 	bg_music_ = Aegis::AudioPlayer::LoadSound("assets/audio/gameplay_bgm.ogg", true, true);
 	fish_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/fish_collect.ogg");
 	death_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/death.ogg");
@@ -84,12 +71,12 @@ void GameplayScene::Init()
 	game_over_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
 
 	level_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations, you won!", Aegis::AABB(400, 200, 300, 300));
-	level_complete_dialog_->AddButton("Next Level", [&]() {manager_->ReplaceScene<GameplayScene>(level_ + 1); });
+	level_complete_dialog_->AddButton("Next Level", [&]() {manager_->ReplaceScene<GameplayScene>(level_ + 1, game_data_); });
 	level_complete_dialog_->AddButton("Replay Level", [&]() {SetUpLevel(); });
 	level_complete_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
 
 	game_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations! You beat the game!", Aegis::AABB(400, 200, 300, 300));
-	game_complete_dialog_->AddButton("Level Select", [&]() {manager_->ReplaceScene<LevelSelectScene>(); });
+	game_complete_dialog_->AddButton("Level Select", [&]() {manager_->ReplaceScene<LevelSelectScene>(game_data_); });
 	game_complete_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
 
 	SetUpLevel();
@@ -138,14 +125,26 @@ void GameplayScene::Update()
 			if (pellets_collected_ == total_pellets_){
 				paused_ = true;
 				Aegis::AudioPlayer::PlaySound(level_complete_sfx_);
-				if (level_ == num_levels_) {
-					game_complete_dialog_->Show(stopwatch_.GetTimeInSeconds(), 2);
+				double completion_time = stopwatch_.GetTimeInSeconds();
+				if (level_ == game_data_.num_levels_) {
+					game_complete_dialog_->Show(completion_time, GetNumStarsEarned(completion_time));
 				}
 				else {
-					level_complete_dialog_->Show(stopwatch_.GetTimeInSeconds(), 2);
+					level_complete_dialog_->Show(completion_time, GetNumStarsEarned(completion_time));
 				}
 			}
 		}
+	}
+}
+
+int GameplayScene::GetNumStarsEarned(double time)
+{
+	if (time <= game_data_.star_thresholds_[level_][0]){
+		return 3;
+	} else if (time <= game_data_.star_thresholds_[level_][1]){
+		return 2;
+	} else {
+		return 1;
 	}
 }
 

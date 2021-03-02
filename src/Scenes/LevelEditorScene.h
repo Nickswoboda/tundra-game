@@ -4,11 +4,13 @@
 
 #include <stack>
 
+class GameData;
+
 class LevelEditorScene : public Aegis::Scene
 {
 public:
 	//-1 indicates that level will be empty
-	LevelEditorScene(int level = -1);
+	LevelEditorScene(GameData& game_data, int level = -1);
 	~LevelEditorScene();
 
 	void Update() override;
@@ -46,5 +48,7 @@ public:
 	std::stack<std::stack<std::shared_ptr<EditCommand>>> edit_stack_;
 
 	int level_num_;
+
+	GameData& game_data_;
 };
 

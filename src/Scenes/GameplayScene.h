@@ -2,6 +2,7 @@
 #include "../TileMap.h" 
 #include "../PauseMenu.h"
 #include "../ScoreCard.h"
+#include "../GameData.h"
 
 #include <stack>
 #include <memory>
@@ -10,8 +11,8 @@ class GameplayScene : public Aegis::Scene
 {
 public:
 
-	GameplayScene(int level);
-	GameplayScene(std::shared_ptr<TileMap> tile_map);
+	GameplayScene(int level, GameData& game_data);
+	GameplayScene(std::shared_ptr<TileMap> tile_map, GameData& game_data);
 	~GameplayScene();
 
 	void Init();
@@ -29,6 +30,7 @@ public:
 	Aegis::Vec2 GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding) const;
 	void SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos);
 	void ResetObjectPositions();
+	int GetNumStarsEarned(double time);
 
 	std::vector<Aegis::Vec2> GetNeighborTilesMoving(const Aegis::Vec2& tile) const;
 	std::vector<Aegis::Vec2> GetNeighborTilesSliding(const Aegis::Vec2& tile) const;
@@ -44,7 +46,6 @@ public:
 	Bjorn bjorn_;
 
 	int level_ = 0;
-	int num_levels_ = 0;
 	std::shared_ptr<TileMap> tile_map_;
 	std::shared_ptr<Aegis::Texture> bg_texture_;
 	std::vector<Pellet> pellets_;
@@ -71,5 +72,7 @@ public:
 	Aegis::SoundID death_sfx_;
 	Aegis::SoundID game_over_sfx_;
 	Aegis::SoundID level_complete_sfx_;
+
+	GameData& game_data_;
 
 };

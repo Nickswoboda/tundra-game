@@ -3,10 +3,12 @@
 #include "src/Aegis.h"
 
 #include <memory>
+
+class GameData;
 class LevelSelectScene : public Aegis::Scene
 {
 public:
-	LevelSelectScene();
+	LevelSelectScene(GameData& game_data);
 	~LevelSelectScene();
 
 	void Update() override;

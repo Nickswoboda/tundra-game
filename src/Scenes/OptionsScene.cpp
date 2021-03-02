@@ -58,7 +58,7 @@ void OptionsScene::OnEvent(Aegis::Event& event)
 void OptionsScene::SetResolution(int x, int y)
 {
 	Aegis::Application::GetWindow().SetResolution(x, y);
-	Aegis::Application::GetWindow().SetSize(x, y);
+	//Aegis::Application::GetWindow().SetSize(x, y);
 	Aegis::Application::GetWindow().CenterOnScreen();
 	manager_->UpdateAllCameraProjections(0, x, y, 0);
 
