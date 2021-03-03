@@ -44,15 +44,17 @@ void GameplayScene::Init()
 
 	//Scoreboard
 	ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(20, 16), Aegis::TextureManager::Load("assets/textures/score_frame.png"));
-	auto scoreboard_container = ui_layer_->AddWidget<Aegis::Container>(Aegis::AABB(20, 16, 98, 128), Aegis::Container::Vertical, 4, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
+	auto scoreboard_container = ui_layer_->AddWidget<Aegis::Container>(Aegis::AABB(20, 16, 98, 140), Aegis::Container::Vertical, 4, Aegis::Alignment::Top | Aegis::Alignment::HCenter);
 	scoreboard_container->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(), Aegis::Vec4(0,0,0,1));
-	auto heart_container = scoreboard_container->AddWidget<Aegis::Container>(Aegis::AABB( 0, 0, 98, 26 ), Aegis::Container::Horizontal, 4, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
+	auto heart_container = scoreboard_container->AddWidget<Aegis::Container>(Aegis::AABB( 0, 0, 98, 20 ), Aegis::Container::Horizontal, 4, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
 	for (int i = 0; i < max_lives_; ++i) {
 		heart_widgets_[i] = heart_container->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(128, 112, 16, 16));
 	}
 	total_pellets_ = tile_map_->pellet_spawn_indices_.size();
 	scoreboard_container->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(96, 96, 32, 32));
 	pellet_count_label_ = scoreboard_container->AddWidget<Aegis::Label>(std::to_string(pellets_collected_) + "/" + std::to_string(total_pellets_), Aegis::Vec2(), Aegis::Vec4(0, 0, 0, 1));
+	scoreboard_container->AddWidget<Aegis::Label>("Time:", Aegis::Vec2(), Aegis::Vec4(0,0,0,1));
+	stopwatch_label_ = scoreboard_container->AddWidget<Aegis::Label>(FormatTime(stopwatch_.GetTimeInSeconds()), Aegis::Vec2(), Aegis::Vec4(0,0,0,1));
 
 	countdown_.ConnectSignal("done", [&]() {countdown_label_->visible_ = false; stopwatch_.Start(); });
 	countdown_.Start(2500);
@@ -70,12 +72,12 @@ void GameplayScene::Init()
 	game_over_dialog_->AddButton("Retry", [&]() {SetUpLevel(); });
 	game_over_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
 
-	level_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations, you won!", Aegis::AABB(400, 200, 300, 300));
+	level_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations, you won!", Aegis::AABB(400, 200, 300, 300), game_data_.star_thresholds_[level_-1]);
 	level_complete_dialog_->AddButton("Next Level", [&]() {manager_->ReplaceScene<GameplayScene>(level_ + 1, game_data_); });
 	level_complete_dialog_->AddButton("Replay Level", [&]() {SetUpLevel(); });
 	level_complete_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
 
-	game_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations! You beat the game!", Aegis::AABB(400, 200, 300, 300));
+	game_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations! You beat the game!", Aegis::AABB(400, 200, 300, 300), game_data_.star_thresholds_[level_-1]);
 	game_complete_dialog_->AddButton("Level Select", [&]() {manager_->ReplaceScene<LevelSelectScene>(game_data_); });
 	game_complete_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
 
@@ -97,6 +99,7 @@ void GameplayScene::Update()
 	}
 
 	stopwatch_.Update();
+	stopwatch_label_->SetText(FormatTime(stopwatch_.GetTimeInSeconds()));
 	player_.Update();
 
 	brutus_.Update();
@@ -119,32 +122,20 @@ void GameplayScene::Update()
 		if (pellet.visible_ && Aegis::AABBHasCollided(player_.GetRect(), pellet.GetRect())) {
 			pellet.visible_ = false;
 			Aegis::AudioPlayer::PlaySound(fish_sfx_, 80);
-			++pellets_collected_; 
 			UpdatePelletCount();
-
+			++pellets_collected_;
 			if (pellets_collected_ == total_pellets_){
 				paused_ = true;
 				Aegis::AudioPlayer::PlaySound(level_complete_sfx_);
 				double completion_time = stopwatch_.GetTimeInSeconds();
 				if (level_ == game_data_.num_levels_) {
-					game_complete_dialog_->Show(completion_time, GetNumStarsEarned(completion_time));
+					game_complete_dialog_->Show(completion_time);
 				}
 				else {
-					level_complete_dialog_->Show(completion_time, GetNumStarsEarned(completion_time));
+					level_complete_dialog_->Show(completion_time);
 				}
 			}
 		}
-	}
-}
-
-int GameplayScene::GetNumStarsEarned(double time)
-{
-	if (time <= game_data_.star_thresholds_[level_][0]){
-		return 3;
-	} else if (time <= game_data_.star_thresholds_[level_][1]){
-		return 2;
-	} else {
-		return 1;
 	}
 }
 

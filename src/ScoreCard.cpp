@@ -1,7 +1,7 @@
 #include "ScoreCard.h"
 
-ScoreCard::ScoreCard(const std::string& label, const Aegis::AABB& rect)
-	:Aegis::Dialog(label, rect)
+ScoreCard::ScoreCard(const std::string& label, const Aegis::AABB& rect, const std::array<double, 2>& star_thresholds)
+	:Aegis::Dialog(label, rect), star_thresholds_(star_thresholds)
 {
 	int x_pos = rect_.pos.x;
 	int y_pos = rect_.pos.y + (rect_.size.y / 3);
@@ -32,17 +32,46 @@ void ScoreCard::OnEvent(Aegis::Event& event)
 	}
 }
 
-void ScoreCard::Show(double time, int stars)
+int ScoreCard::GetNumStarsEarned(double time) const 
 {
+	if (time <= star_thresholds_[0]){
+		return 3;
+	} else if (time <= star_thresholds_[1]){
+		return 2;
+	} else {
+		return 1;
+	}
+}
+
+std::string FormatTime(double time_in_seconds)
+{
+	int num_mins = time_in_seconds / 60;
+	time_in_seconds -= num_mins * 60;
+
+	int num_secs = time_in_seconds;
+	time_in_seconds -= num_secs;
+
+	int num_cs = time_in_seconds * 100;
+
+	auto mins = num_mins >= 10 ? std::to_string(num_mins) : "0" + std::to_string(num_mins);
+	auto secs = num_secs >= 10 ? std::to_string(num_secs) : "0" + std::to_string(num_secs);
+	auto cs = num_cs >= 10 ? std::to_string(num_cs) : "0" + std::to_string(num_cs);
+
+	return mins + ":" + secs + ":" + cs;
+}
+
+void ScoreCard::Show(double time)
+{
+	int num_stars = GetNumStarsEarned(time);
 	for (int i = 0; i < 3; ++i){
-		if (i < stars){
+		if (i < num_stars){
 			star_sprites_[i]->sprite_.SetSubTextureRect({0, 128, 32, 32});
 		} else {
 			star_sprites_[i]->sprite_.SetSubTextureRect({32, 128, 32, 32});
 		}
 	}
-	time_label_->SetText(std::to_string(time));
+
+	time_label_->SetText(FormatTime(time));
 	visible_ = true;
 }
-
 

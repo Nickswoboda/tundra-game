@@ -30,7 +30,6 @@ public:
 	Aegis::Vec2 GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding) const;
 	void SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos);
 	void ResetObjectPositions();
-	int GetNumStarsEarned(double time);
 
 	std::vector<Aegis::Vec2> GetNeighborTilesMoving(const Aegis::Vec2& tile) const;
 	std::vector<Aegis::Vec2> GetNeighborTilesSliding(const Aegis::Vec2& tile) const;
@@ -57,6 +56,7 @@ public:
 	int total_pellets_ = 0;
 	std::shared_ptr<Aegis::Label> pellet_count_label_;
 	Aegis::StopWatch stopwatch_;
+	std::shared_ptr<Aegis::Label> stopwatch_label_;
 	Aegis::Timer countdown_;
 	std::shared_ptr<Aegis::Label> countdown_label_;
 
