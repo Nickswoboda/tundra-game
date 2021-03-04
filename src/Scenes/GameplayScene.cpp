@@ -1,6 +1,7 @@
 #include "GameplayScene.h"
 #include "OptionsScene.h"
 #include "LevelSelectScene.h"
+#include "../InfoDialog.h"
 
 #include <fstream>
 #include <iostream>
@@ -80,6 +81,12 @@ void GameplayScene::Init()
 	game_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations! You beat the game!", Aegis::AABB(400, 200, 300, 300), game_data_.star_thresholds_[level_-1]);
 	game_complete_dialog_->AddButton("Level Select", [&]() {manager_->ReplaceScene<LevelSelectScene>(game_data_); });
 	game_complete_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
+
+	if (game_data_.first_time_playing_) {
+		paused_ = true;
+		info_dialog_ = ui_layer_->AddWidget<InfoDialog>();
+		info_dialog_->close_button_->ConnectSignal("pressed", [&]() { game_data_.first_time_playing_ = false;  Resume(); });
+	}
 
 	SetUpLevel();
 	for (auto& pos : tile_map_->pellet_spawn_indices_){
@@ -171,6 +178,9 @@ void GameplayScene::Resume()
 	stopwatch_.Start();
 	paused_ = false;
 	pause_menu_->visible_ = false;
+	if (info_dialog_) {
+		info_dialog_->visible_ = false;
+	}
 }
 
 void GameplayScene::Render(float delta_time)
