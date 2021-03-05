@@ -5,7 +5,7 @@
 class ScoreCard : public Aegis::Dialog
 {
 public:
-	ScoreCard(const std::string& label, const Aegis::AABB& rect, const std::array<double, 2>& star_thresholds);
+	ScoreCard(const std::string& label, const std::array<double, 2>& star_thresholds);
 
 	void Render() const override;
 	void OnEvent(Aegis::Event& event) override;

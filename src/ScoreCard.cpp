@@ -1,11 +1,13 @@
 #include "ScoreCard.h"
 
-ScoreCard::ScoreCard(const std::string& label, const Aegis::AABB& rect, const std::array<double, 2>& star_thresholds)
-	:Aegis::Dialog(label, rect), star_thresholds_(star_thresholds)
+ScoreCard::ScoreCard(const std::string& label, const std::array<double, 2>& star_thresholds)
+	:Aegis::Dialog(label, {0,0, 400, 400}), star_thresholds_(star_thresholds)
 {
-	int x_pos = rect_.pos.x;
-	int y_pos = rect_.pos.y + (rect_.size.y / 3);
-	score_container_ = std::make_unique<Aegis::Container>(Aegis::AABB(x_pos,y_pos,rect_.size.x, rect_.size.y / 3), Aegis::Container::Vertical, 5, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter); 
+	Aegis::CenterAABB(rect_, Aegis::Application::GetWindow().GetViewport());
+
+	Aegis::Vec2 score_pos = {rect_.pos.x, rect_.pos.y + (rect_.size.y / 3)};
+	Aegis::Vec2 score_size = rect_.size / Aegis::Vec2(1, 3);
+	score_container_ = std::make_unique<Aegis::Container>(Aegis::AABB(score_pos, score_size), Aegis::Container::Vertical, 5, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter); 
 	time_label_ = score_container_->AddWidget<Aegis::Label>("", Aegis::Vec2(0,0));
 	auto star_container = score_container_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 200, 50), Aegis::Container::Horizontal, 5, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
 
