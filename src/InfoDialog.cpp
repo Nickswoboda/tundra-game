@@ -2,45 +2,71 @@
 
 InfoDialog::InfoDialog()
 {
-	rect_ = {50, 50, 600, 400};
-	Aegis::AABB window_size{ 0, 0, Aegis::Application::GetWindow().GetSize().x, Aegis::Application::GetWindow().GetSize().y };
-	Aegis::CenterAABBHorizontally(rect_, window_size);
-	Aegis::CenterAABBVertically(rect_, window_size);
+	rect_ = {0, 0, 800, 600};
+	Aegis::CenterAABB(rect_, Aegis::Application::GetWindow().GetViewport());
 
-	v_box_ = std::make_shared<Aegis::Container>(rect_, Aegis::Container::Vertical, 10, Aegis::Alignment::HCenter);
+	bg_ = Aegis::TextureManager::Load("assets/textures/info_frame.png");
+
+	auto v_box_rect = rect_;
+	v_box_rect.pos.y += 50;
+	v_box_rect.size.y -= 50;
+	v_box_ = std::make_shared<Aegis::Container>(v_box_rect, Aegis::Container::Vertical, 5, Aegis::Alignment::HCenter);
 
 	auto sprite_sheet = Aegis::TextureManager::Load("assets/textures/tile_map.png");
 
-	auto bruce_info = v_box_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, rect_.size.x, 64), Aegis::Container::Horizontal, 32);
+	Aegis::Vec2 info_size = {650, 64};
+	auto bruce_info = v_box_->AddWidget<Aegis::Container>(Aegis::AABB({0,0}, info_size), Aegis::Container::Horizontal, 32);
+	bruce_info->SetAlignment(Aegis::Alignment::VCenter | Aegis::Alignment::Left);
 	auto bruce_sprite = bruce_info->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(0, 96, 32, 32));
-	bruce_sprite->sprite_.scale_ = {2,2};
-	bruce_info->AddWidget<Aegis::Label>("You play as Bruce. Bruce slides on ice.", Aegis::Vec2());
+	auto bruce_text = bruce_info->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 500, 64 ), Aegis::Container::Vertical, 2);
+	bruce_text->SetAlignment(Aegis::Alignment::VCenter);
+	bruce_text->AddWidget<Aegis::Label>("You play as Bruce.", Aegis::Vec2());
+	bruce_text->AddWidget<Aegis::Label>("You are unable to change directions on ice.", Aegis::Vec2());
+	bruce_text->AddWidget<Aegis::Label>("You must use a wall or ground tiles to change directions.", Aegis::Vec2());
 
-	auto bjorn_info = v_box_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, rect_.size.x, 64), Aegis::Container::Horizontal, 32);
-	auto bjorn_sprite = bjorn_info->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(64, 96, 32, 32));
-	bjorn_sprite->sprite_.scale_ = {2,2};
-	bjorn_info->AddWidget<Aegis::Label>("Bjorn predicts your movements but slides on ice.", Aegis::Vec2());
-
-	auto brutus_info = v_box_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, rect_.size.x, 64), Aegis::Container::Horizontal, 32);
-	auto brutus_sprite = brutus_info->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(32, 96, 32, 32));
-	brutus_sprite->sprite_.scale_ = {2,2};
-	brutus_info->AddWidget<Aegis::Label>("Brutus follows you and can change directions on ice.", Aegis::Vec2());
-
-	auto fish_info = v_box_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, rect_.size.x, 64), Aegis::Container::Horizontal, 32);
+	auto fish_info = v_box_->AddWidget<Aegis::Container>(Aegis::AABB({0,0}, info_size), Aegis::Container::Horizontal, 32);
+	fish_info->SetAlignment(Aegis::Alignment::VCenter | Aegis::Alignment::Left);
 	auto fish_sprite = fish_info->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(96, 96, 32, 32));
-	fish_sprite->sprite_.scale_ = { 2,2 };
-	fish_info->AddWidget<Aegis::Label>("Collect all fish to complete the level.", Aegis::Vec2());
+	fish_info->AddWidget<Aegis::Label>("Collect all the fish while avoiding the bears to complete the level.", Aegis::Vec2());
 
-	close_button_ = v_box_->AddWidget<Aegis::Button>(Aegis::AABB(0, 0, 200, 50), "close");
+	auto star_info = v_box_->AddWidget<Aegis::Container>(Aegis::AABB({0,0}, info_size), Aegis::Container::Horizontal, 32);
+	star_info->SetAlignment(Aegis::Alignment::VCenter | Aegis::Alignment::Left);
+	auto star_sprite = star_info->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(0, 128, 32, 32));
+	auto star_text = star_info->AddWidget<Aegis::Container>(Aegis::AABB(0, 0, 505, 64), Aegis::Container::Vertical, 2);
+	star_text->SetAlignment(Aegis::Alignment::VCenter);
+	star_text->AddWidget<Aegis::Label>("Earn stars for each level you complete.", Aegis::Vec2());
+	star_text->AddWidget<Aegis::Label>("The quicker the level is beaten, the more stars earned (up to 3).", Aegis::Vec2());
+
+	auto bjorn_info = v_box_->AddWidget<Aegis::Container>(Aegis::AABB({0,0}, info_size), Aegis::Container::Horizontal, 32);
+	bjorn_info->SetAlignment(Aegis::Alignment::VCenter | Aegis::Alignment::Left);
+	auto bjorn_sprite = bjorn_info->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(64, 96, 32, 32));
+	bjorn_info->AddWidget<Aegis::Label>("Bjorn is quick and predicts your movements but slides on ice.", Aegis::Vec2());
+
+	auto brutus_info = v_box_->AddWidget<Aegis::Container>(Aegis::AABB({0,0}, info_size), Aegis::Container::Horizontal, 32);
+	brutus_info->SetAlignment(Aegis::Alignment::VCenter | Aegis::Alignment::Left);
+	auto brutus_sprite = brutus_info->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(32, 96, 32, 32));
+	brutus_info->AddWidget<Aegis::Label>("Brutus is slower and follows you, but can turn on ice.", Aegis::Vec2());
+
+
+	Aegis::AABB button_rect = {0, rect_.pos.y + rect_.size.y - 96, 200, 50};
+	Aegis::CenterAABBHorizontally(button_rect, rect_);
+	close_button_ = std::make_shared<Aegis::Button>(button_rect);
+	close_button_->SetStateTexture(Aegis::Button::Normal, Aegis::Texture::Create("assets/textures/close_btn.png"));
+	close_button_->SetStateTexture(Aegis::Button::Hovered, Aegis::Texture::Create("assets/textures/close_btn_hovered.png"));
+
+	auto id = Aegis::AudioPlayer::LoadSound("assets/audio/button_hover.ogg");
+	close_button_->ConnectSignal("entered", [id](){Aegis::AudioPlayer::PlaySound(id, 40);});
 }
 
 void InfoDialog::Render() const
 {
-	Aegis::DrawQuad(rect_.pos, rect_.size, Aegis::Vec4 {0, 0, 1, 1});
+	Aegis::DrawQuad(rect_.pos, *bg_);
 	v_box_->Render();
+	close_button_->Render();
 }
 
 void InfoDialog::OnEvent(Aegis::Event& event)
 {
 	v_box_->OnEvent(event);
+	close_button_->OnEvent(event);
 }

@@ -69,21 +69,22 @@ void GameplayScene::Init()
 	pause_menu_->options_button_->ConnectSignal("pressed", [&]() {manager_->PushScene<OptionsScene>(); });
 	pause_menu_->quit_button_->ConnectSignal("pressed", [&]() {manager_->PopScene(); });
 
-	game_over_dialog_ = ui_layer_->AddWidget<Aegis::Dialog>("You lose. Try Again?", Aegis::AABB(400, 200, 300, 300));
+	Aegis::AABB rect = {0,0, 300, 200};
+	Aegis::CenterAABB(rect, Aegis::Application::GetWindow().GetViewport());
+	game_over_dialog_ = ui_layer_->AddWidget<Aegis::Dialog>("You lose. Try Again?", rect); 
 	game_over_dialog_->AddButton("Retry", [&]() {SetUpLevel(); });
 	game_over_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
 
-	level_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations, you won!", Aegis::AABB(400, 200, 300, 300), game_data_.star_thresholds_[level_-1]);
+	level_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations, you won!", game_data_.star_thresholds_[level_-1]);
 	level_complete_dialog_->AddButton("Next Level", [&]() {manager_->ReplaceScene<GameplayScene>(level_ + 1, game_data_); });
 	level_complete_dialog_->AddButton("Replay Level", [&]() {SetUpLevel(); });
 	level_complete_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
 
-	game_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations! You beat the game!", Aegis::AABB(400, 200, 300, 300), game_data_.star_thresholds_[level_-1]);
+	game_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations! You beat the game!", game_data_.star_thresholds_[level_-1]);
 	game_complete_dialog_->AddButton("Level Select", [&]() {manager_->ReplaceScene<LevelSelectScene>(game_data_); });
 	game_complete_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
 
 	if (game_data_.first_time_playing_) {
-		paused_ = true;
 		info_dialog_ = ui_layer_->AddWidget<InfoDialog>();
 		info_dialog_->close_button_->ConnectSignal("pressed", [&]() { game_data_.first_time_playing_ = false;  Resume(); });
 	}
@@ -356,7 +357,9 @@ void GameplayScene::SetUpLevel()
 
 	pellets_collected_ = 0;
 	UpdatePelletCount();
-	paused_ = false;
+
+	//pause for info dialog;
+	paused_ = game_data_.first_time_playing_;
 }
 
 void GameplayScene::RemoveLife()
