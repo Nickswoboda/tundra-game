@@ -6,4 +6,5 @@ int main()
 	Aegis::Application::ShowFrameTime(true);
 	GameData game_data_;
 	Aegis::Application::Start(std::make_unique<MenuScene>(game_data_));
+	game_data_.Save();
 }
