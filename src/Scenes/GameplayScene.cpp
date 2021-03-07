@@ -2,6 +2,7 @@
 #include "OptionsScene.h"
 #include "LevelSelectScene.h"
 #include "../InfoDialog.h"
+#include "../PathFinding.h"
 
 #include <fstream>
 #include <iostream>
@@ -215,78 +216,21 @@ void GameplayScene::HandlePlayerMovement(int key_code)
 
 	//if already moving, uses target_index to queue up movement
 	if (player_.IsMoving()){
-		player_.MoveTo(GetSlidingTargetTile(player_.target_grid_index_, dir));
+		player_.MoveTo(GetSlidingTargetTile(*tile_map_, player_.target_grid_index_, dir));
 	}
 	else{
-		player_.MoveTo(GetSlidingTargetTile(player_.GetGridIndex(), dir));
+		player_.MoveTo(GetSlidingTargetTile(*tile_map_, player_.GetGridIndex(), dir));
 	}
 }
 
 Aegis::Vec2 GameplayScene::GetEnemyTargetPos(GameObject& obj)
 {
 	if (obj.slides_on_ice_) {
-		return GetTargetTileCoordBFS(obj.GetGridIndex(), player_.target_grid_index_, obj.slides_on_ice_);
+		return GetTargetTileCoordBFS(*tile_map_, obj.GetGridIndex(), player_.target_grid_index_, obj.slides_on_ice_);
 	}
 	else {
-		return GetTargetTileCoordBFS(obj.GetGridIndex(), player_.GetGridIndex(), obj.slides_on_ice_);
+		return GetTargetTileCoordBFS(*tile_map_, obj.GetGridIndex(), player_.GetGridIndex(), obj.slides_on_ice_);
 	}
-}
-
-Aegis::Vec2 GameplayScene::GetSlidingTargetTile(const Aegis::Vec2& start, const Aegis::Vec2& dir) const
-{
-	Aegis::Vec2 pos = start;
-
-	//Check each tile, if ice, go to next tile. If ground, stop, if wall or edge of map, go back one tile
-	pos += dir;
-	const Tile* tile = tile_map_->GetTileByIndex(pos.x, pos.y); 
-	while (tile && tile->is_slippery_){
-		pos += dir;
-		tile = tile_map_->GetTileByIndex(pos.x, pos.y); 
-	}
-	if (!tile || tile->is_solid_){
-		pos -= dir;
-	}
-
-	return Aegis::Vec2(pos.x, pos.y);
-}
-
-
-Aegis::Vec2 GameplayScene::GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool slides) const
-{
-	std::vector<Aegis::Vec2> frontier;
-	frontier.push_back(start);
-
-	std::vector<std::vector<Aegis::Vec2>> parent(tile_map_->grid_size_.x, std::vector<Aegis::Vec2>(tile_map_->grid_size_.y, Aegis::Vec2(-1, -1)));
-	parent[start.x][start.y] = start;
-
-	while (!frontier.empty()) {
-		auto current = frontier[0];
-		frontier.erase(frontier.begin());
-
-		if (current == end) {
-			break;
-		}
-		std::vector<Aegis::Vec2> neighbors = slides ? GetNeighborTilesSliding(current) : GetNeighborTilesMoving(current);
-
-		for (auto& neighbor : neighbors) {
-			//if not already in list
-			if (parent[neighbor.x][neighbor.y].x == -1 ) {
-				frontier.push_back(neighbor);
-				parent[neighbor.x][neighbor.y] = current;
-			}
-		}
-	}
-	//if no path available
-	if (parent[end.x][end.y].x == -1) {
-		std::cout << "Unable to find path BFS";
-		return start;
-	}
-
-	Aegis::Vec2 path_start = end;
-	while (parent[path_start.x][path_start.y] != start) {
-		path_start = parent[path_start.x][path_start.y];
-	}
-	return path_start;
 }
 
 void GameplayScene::SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos)
@@ -312,30 +256,6 @@ void GameplayScene::ResetObjectPositions()
 	stopwatch_.Stop();
 }
 
-std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesSliding(const Aegis::Vec2& tile) const
-{
-	std::vector<Aegis::Vec2> neighbors;
-	neighbors.push_back(GetSlidingTargetTile(tile, {0, -1}));
-	neighbors.push_back(GetSlidingTargetTile(tile, {0, 1}));
-	neighbors.push_back(GetSlidingTargetTile(tile, {-1, 0}));
-	neighbors.push_back(GetSlidingTargetTile(tile, {1, 0}));
-
-	return neighbors;
-}
-
-std::vector<Aegis::Vec2> GameplayScene::GetNeighborTilesMoving(const Aegis::Vec2& tile) const
-{
-	auto adjacent_indices = tile_map_->GetAdjacentTilesIndices(tile);
-
-	std::vector<Aegis::Vec2> neighbors;
-	for (auto index : adjacent_indices){
-		if (!tile_map_->GetTileByIndex(index.x, index.y)->is_solid_){
-			neighbors.push_back(index);
-		}
-	}
-
-	return neighbors;
-}
 
 void GameplayScene::SpawnPellets()
 {

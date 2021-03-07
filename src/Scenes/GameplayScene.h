@@ -25,15 +25,11 @@ public:
 	void Pause();
 	void Resume();
 
+
 	void HandlePlayerMovement(int key_code);
 	Aegis::Vec2 GetEnemyTargetPos(GameObject& obj);
-	Aegis::Vec2 GetSlidingTargetTile(const Aegis::Vec2& start, const Aegis::Vec2& dir) const;
-	Aegis::Vec2 GetTargetTileCoordBFS(const Aegis::Vec2& start, const Aegis::Vec2& end, bool sliding) const;
 	void SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos);
 	void ResetObjectPositions();
-
-	std::vector<Aegis::Vec2> GetNeighborTilesMoving(const Aegis::Vec2& tile) const;
-	std::vector<Aegis::Vec2> GetNeighborTilesSliding(const Aegis::Vec2& tile) const;
 
 	void RemoveLife();
 	void UpdatePelletCount();

@@ -19,15 +19,15 @@ public:
 	void Render() const;
 	void Clear();
 
-	const Tile* GetTileByIndex(int col, int row);
-	const Tile* GetTileByPos(int x_pos, int y_pos);
+	const Tile* GetTileByIndex(int col, int row) const;
+	const Tile* GetTileByPos(int x_pos, int y_pos) const;
 	void SetTile(const Aegis::Vec2 index, const Tile& tile);
 
-	std::vector<Aegis::Vec2> GetAdjacentTilesIndices(Aegis::Vec2 index);
-	std::vector<const Tile*> GetTilesUnderneath(int x, int y, int w, int h);
-	std::vector<const Tile*> GetTilesUnderneath(const Aegis::AABB& rect);
+	std::vector<Aegis::Vec2> GetAdjacentTilesIndices(Aegis::Vec2 index) const;
+	std::vector<const Tile*> GetTilesUnderneath(int x, int y, int w, int h) const;
+	std::vector<const Tile*> GetTilesUnderneath(const Aegis::AABB& rect) const;
 	//TODO: possibly create hash func for Aegis::Vec2
-	std::vector<std::vector<bool>> GetReachableTileIndices(Aegis::Vec2 start_index);
+	std::vector<std::vector<bool>> GetReachableTileIndices(Aegis::Vec2 start_index) const;
 
 	Aegis::Vec2 GetGridIndexByPos(const Aegis::Vec2& pos) const;
 
