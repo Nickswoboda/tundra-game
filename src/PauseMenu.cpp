@@ -1,6 +1,8 @@
 #include "PauseMenu.h"
+#include "Scenes/GameplayScene.h"
+#include "Scenes/OptionsScene.h"
 
-PauseMenu::PauseMenu(Aegis::AABB rect)
+PauseMenu::PauseMenu(Aegis::AABB rect, GameplayScene& scene)
 {
 	bg_texture_ = Aegis::Texture::Create("assets/textures/pause_menu_bg.png");
 	rect_ = rect;
@@ -27,6 +29,11 @@ PauseMenu::PauseMenu(Aegis::AABB rect)
 	retry_button_->ConnectSignal("entered", [id](){Aegis::AudioPlayer::PlaySound(id, 40);});
 	options_button_->ConnectSignal("entered", [id](){Aegis::AudioPlayer::PlaySound(id, 40);});
 	quit_button_->ConnectSignal("entered", [id](){Aegis::AudioPlayer::PlaySound(id, 40);});
+
+	continue_button_->ConnectSignal("pressed", [&]() {scene.Resume(); });
+	retry_button_->ConnectSignal("pressed", [&]() {scene.SetUpLevel(); scene.Resume(); });
+	options_button_->ConnectSignal("pressed", [&]() {scene.manager_->PushScene<OptionsScene>(); });
+	quit_button_->ConnectSignal("pressed", [&]() {scene.manager_->PopScene(); });
 
 	v_box_->AddWidget(continue_button_);
 	v_box_->AddWidget(retry_button_);

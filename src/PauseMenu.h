@@ -1,11 +1,14 @@
 #pragma once 
 
+
 #include "src/Aegis.h"
+
+class GameplayScene;
 
 class PauseMenu : public Aegis::Widget
 {
 public:
-	PauseMenu(Aegis::AABB rect);
+	PauseMenu(Aegis::AABB rect, GameplayScene& scene);
 	void OnEvent(Aegis::Event& event) override;
 	void Render() const override;
 
