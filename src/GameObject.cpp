@@ -12,16 +12,6 @@ void GameObject::MoveTo(const Aegis::Vec2 pos)
 	animation_.Start(pos * TILE_SIZE, speed_, num_tiles);
 }
 
-void Player::MoveTo(const Aegis::Vec2 pos)
-{
-	if (!animation_.playing_){
-		GameObject::MoveTo(pos);
-	}
-	else{
-		queued_movement_ = pos;
-	}
-}
-
 void GameObject::Update()
 {
 	animation_.Update();
@@ -41,6 +31,7 @@ void Player::Update()
 void GameObject::SetPosition(Aegis::Vec2 pos)
 {
 	sprite_.position_ = pos;
+	animation_.Stop();
 }
 
 Aegis::AABB GameObject::GetRect() const

@@ -28,15 +28,12 @@ public:
 	void Pause();
 	void Resume();
 
-	void HandlePlayerMovement(int key_code);
-	Aegis::Vec2 GetEnemyTargetPos(GameObject& obj);
-	void SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos);
+	void MovePlayer(Aegis::Vec2 dir);
 	void ResetObjectPositions();
 
 	void RemoveLife();
-	void UpdatePelletCount();
+	void IncrementPelletCount();
 
-	void SpawnPellets();
 	void SetUpLevel();
 
 	Player player_;

@@ -44,7 +44,7 @@ public:
 	virtual void Update();
 	virtual void Render(float delta_time) const { sprite_.Draw(); }
 	virtual void SetPosition(Aegis::Vec2 pos);
-	virtual void MoveTo(const Aegis::Vec2 pos);
+	void MoveTo(const Aegis::Vec2 pos);
 	bool IsMoving() const { return animation_.playing_;}
 	Aegis::Vec2 GetGridIndex() const {return sprite_.position_ / 32;}
 	Aegis::AABB GetRect() const;
@@ -78,8 +78,6 @@ public:
 		animation_.SetSfx("assets/audio/bruce_footsteps.ogg");
 	}
 	void Update() override;
-	void MoveTo(const Aegis::Vec2 pos) override;
-
 	Aegis::Vec2 queued_movement_;
 };
 

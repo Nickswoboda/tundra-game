@@ -97,14 +97,15 @@ void GameplayScene::Update()
 
 	brutus_.Update();
 	if (!brutus_.IsMoving()){
-		brutus_.MoveTo(GetEnemyTargetPos(brutus_));
+		auto target_pos = GetTargetTileCoordBFS(*tile_map_, brutus_.GetGridIndex(), player_.GetGridIndex(), brutus_.slides_on_ice_);
+		brutus_.MoveTo(target_pos);
 	}
 
 	bjorn_.Update();
 	if (!bjorn_.IsMoving()) {
-		bjorn_.MoveTo(GetEnemyTargetPos(bjorn_));
+		auto target_pos = GetTargetTileCoordBFS(*tile_map_, bjorn_.GetGridIndex(), player_.target_grid_index_, bjorn_.slides_on_ice_);
+		bjorn_.MoveTo(target_pos);
 	}
-
 
 	if (Aegis::AABBHasCollided(player_.GetRect(), brutus_.GetRect()) 
 		|| Aegis::AABBHasCollided(player_.GetRect(), bjorn_.GetRect())) {
@@ -114,20 +115,7 @@ void GameplayScene::Update()
 	for (auto& pellet : pellets_){
 		if (pellet.visible_ && Aegis::AABBHasCollided(player_.GetRect(), pellet.GetRect())) {
 			pellet.visible_ = false;
-			Aegis::AudioPlayer::PlaySound(fish_sfx_, 80);
-			++pellets_collected_;
-			UpdatePelletCount();
-			if (pellets_collected_ == total_pellets_){
-				paused_ = true;
-				Aegis::AudioPlayer::PlaySound(level_complete_sfx_);
-				double completion_time = stopwatch_.GetTimeInSeconds();
-				if (level_ == game_data_.num_levels_) {
-					game_complete_dialog_->Show(completion_time);
-				}
-				else {
-					level_complete_dialog_->Show(completion_time);
-				}
-			}
+			IncrementPelletCount();
 		}
 	}
 }
@@ -137,15 +125,12 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 	auto key_event = dynamic_cast<Aegis::KeyEvent*>(&event);
 
 	if (key_event && (key_event->action_ == AE_BUTTON_PRESS || key_event->action_ == AE_BUTTON_REPEAT)) {
-		auto key = key_event->key_;
-		if (key == AE_KEY_ESCAPE) {
-			Pause();
-		}
-		if (key == AE_KEY_K) {
-			SetUpLevel();
-		}
-		if (key == AE_KEY_UP || key == AE_KEY_DOWN || key == AE_KEY_LEFT || key == AE_KEY_RIGHT) {
-			HandlePlayerMovement(key);
+		switch(key_event->key_){
+			case AE_KEY_ESCAPE: Pause(); break;
+			case AE_KEY_UP: MovePlayer({0, -1}); break;
+			case AE_KEY_DOWN: MovePlayer({0, 1}); break;
+			case AE_KEY_LEFT: MovePlayer({-1, 0}); break;
+			case AE_KEY_RIGHT: MovePlayer({1, 0}); break;
 		}
 	}
 }
@@ -187,78 +172,45 @@ void GameplayScene::Render(float delta_time)
 	bjorn_.Render(delta_time);
 }
 
-void GameplayScene::HandlePlayerMovement(int key_code)
+void GameplayScene::MovePlayer(Aegis::Vec2 dir)
 {
-	Aegis::Vec2 dir;
-	switch (key_code)
-	{
-	case GLFW_KEY_UP: dir = {0, -1};  break;
-	case GLFW_KEY_DOWN: dir = {0, 1}; break;
-	case GLFW_KEY_LEFT: dir = {-1, 0};  break;
-	case GLFW_KEY_RIGHT: dir = {1, 0};  break;
-	}
-
-	//if already moving, uses target_index to queue up movement
 	if (player_.IsMoving()){
-		player_.MoveTo(GetSlidingTargetTile(*tile_map_, player_.target_grid_index_, dir));
+		player_.queued_movement_ = GetSlidingTargetTile(*tile_map_, player_.target_grid_index_, dir);
 	}
 	else{
 		player_.MoveTo(GetSlidingTargetTile(*tile_map_, player_.GetGridIndex(), dir));
 	}
 }
 
-Aegis::Vec2 GameplayScene::GetEnemyTargetPos(GameObject& obj)
-{
-	if (obj.slides_on_ice_) {
-		return GetTargetTileCoordBFS(*tile_map_, obj.GetGridIndex(), player_.target_grid_index_, obj.slides_on_ice_);
-	}
-	else {
-		return GetTargetTileCoordBFS(*tile_map_, obj.GetGridIndex(), player_.GetGridIndex(), obj.slides_on_ice_);
-	}
-}
-
-void GameplayScene::SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos)
-{
-	obj.SetPosition(pos * tile_map_->tile_size_);
-}
-
 void GameplayScene::ResetObjectPositions()
 {
-	SetObjectOnGrid(player_, tile_map_->bruce_spawn_index_);
-	SetObjectOnGrid(brutus_, tile_map_->brutus_spawn_index_);
-	SetObjectOnGrid(bjorn_, tile_map_->bjorn_spawn_index_);
+	player_.SetPosition(tile_map_->bruce_spawn_index_ * tile_map_->tile_size_);
+	brutus_.SetPosition(tile_map_->brutus_spawn_index_ * tile_map_->tile_size_);
+	bjorn_.SetPosition(tile_map_->bjorn_spawn_index_ * tile_map_->tile_size_);
+
 	player_.target_grid_index_ = player_.GetGridIndex();
 	player_.queued_movement_ = {-1, -1};
-	GetEnemyTargetPos(brutus_);
-	GetEnemyTargetPos(bjorn_);
-	player_.animation_.Stop();
-	brutus_.animation_.Stop();
-	bjorn_.animation_.Stop();
 
 	countdown_label_->visible_ = true;
 	countdown_.Start(3000);
 	stopwatch_.Stop();
 }
 
-
-void GameplayScene::SpawnPellets()
+void GameplayScene::SetUpLevel()
 {
+	ResetObjectPositions();
+
+	stopwatch_.Restart();
+
 	for (auto& pellet : pellets_){
 		pellet.visible_ = true;
 	}
-}
 
-void GameplayScene::SetUpLevel()
-{
-	stopwatch_.Restart();
-	ResetObjectPositions();
-	SpawnPellets();
-
-	num_lives_ = 3;
-	score_board_->SetNumLives(num_lives_);
+	num_lives_ = max_lives_;
+	score_board_->SetNumLives(max_lives_);
 
 	pellets_collected_ = 0;
-	UpdatePelletCount();
+	score_board_->SetPelletCount(pellets_collected_, total_pellets_);
 
 	//pause for info dialog;
 	paused_ = game_data_.first_time_playing_;
@@ -269,19 +221,32 @@ void GameplayScene::RemoveLife()
 	--num_lives_;
 
 	score_board_->SetNumLives(num_lives_);
-	if (num_lives_ == 0) {
-		game_over_dialog_->visible_ = true;
-		paused_ = true;
-		Aegis::AudioPlayer::PlaySound(game_over_sfx_);
-		return;
-	}
-	else {
+	if (num_lives_ > 0) {
 		Aegis::AudioPlayer::PlaySound(death_sfx_);
 		ResetObjectPositions();
 	}
+	else {
+		game_over_dialog_->visible_ = true;
+		paused_ = true;
+		Aegis::AudioPlayer::PlaySound(game_over_sfx_);
+	}
 }
 
-void GameplayScene::UpdatePelletCount()
+void GameplayScene::IncrementPelletCount()
 {
+	Aegis::AudioPlayer::PlaySound(fish_sfx_, 80);
+	++pellets_collected_;
 	score_board_->SetPelletCount(pellets_collected_, total_pellets_);
+
+	if (pellets_collected_ == total_pellets_){
+		paused_ = true;
+		Aegis::AudioPlayer::PlaySound(level_complete_sfx_);
+		double completion_time = stopwatch_.GetTimeInSeconds();
+		if (level_ == game_data_.num_levels_) {
+			game_complete_dialog_->Show(completion_time);
+		}
+		else {
+			level_complete_dialog_->Show(completion_time);
+		}
+	}
 }
