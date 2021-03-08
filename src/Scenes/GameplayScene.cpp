@@ -35,40 +35,23 @@ void GameplayScene::Init()
 	death_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/death.ogg");
 	game_over_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/lose.ogg");
 	level_complete_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/level_complete.ogg");
-
 	Aegis::AudioPlayer::PlaySound(bg_music_, 90);
+
 	camera_.SetPosition({ -144, -24});
 
 	bg_texture_ = Aegis::TextureManager::Load("assets/textures/frame_bg.png");
-	auto sprite_sheet = Aegis::TextureManager::Load("assets/textures/tile_map.png");
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 
-	//Scoreboard
-	ui_layer_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(20, 16), Aegis::TextureManager::Load("assets/textures/score_frame.png"));
-	auto scoreboard_container = ui_layer_->AddWidget<Aegis::Container>(Aegis::AABB(20, 16, 98, 140), Aegis::Container::Vertical, 4, Aegis::Alignment::Top | Aegis::Alignment::HCenter);
-	scoreboard_container->AddWidget<Aegis::Label>("Lives:", Aegis::Vec2(), Aegis::Vec4(0,0,0,1));
-	auto heart_container = scoreboard_container->AddWidget<Aegis::Container>(Aegis::AABB( 0, 0, 98, 20 ), Aegis::Container::Horizontal, 4, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
-	for (int i = 0; i < max_lives_; ++i) {
-		heart_widgets_[i] = heart_container->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(128, 112, 16, 16));
-	}
 	total_pellets_ = tile_map_->pellet_spawn_indices_.size();
-	scoreboard_container->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(96, 96, 32, 32));
-	pellet_count_label_ = scoreboard_container->AddWidget<Aegis::Label>(std::to_string(pellets_collected_) + "/" + std::to_string(total_pellets_), Aegis::Vec2(), Aegis::Vec4(0, 0, 0, 1));
-	scoreboard_container->AddWidget<Aegis::Label>("Time:", Aegis::Vec2(), Aegis::Vec4(0,0,0,1));
-	stopwatch_label_ = scoreboard_container->AddWidget<Aegis::Label>(FormatTime(stopwatch_.GetTimeInSeconds()), Aegis::Vec2(), Aegis::Vec4(0,0,0,1));
+	score_board_ = ui_layer_->AddWidget<ScoreBoard>(num_lives_, total_pellets_);
+	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(Aegis::AABB{ 400, 400, 240, 350 }, *this);
 
 	countdown_.ConnectSignal("done", [&]() {countdown_label_->visible_ = false; stopwatch_.Start(); });
 	countdown_.Start(2500);
 	countdown_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string((int)countdown_.GetTimeInSeconds() + 1), Aegis::Vec2(600, 300), Aegis::Vec4(0.0f,0.0f, 0.0f, 1.0f));
 	auto countdown_font = Aegis::FontManager::Load("assets/fonts/roboto_regular.ttf", 128);
 	countdown_label_->SetFont(countdown_font);
-
-	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(Aegis::AABB{ 400, 400, 240, 350 });
-	pause_menu_->continue_button_->ConnectSignal("pressed", [&]() {Resume(); });
-	pause_menu_->retry_button_->ConnectSignal("pressed", [&]() {SetUpLevel(); Resume(); });
-	pause_menu_->options_button_->ConnectSignal("pressed", [&]() {manager_->PushScene<OptionsScene>(); });
-	pause_menu_->quit_button_->ConnectSignal("pressed", [&]() {manager_->PopScene(); });
 
 	Aegis::AABB rect = {0,0, 300, 200};
 	Aegis::CenterAABB(rect, Aegis::Application::GetWindow().GetViewport());
@@ -90,10 +73,11 @@ void GameplayScene::Init()
 		info_dialog_->close_button_->ConnectSignal("pressed", [&]() { game_data_.first_time_playing_ = false;  Resume(); });
 	}
 
-	SetUpLevel();
 	for (auto& pos : tile_map_->pellet_spawn_indices_){
-		pellets_.emplace_back(Pellet((pos.x * 32) + 12, (pos.y * 32) + 12));
+		pellets_.emplace_back((pos.x * 32) + 12, (pos.y * 32) + 12);
 	}
+
+	SetUpLevel();
 }
 
 void GameplayScene::Update()
@@ -108,7 +92,7 @@ void GameplayScene::Update()
 	}
 
 	stopwatch_.Update();
-	stopwatch_label_->SetText(FormatTime(stopwatch_.GetTimeInSeconds()));
+	score_board_->SetTimeLabel(FormatTime(stopwatch_.GetTimeInSeconds()));
 	player_.Update();
 
 	brutus_.Update();
@@ -131,8 +115,8 @@ void GameplayScene::Update()
 		if (pellet.visible_ && Aegis::AABBHasCollided(player_.GetRect(), pellet.GetRect())) {
 			pellet.visible_ = false;
 			Aegis::AudioPlayer::PlaySound(fish_sfx_, 80);
-			UpdatePelletCount();
 			++pellets_collected_;
+			UpdatePelletCount();
 			if (pellets_collected_ == total_pellets_){
 				paused_ = true;
 				Aegis::AudioPlayer::PlaySound(level_complete_sfx_);
@@ -271,9 +255,7 @@ void GameplayScene::SetUpLevel()
 	SpawnPellets();
 
 	num_lives_ = 3;
-	for (auto& heart : heart_widgets_) {
-		heart->sprite_.SetSubTextureRect({ 128, 112, 16, 16 });
-	}
+	score_board_->SetNumLives(num_lives_);
 
 	pellets_collected_ = 0;
 	UpdatePelletCount();
@@ -286,7 +268,7 @@ void GameplayScene::RemoveLife()
 {
 	--num_lives_;
 
-	heart_widgets_[num_lives_]->sprite_.SetSubTextureRect({ 128, 96, 16, 16 });
+	score_board_->SetNumLives(num_lives_);
 	if (num_lives_ == 0) {
 		game_over_dialog_->visible_ = true;
 		paused_ = true;
@@ -301,5 +283,5 @@ void GameplayScene::RemoveLife()
 
 void GameplayScene::UpdatePelletCount()
 {
-	pellet_count_label_->SetText(std::to_string(pellets_collected_) + "/" + std::to_string(total_pellets_));
+	score_board_->SetPelletCount(pellets_collected_, total_pellets_);
 }

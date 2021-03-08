@@ -1,9 +1,12 @@
+#pragma once
+
 #include "../GameObject.h"
 #include "../TileMap.h" 
 #include "../PauseMenu.h"
 #include "../ScoreCard.h"
 #include "../GameData.h"
 #include "../InfoDialog.h"
+#include "../ScoreBoard.h"
 
 #include <stack>
 #include <memory>
@@ -25,7 +28,6 @@ public:
 	void Pause();
 	void Resume();
 
-
 	void HandlePlayerMovement(int key_code);
 	Aegis::Vec2 GetEnemyTargetPos(GameObject& obj);
 	void SetObjectOnGrid(GameObject& obj, const Aegis::Vec2& pos);
@@ -41,19 +43,19 @@ public:
 	Brutus brutus_;
 	Bjorn bjorn_;
 
-	int level_ = 0;
+	//-1 indicates level editor preview
+	int level_ = -1;
 	std::shared_ptr<TileMap> tile_map_;
 	std::shared_ptr<Aegis::Texture> bg_texture_;
 	std::vector<Pellet> pellets_;
 	const int max_lives_ = 3;
 	int num_lives_ = 3;
-	std::array<std::shared_ptr<Aegis::SpriteWidget>, 3> heart_widgets_;
 
+	std::shared_ptr<ScoreBoard> score_board_;
 	int pellets_collected_ = 0;
 	int total_pellets_ = 0;
-	std::shared_ptr<Aegis::Label> pellet_count_label_;
+
 	Aegis::StopWatch stopwatch_;
-	std::shared_ptr<Aegis::Label> stopwatch_label_;
 	Aegis::Timer countdown_;
 	std::shared_ptr<Aegis::Label> countdown_label_;
 
