@@ -30,3 +30,14 @@ void StylizeButton(Aegis::Button& button, int border_size, int font_size)
 	button.ConnectSignal("entered", [hover_sfx]() {Aegis::AudioPlayer::PlaySound(hover_sfx, 40); });
 }
 
+void DrawFrameBorder(const Aegis::AABB& rect)
+{
+	Aegis::Vec4 brown{ 0.61f, 0.39f, 0.20f, 1.0f};
+	Aegis::Vec4 light_brown{0.72f, 0.47f, 0.28f, 1.0f};
+
+	int br_size = 6;
+	int lbr_size = 2;
+
+	Aegis::DrawQuad(rect.pos - Aegis::Vec2(br_size, br_size), rect.size + Aegis::Vec2(br_size*2, br_size*2), brown);
+	Aegis::DrawQuad(rect.pos - Aegis::Vec2(lbr_size, lbr_size), rect.size + Aegis::Vec2(lbr_size * 2, lbr_size * 2), light_brown);
+}
