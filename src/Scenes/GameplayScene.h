@@ -6,6 +6,7 @@
 #include "../ScoreCard.h"
 #include "../GameData.h"
 #include "../InfoDialog.h"
+#include "../GameOverDialog.h"
 #include "../ScoreBoard.h"
 
 #include <stack>
@@ -56,7 +57,7 @@ public:
 	Aegis::Timer countdown_;
 	std::shared_ptr<Aegis::Label> countdown_label_;
 
-	std::shared_ptr<Aegis::Dialog> game_over_dialog_;
+	std::shared_ptr<GameOverDialog> game_over_dialog_;
 	std::shared_ptr<ScoreCard> level_complete_dialog_;
 	std::shared_ptr<ScoreCard> game_complete_dialog_;
 	std::shared_ptr<InfoDialog> info_dialog_;

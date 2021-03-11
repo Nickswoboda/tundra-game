@@ -1,7 +1,6 @@
 #include "GameplayScene.h"
 #include "OptionsScene.h"
 #include "LevelSelectScene.h"
-#include "../InfoDialog.h"
 #include "../PathFinding.h"
 #include "../Utilities.h"
 
@@ -46,7 +45,6 @@ void GameplayScene::Init()
 
 	total_pellets_ = tile_map_->pellet_spawn_indices_.size();
 	score_board_ = ui_layer_->AddWidget<ScoreBoard>(num_lives_, total_pellets_);
-	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(Aegis::AABB{ 400, 400, 240, 350 }, *this);
 
 	countdown_.ConnectSignal("done", [&]() {countdown_label_->visible_ = false; stopwatch_.Start(); });
 	countdown_.Start(2500);
@@ -54,11 +52,9 @@ void GameplayScene::Init()
 	auto countdown_font = Aegis::FontManager::Load("assets/fonts/roboto_regular.ttf", 128);
 	countdown_label_->SetFont(countdown_font);
 
-	Aegis::AABB rect = {0,0, 300, 200};
-	Aegis::CenterAABB(rect, Aegis::Application::GetWindow().GetViewport());
-	game_over_dialog_ = ui_layer_->AddWidget<Aegis::Dialog>("You lose. Try Again?", rect); 
-	game_over_dialog_->AddButton("Retry", [&]() {SetUpLevel(); });
-	game_over_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
+	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(Aegis::AABB{ 400, 400, 240, 350 }, *this);
+
+	game_over_dialog_ = ui_layer_->AddWidget<GameOverDialog>(*this);
 
 	level_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations, you won!", game_data_.star_thresholds_[level_-1]);
 	level_complete_dialog_->AddButton("Next Level", [&]() {manager_->ReplaceScene<GameplayScene>(level_ + 1, game_data_); });
