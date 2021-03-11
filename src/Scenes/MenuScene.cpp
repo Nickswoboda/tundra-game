@@ -4,21 +4,9 @@
 #include "LevelSelectScene.h"
 #include "OptionsScene.h"
 #include "LevelEditorScene.h"
+#include "../Utilities.h"
 
 #include <iostream>
-
-void StylizeButton(Aegis::Button& button, int font_size)
-{
-	button.SetStateBgColor(Aegis::Button::Normal, { 0.37f, 0.5f,  0.72f, 1.0f });
-	button.SetStateBgColor(Aegis::Button::Pressed, { 0.37f, 0.5f,  0.72f, 1.0f });
-	button.SetStateBgColor(Aegis::Button::Hovered, { 0.45f, 0.58f, 0.78f, 1.0f });
-	button.border_size_ = 3;
-
-	button.SetFont(Aegis::FontManager::Load("assets/fonts/roboto_bold.ttf", font_size));
-
-	auto hover_sfx = Aegis::AudioPlayer::LoadSound("assets/audio/button_hover.ogg");
-	button.ConnectSignal("entered", [hover_sfx]() {Aegis::AudioPlayer::PlaySound(hover_sfx, 40); });
-}
 
 MenuScene::MenuScene(GameData& game_data) 
 	:game_data_(game_data)
@@ -36,10 +24,10 @@ MenuScene::MenuScene(GameData& game_data)
 	auto options_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 230, 200, 50 ), "OPTIONS");
 	auto exit_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 270, 200, 50 ), "EXIT");
 
-	StylizeButton(*new_game_button, 32);
-	StylizeButton(*level_select_button, 28);
-	StylizeButton(*options_button, 32);
-	StylizeButton(*exit_button, 32);
+	StylizeButton(*new_game_button, 3, 32);
+	StylizeButton(*level_select_button, 3, 28);
+	StylizeButton(*options_button, 3, 32);
+	StylizeButton(*exit_button, 3, 32);
 
 	new_game_button->ConnectSignal("pressed", [&]() {manager_->PushScene<GameplayScene>(1, game_data_); Aegis::AudioPlayer::StopSound(bg_music_); });
 	level_select_button->ConnectSignal("pressed", [&]() {manager_->PushScene<LevelSelectScene>(game_data_);});

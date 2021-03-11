@@ -3,6 +3,7 @@
 #include "LevelSelectScene.h"
 #include "../InfoDialog.h"
 #include "../PathFinding.h"
+#include "../Utilities.h"
 
 #include <fstream>
 #include <iostream>
