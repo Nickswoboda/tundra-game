@@ -55,15 +55,7 @@ void GameplayScene::Init()
 	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(Aegis::AABB{ 400, 400, 240, 350 }, *this);
 
 	game_over_dialog_ = ui_layer_->AddWidget<GameOverDialog>(*this);
-
-	level_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations, you won!", game_data_.star_thresholds_[level_-1]);
-	level_complete_dialog_->AddButton("Next Level", [&]() {manager_->ReplaceScene<GameplayScene>(level_ + 1, game_data_); });
-	level_complete_dialog_->AddButton("Replay Level", [&]() {SetUpLevel(); });
-	level_complete_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
-
-	game_complete_dialog_ = ui_layer_->AddWidget<ScoreCard>("Congratulations! You beat the game!", game_data_.star_thresholds_[level_-1]);
-	game_complete_dialog_->AddButton("Level Select", [&]() {manager_->ReplaceScene<LevelSelectScene>(game_data_); });
-	game_complete_dialog_->AddButton("Main Menu", [&]() {manager_->PopScene(); });
+	score_dialog_ = ui_layer_->AddWidget<ScoreDialog>(*this);
 
 	if (game_data_.first_time_playing_) {
 		info_dialog_ = ui_layer_->AddWidget<InfoDialog>();
@@ -238,12 +230,6 @@ void GameplayScene::IncrementPelletCount()
 	if (pellets_collected_ == total_pellets_){
 		paused_ = true;
 		Aegis::AudioPlayer::PlaySound(level_complete_sfx_);
-		double completion_time = stopwatch_.GetTimeInSeconds();
-		if (level_ == game_data_.num_levels_) {
-			game_complete_dialog_->Show(completion_time);
-		}
-		else {
-			level_complete_dialog_->Show(completion_time);
-		}
+		score_dialog_->Show(stopwatch_.GetTimeInSeconds());
 	}
 }

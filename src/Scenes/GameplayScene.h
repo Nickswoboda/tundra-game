@@ -3,7 +3,7 @@
 #include "../GameObject.h"
 #include "../TileMap.h" 
 #include "../PauseMenu.h"
-#include "../ScoreCard.h"
+#include "../ScoreDialog.h"
 #include "../GameData.h"
 #include "../InfoDialog.h"
 #include "../GameOverDialog.h"
@@ -58,8 +58,7 @@ public:
 	std::shared_ptr<Aegis::Label> countdown_label_;
 
 	std::shared_ptr<GameOverDialog> game_over_dialog_;
-	std::shared_ptr<ScoreCard> level_complete_dialog_;
-	std::shared_ptr<ScoreCard> game_complete_dialog_;
+	std::shared_ptr<ScoreDialog> score_dialog_;
 	std::shared_ptr<InfoDialog> info_dialog_;
 
 	std::shared_ptr<PauseMenu> pause_menu_;

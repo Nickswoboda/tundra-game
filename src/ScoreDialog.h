@@ -2,10 +2,11 @@
 
 #include "src/Aegis.h"
 
-class ScoreCard : public Aegis::Dialog
+class GameplayScene;
+class ScoreDialog : public Aegis::Dialog
 {
 public:
-	ScoreCard(const std::string& label, const std::array<double, 2>& star_thresholds);
+	ScoreDialog(GameplayScene& scene);
 
 	void Render() const override;
 	void OnEvent(Aegis::Event& event) override;
@@ -13,6 +14,7 @@ public:
 	void Show(double time);
 
 private:
+	void AddButton(const std::string& label, std::function<void()> callback) override;
 	int GetNumStarsEarned(double time_in_seconds) const;
 
 	std::unique_ptr<Aegis::Container> score_container_;
