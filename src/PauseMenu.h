@@ -15,7 +15,7 @@ public:
 	std::shared_ptr<Aegis::Texture> bg_texture_;
 	std::shared_ptr<Aegis::Container> v_box_;
 
-	std::shared_ptr<Aegis::Button> continue_button_;
+	std::shared_ptr<Aegis::Button> resume_button_;
 	std::shared_ptr<Aegis::Button> retry_button_;
 	std::shared_ptr<Aegis::Button> options_button_;
 	std::shared_ptr<Aegis::Button> quit_button_;

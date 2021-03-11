@@ -16,13 +16,10 @@ public:
 	void OnEvent(Aegis::Event& event) override;
 
 	std::shared_ptr<Aegis::Texture> title_background_;
-
 	std::shared_ptr<Aegis::Container> v_box_;
 
 	std::shared_ptr<ParticleEngine> snow_engine_;
 
 	Aegis::SoundID bg_music_;
-	Aegis::SoundID button_hover_sfx_;
-
 	GameData& game_data_;
 };

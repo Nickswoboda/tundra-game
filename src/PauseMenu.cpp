@@ -1,44 +1,31 @@
 #include "PauseMenu.h"
 #include "Scenes/GameplayScene.h"
 #include "Scenes/OptionsScene.h"
+#include "Utilities.h"
 
 PauseMenu::PauseMenu(Aegis::AABB rect, GameplayScene& scene)
 {
 	bg_texture_ = Aegis::Texture::Create("assets/textures/pause_menu_bg.png");
+
 	rect_ = rect;
-	Aegis::AABB window_size{ 0, 0, Aegis::Application::GetWindow().GetSize().x, Aegis::Application::GetWindow().GetSize().y };
-	Aegis::CenterAABBHorizontally(rect_, window_size);
-	Aegis::CenterAABBVertically(rect_, window_size);
+	Aegis::CenterAABB(rect_, Aegis::Application::GetWindow().GetViewport());
+
 	v_box_ = std::make_shared<Aegis::Container>(Aegis::AABB(rect_.pos.x, rect_.pos.y + 50, rect_.size.x, rect_.size.y - 50), Aegis::Container::Vertical, 10, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
 
-	continue_button_ = std::make_shared<Aegis::Button>(Aegis::AABB(0,0, 200, 50));
-	continue_button_->SetStateTexture(Aegis::Button::Normal, Aegis::Texture::Create("assets/textures/resume_btn.png"));
-	continue_button_->SetStateTexture(Aegis::Button::Hovered, Aegis::Texture::Create("assets/textures/resume_btn_hovered.png"));
-	retry_button_ = std::make_shared<Aegis::Button>(Aegis::AABB(0, 0, 200, 50));
-	retry_button_->SetStateTexture(Aegis::Button::Normal, Aegis::Texture::Create("assets/textures/restart_btn.png"));
-	retry_button_->SetStateTexture(Aegis::Button::Hovered, Aegis::Texture::Create("assets/textures/restart_btn_hovered.png"));
-	options_button_ = std::make_shared<Aegis::Button>(Aegis::AABB(0, 0, 200, 50));
-	options_button_->SetStateTexture(Aegis::Button::Normal, Aegis::Texture::Create("assets/textures/options_btn.png"));
-	options_button_->SetStateTexture(Aegis::Button::Hovered, Aegis::Texture::Create("assets/textures/options_btn_hovered.png")); 
-	quit_button_ = std::make_shared<Aegis::Button>(Aegis::AABB(0, 0, 200, 50));
-	quit_button_->SetStateTexture(Aegis::Button::Normal, Aegis::Texture::Create("assets/textures/quit_btn.png"));
-	quit_button_->SetStateTexture(Aegis::Button::Hovered, Aegis::Texture::Create("assets/textures/quit_btn_hovered.png"));
-	
-	auto id = Aegis::AudioPlayer::LoadSound("assets/audio/button_hover.ogg");
-	continue_button_->ConnectSignal("entered", [id](){Aegis::AudioPlayer::PlaySound(id, 40);});
-	retry_button_->ConnectSignal("entered", [id](){Aegis::AudioPlayer::PlaySound(id, 40);});
-	options_button_->ConnectSignal("entered", [id](){Aegis::AudioPlayer::PlaySound(id, 40);});
-	quit_button_->ConnectSignal("entered", [id](){Aegis::AudioPlayer::PlaySound(id, 40);});
+	resume_button_ = v_box_->AddWidget<Aegis::Button>(Aegis::AABB(0, 0, 200, 50), "Resume");
+	retry_button_ = v_box_->AddWidget<Aegis::Button>(Aegis::AABB(0, 0, 200, 50), "Retry");
+	options_button_ = v_box_->AddWidget<Aegis::Button>(Aegis::AABB(0, 0, 200, 50), "Options");
+	quit_button_ = v_box_->AddWidget<Aegis::Button>(Aegis::AABB(0, 0, 200, 50), "Quit");
 
-	continue_button_->ConnectSignal("pressed", [&]() {scene.Resume(); });
+	StylizeButton(*resume_button_, 3, 32);
+	StylizeButton(*retry_button_, 3, 32);
+	StylizeButton(*options_button_, 3, 32);
+	StylizeButton(*quit_button_, 3, 32);
+
+	resume_button_->ConnectSignal("pressed", [&]() {scene.Resume(); });
 	retry_button_->ConnectSignal("pressed", [&]() {scene.SetUpLevel(); scene.Resume(); });
 	options_button_->ConnectSignal("pressed", [&]() {scene.manager_->PushScene<OptionsScene>(); });
 	quit_button_->ConnectSignal("pressed", [&]() {scene.manager_->PopScene(); });
-
-	v_box_->AddWidget(continue_button_);
-	v_box_->AddWidget(retry_button_);
-	v_box_->AddWidget(options_button_);
-	v_box_->AddWidget(quit_button_);
 
 	visible_ = false;
 }
@@ -49,19 +36,12 @@ void PauseMenu::Render() const
 
 	Aegis::DrawQuad(rect_.pos, *bg_texture_);
 	v_box_->Render();
-	continue_button_->Render();
-	retry_button_->Render();
-	options_button_->Render();
-	quit_button_->Render();
 }
 
 void PauseMenu::OnEvent(Aegis::Event& event)
 {
 	if (!visible_) return;
-	continue_button_->OnEvent(event);
-	retry_button_->OnEvent(event);
-	options_button_->OnEvent(event);
-	quit_button_->OnEvent(event);
+	v_box_->OnEvent(event);
 }
 
 

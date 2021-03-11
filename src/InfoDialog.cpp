@@ -1,4 +1,5 @@
 #include "InfoDialog.h"
+#include "Utilities.h"
 
 InfoDialog::InfoDialog()
 {
@@ -50,12 +51,8 @@ InfoDialog::InfoDialog()
 
 	Aegis::AABB button_rect = {0, rect_.pos.y + rect_.size.y - 96, 200, 50};
 	Aegis::CenterAABBHorizontally(button_rect, rect_);
-	close_button_ = std::make_shared<Aegis::Button>(button_rect);
-	close_button_->SetStateTexture(Aegis::Button::Normal, Aegis::Texture::Create("assets/textures/close_btn.png"));
-	close_button_->SetStateTexture(Aegis::Button::Hovered, Aegis::Texture::Create("assets/textures/close_btn_hovered.png"));
-
-	auto id = Aegis::AudioPlayer::LoadSound("assets/audio/button_hover.ogg");
-	close_button_->ConnectSignal("entered", [id](){Aegis::AudioPlayer::PlaySound(id, 40);});
+	close_button_ = std::make_shared<Aegis::Button>(button_rect, "Close");
+	StylizeButton(*close_button_, 3, 32);
 }
 
 void InfoDialog::Render() const
