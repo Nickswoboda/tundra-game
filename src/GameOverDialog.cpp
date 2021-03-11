@@ -15,7 +15,6 @@ GameOverDialog::GameOverDialog(GameplayScene& scene)
 	AddButton("Menu", [&]() {scene.manager_->PopScene(); });
 
 	bg_color_ =  {0.22f, 0.31f, 0.42f, 1.0f};
-	visible_ = true;
 
 	text_->SetFont(Aegis::FontManager::Load("assets/fonts/roboto_regular.ttf", 28));
 	auto text_rect = Aegis::AABB({ 0, 0 }, text_->font_->GetStringPixelSize(text_->GetText()));
