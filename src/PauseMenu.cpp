@@ -40,7 +40,7 @@ void PauseMenu::Render() const
 	if (!visible_) return;
 
 	DrawFrameBorder(rect_);
-	Aegis::DrawQuad(rect_.pos, rect_.size, k_tundra_bg_color);
+	Aegis::DrawQuad(rect_.pos, rect_.size, k_bg_color);
 	v_box_->Render();
 }
 

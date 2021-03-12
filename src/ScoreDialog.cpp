@@ -20,7 +20,7 @@ ScoreDialog::ScoreDialog(GameplayScene& scene)
 	for (int i = 0; i < 3; ++i){
 		star_sprites_[i] = star_container->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(0, 128, 32, 32));
 	}
-	bg_color_ =  {0.22f, 0.31f, 0.42f, 1.0f};
+	bg_color_ =  k_bg_color;
 
 	bool last_level = scene.level_ == scene.game_data_.num_levels_;
 	if (last_level){
