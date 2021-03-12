@@ -85,7 +85,7 @@ void GameData::Load()
 
 	auto first_time = GetOptionValue("first_time");
 
-	first_time_playing_ = first_time.empty() ? true : (first_time != "1"); 
+	first_time_playing_ = first_time.empty() ? true : (first_time == "1"); 
 }
 
 void GameData::Save() const
