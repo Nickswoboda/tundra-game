@@ -52,14 +52,17 @@ void GameplayScene::Init()
 	auto countdown_font = Aegis::FontManager::Load("assets/fonts/roboto_regular.ttf", 128);
 	countdown_label_->SetFont(countdown_font);
 
-	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(Aegis::AABB{ 400, 400, 240, 350 }, *this);
-
+	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(*this);
 	game_over_dialog_ = ui_layer_->AddWidget<GameOverDialog>(*this);
 	score_dialog_ = ui_layer_->AddWidget<ScoreDialog>(*this);
 
 	if (game_data_.first_time_playing_) {
 		info_dialog_ = ui_layer_->AddWidget<InfoDialog>();
-		info_dialog_->close_button_->ConnectSignal("pressed", [&]() { game_data_.first_time_playing_ = false;  Resume(); });
+		info_dialog_->ConnectSignal("closed", [&]() { 
+			if (!pause_menu_->visible_) {
+				game_data_.first_time_playing_ = false;  Resume(); 
+			}
+		});
 	}
 
 	for (auto& pos : tile_map_->pellet_spawn_indices_){
@@ -116,9 +119,13 @@ void GameplayScene::OnEvent(Aegis::Event& event)
 	if (key_event && (key_event->action_ == AE_BUTTON_PRESS || key_event->action_ == AE_BUTTON_REPEAT)) {
 		switch(key_event->key_){
 			case AE_KEY_ESCAPE: Pause(); break;
+			case AE_KEY_W:
 			case AE_KEY_UP: MovePlayer({0, -1}); break;
+			case AE_KEY_S:
 			case AE_KEY_DOWN: MovePlayer({0, 1}); break;
+			case AE_KEY_A:
 			case AE_KEY_LEFT: MovePlayer({-1, 0}); break;
+			case AE_KEY_D:
 			case AE_KEY_RIGHT: MovePlayer({1, 0}); break;
 		}
 	}
@@ -138,9 +145,6 @@ void GameplayScene::Resume()
 	stopwatch_.Start();
 	paused_ = false;
 	pause_menu_->visible_ = false;
-	if (info_dialog_) {
-		info_dialog_->visible_ = false;
-	}
 }
 
 void GameplayScene::Render(float delta_time)

@@ -3,6 +3,7 @@
 
 InfoDialog::InfoDialog()
 {
+	AddSignal("closed");
 	rect_ = {0, 0, 800, 600};
 	Aegis::CenterAABB(rect_, Aegis::Application::GetWindow().GetViewport());
 
@@ -48,10 +49,13 @@ InfoDialog::InfoDialog()
 	auto brutus_sprite = brutus_info->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(32, 96, 32, 32));
 	brutus_info->AddWidget<Aegis::Label>("Brutus is slower and follows you, but can turn on ice.", Aegis::Vec2());
 
+	v_box_->AddWidget<Aegis::Label>("Press the arrow or 'WASD' keys to move.", Aegis::Vec2());
+	v_box_->AddWidget<Aegis::Label>("Press 'ESC' to pause the game.", Aegis::Vec2());
 
 	Aegis::AABB button_rect = {0, rect_.pos.y + rect_.size.y - 96, 200, 50};
 	Aegis::CenterAABBHorizontally(button_rect, rect_);
 	close_button_ = std::make_shared<Aegis::Button>(button_rect, "Close");
+	close_button_->ConnectSignal("pressed", [&]() { visible_ = false; Emit("closed"); });
 	StylizeButton(*close_button_, 3, 32);
 }
 
@@ -64,6 +68,8 @@ void InfoDialog::Render() const
 
 void InfoDialog::OnEvent(Aegis::Event& event)
 {
-	v_box_->OnEvent(event);
-	close_button_->OnEvent(event);
+	if (visible_) {
+		close_button_->OnEvent(event);
+		event.handled_ = true;
+	}
 }
