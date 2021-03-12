@@ -5,12 +5,15 @@
 
 PauseMenu::PauseMenu(GameplayScene& scene)
 {
-	bg_texture_ = Aegis::Texture::Create("assets/textures/pause_menu_bg.png");
-
-	rect_ = { 0, 0, 240, 425 };
+	rect_ = { 0, 0, 240, 400 };
 	Aegis::CenterAABB(rect_, Aegis::Application::GetWindow().GetViewport());
 
-	v_box_ = std::make_shared<Aegis::Container>(Aegis::AABB(rect_.pos.x, rect_.pos.y + 50, rect_.size.x, rect_.size.y - 50), Aegis::Container::Vertical, 10, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
+	v_box_ = std::make_shared<Aegis::Container>(rect_, Aegis::Container::Vertical, 10, Aegis::Alignment::Center);
+	
+	auto label = std::make_shared<Aegis::Label>("PAUSED", Aegis::Vec2());
+	label->SetFont(Aegis::FontManager::Load("assets/fonts/roboto_bold.ttf", 40));
+	v_box_->AddWidget(label);
+
 	auto resume_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB(0, 0, 200, 50), "Resume");
 	auto retry_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB(0, 0, 200, 50), "Retry");
 	auto info_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB(0, 0, 200, 50), "Info");
@@ -36,7 +39,8 @@ void PauseMenu::Render() const
 {
 	if (!visible_) return;
 
-	Aegis::DrawQuad(rect_.pos, *bg_texture_);
+	DrawFrameBorder(rect_);
+	Aegis::DrawQuad(rect_.pos, rect_.size, k_tundra_bg_color);
 	v_box_->Render();
 }
 
