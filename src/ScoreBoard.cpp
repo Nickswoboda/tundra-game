@@ -35,9 +35,9 @@ void ScoreBoard::SetNumLives(int num_lives)
 {
 	for (int i = 0; i < 3; ++i){
 		if (i < num_lives){
-			heart_widgets_[i]->sprite_.SetSubTextureRect({128, 112, 16, 16});
+			heart_widgets_[i]->SetSubTextureRect({128, 112, 16, 16});
 		} else {
-			heart_widgets_[i]->sprite_.SetSubTextureRect({128, 96, 16, 16});
+			heart_widgets_[i]->SetSubTextureRect({128, 96, 16, 16});
 		}
 	}
 }

@@ -74,9 +74,9 @@ void ScoreDialog::Show(double time)
 	int num_stars = GetNumStarsEarned(time);
 	for (int i = 0; i < 3; ++i){
 		if (i < num_stars){
-			star_sprites_[i]->sprite_.SetSubTextureRect({0, 128, 32, 32});
+			star_sprites_[i]->SetSubTextureRect({0, 128, 32, 32});
 		} else {
-			star_sprites_[i]->sprite_.SetSubTextureRect({32, 128, 32, 32});
+			star_sprites_[i]->SetSubTextureRect({32, 128, 32, 32});
 		}
 	}
 

@@ -56,14 +56,12 @@ void GameplayScene::Init()
 	game_over_dialog_ = ui_layer_->AddWidget<GameOverDialog>(*this);
 	score_dialog_ = ui_layer_->AddWidget<ScoreDialog>(*this);
 
-	if (game_data_.first_time_playing_) {
-		info_dialog_ = ui_layer_->AddWidget<InfoDialog>();
-		info_dialog_->ConnectSignal("closed", [&]() { 
-			if (!pause_menu_->visible_) {
-				game_data_.first_time_playing_ = false;  Resume(); 
-			}
-		});
-	}
+	info_dialog_ = ui_layer_->AddWidget<InfoDialog>();
+	info_dialog_->ConnectSignal("closed", [&]() { 
+		if (!pause_menu_->visible_) {
+			game_data_.first_time_playing_ = false;  Resume(); 
+		}
+	});
 
 	for (auto& pos : tile_map_->pellet_spawn_indices_){
 		pellets_.emplace_back((pos.x * 32) + 12, (pos.y * 32) + 12);
