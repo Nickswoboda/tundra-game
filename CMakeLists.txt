@@ -16,6 +16,7 @@ add_executable (Tundra
 	"src/PathFinding.cpp"
 	"src/ScoreBoard.cpp"
 	"src/Utilities.cpp"
+	"src/LevelCard.cpp"
 	"src/GameOverDialog.cpp"
 	"src/Scenes/MenuScene.cpp"
 	"src/Scenes/OptionsScene.cpp" 

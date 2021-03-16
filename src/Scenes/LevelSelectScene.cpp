@@ -2,6 +2,7 @@
 
 #include "GameplayScene.h"
 #include "LevelEditorScene.h"
+#include "../LevelCard.h"
 
 #include <filesystem>
 LevelSelectScene::LevelSelectScene(GameData& game_data)
@@ -22,23 +23,16 @@ LevelSelectScene::LevelSelectScene(GameData& game_data)
 	edit_button->ConnectSignal("pressed", [&]() { if (selected_level_ != -1) manager_->PushScene<LevelEditorScene>(game_data, selected_level_);});
 	create_level_button->ConnectSignal("pressed", [&]() {manager_->PushScene<LevelEditorScene>(game_data);});
 
-	int level = 1;
-	int x_pos = 500;
-	int y_pos = 200;
-	while (std::filesystem::exists("assets/levels/level_" + std::to_string(level) + ".txt")){
-		auto button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB(x_pos, y_pos, 64, 64), std::to_string(level));
-		button->ConnectSignal("pressed", [&, level]() { selected_level_ = level;});
-		button->ConnectSignal("double pressed", [&, level]() {manager_->PushScene<GameplayScene>(level, game_data);});
-		level_buttons_.push_back(button);
-		x_pos += 74;
-
-		//maximum of 4 buttons per row
-		if (level % 4 == 0){
-			x_pos = 500;
-			y_pos += 74;
+	Aegis::AABB rect = {0,0, 600, 600};
+	Aegis::CenterAABB(rect, Aegis::Application::GetWindow().GetViewport());
+	auto level_card_box = ui_layer_->AddWidget<Aegis::Container>(rect, Aegis::Container::Vertical, 16, Aegis::Alignment::HCenter );
+	std::shared_ptr<Aegis::Container> level_row_box;
+	for (int i = 0; i < 16; ++i){
+		if (i % 4 == 0){
+			level_row_box = level_card_box->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 500, 100), Aegis::Container::Horizontal, 16);
 		}
+		auto card = level_row_box->AddWidget<LevelCard>(i+1);
 
-		++level;
 	}
 }
 
