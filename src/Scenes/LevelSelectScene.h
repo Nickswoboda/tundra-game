@@ -18,7 +18,5 @@ public:
 	std::shared_ptr<Aegis::Font> title_font_;
 	std::shared_ptr<Aegis::Font> button_font_;
 
-	std::vector<std::shared_ptr<Aegis::Button>> level_buttons_;
-
 	int selected_level_ = -1;
 };

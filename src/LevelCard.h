@@ -5,7 +5,7 @@
 class LevelCard : public Aegis::Widget
 {
 public:
-	LevelCard(int level);
+	LevelCard(int level, std::array<double, 2> star_thresholds, double fastest_time_);
 
 	void Render() const override;
 	void OnEvent(Aegis::Event& event) override;
@@ -17,5 +17,6 @@ public:
 	int num_stars_earned = 0;
 	double fastest_time_ = 0;
 	double time_needed_for_next_star_ = 0;
+	bool selected_ = false;
 };
 
