@@ -31,7 +31,7 @@ LevelSelectScene::LevelSelectScene(GameData& game_data)
 		if (i % 4 == 0){
 			level_row_box = level_card_box->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 800, 128), Aegis::Container::Horizontal, 16);
 		}
-		auto card = level_row_box->AddWidget<LevelCard>(i+1, game_data.star_thresholds_[0], 3.0);
+		auto card = level_row_box->AddWidget<LevelCard>(i+1, game_data.star_thresholds_[i], game_data.record_times_[i]);
 		card->ConnectSignal("double pressed", [&, level = i+1](){manager_->ReplaceScene<GameplayScene>(level, game_data);});
 		card->ConnectSignal("pressed", [&selected = selected_level_, level = i + 1](){ selected = level;}); 
 	}

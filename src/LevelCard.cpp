@@ -2,25 +2,42 @@
 
 #include "Utilities.h"
 
-LevelCard::LevelCard(int level, std::array<double, 2> star_thresholds, double fastest_time)
+int GetNumStarsEarned(const std::array<double, 2>& star_thresholds, const double time)
+{
+	if (time < 0) return 0;
+
+	if (time <= star_thresholds[0]){
+		return 3;
+	} else if (time <= star_thresholds[1]){
+		return 2;
+	} else {
+		return 1;
+	}
+}
+
+LevelCard::LevelCard(int level, const std::array<double, 2>& star_thresholds, const double fastest_time)
 	:Aegis::Widget({0,0, 160, 128})
 {
 	AddSignal("pressed");
 	AddSignal("double pressed");
-	v_box_ = std::make_shared<Aegis::Container>(rect_, Aegis::Container::Vertical, 4, Aegis::Alignment::HCenter);
+	v_box_ = std::make_shared<Aegis::Container>(rect_, Aegis::Container::Vertical, 4, Aegis::Alignment::Center);
 	auto label = v_box_->AddWidget<Aegis::Label>(std::to_string(level), Aegis::Vec2());
 	label->SetFont(Aegis::FontManager::Load("assets/fonts/roboto_bold.ttf", 24));
 	auto star_container = v_box_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 100, 50), Aegis::Container::Horizontal, 1, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
 	auto sprite_sheet = Aegis::TextureManager::Load("assets/textures/tile_map.png");
 
+	int num_stars_earned = GetNumStarsEarned(star_thresholds, fastest_time);
 	for (int i = 0; i < 3; ++i){
-		auto star = star_container->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(0, 128, 32, 32));
+		auto subtexture_rect = i < num_stars_earned ? Aegis::AABB(0, 128, 32, 32) : Aegis::AABB(32, 128, 32, 32);
+		auto star = star_container->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, subtexture_rect);
 	}
 	
 	auto font = Aegis::FontManager::Load("assets/fonts/roboto_regular.ttf", 14);
 
 	auto label1 = v_box_->AddWidget<Aegis::Label>("Record: " + FormatTime(fastest_time), Aegis::Vec2());
-	auto label2 = v_box_->AddWidget<Aegis::Label>("Next Star: --:--:--", Aegis::Vec2());
+
+	double next_star_time = num_stars_earned == 3 || num_stars_earned == 0 ? -1 : star_thresholds[2 - num_stars_earned];
+	auto label2 = v_box_->AddWidget<Aegis::Label>("Next Star: " + FormatTime(next_star_time), Aegis::Vec2());
 
 	label1->SetFont(font);
 	label2->SetFont(font);

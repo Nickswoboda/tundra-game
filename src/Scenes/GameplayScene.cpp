@@ -232,6 +232,11 @@ void GameplayScene::IncrementPelletCount()
 	if (pellets_collected_ == total_pellets_){
 		paused_ = true;
 		Aegis::AudioPlayer::PlaySound(level_complete_sfx_);
-		score_dialog_->Show(stopwatch_.GetTimeInSeconds());
+		double completion_time = stopwatch_.GetTimeInSeconds();
+		if (game_data_.record_times_[level_-1] < 0 || completion_time < game_data_.record_times_[level_-1]){
+			game_data_.record_times_[level_-1] = completion_time;
+		}
+		score_dialog_->Show(completion_time);
+		
 	}
 }

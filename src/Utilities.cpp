@@ -2,6 +2,8 @@
 
 std::string FormatTime(double time_in_seconds)
 {
+	if (time_in_seconds < 0) return "--:--:--";
+
 	int num_mins = time_in_seconds / 60;
 	time_in_seconds -= num_mins * 60;
 
