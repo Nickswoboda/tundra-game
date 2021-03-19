@@ -15,8 +15,9 @@ public:
 	void Render(float delta_time) override;
 	void OnEvent(Aegis::Event& event) override;
 
-	std::shared_ptr<Aegis::Font> title_font_;
-	std::shared_ptr<Aegis::Font> button_font_;
+	std::shared_ptr<Aegis::Texture> bg_;
+
+	std::shared_ptr<Aegis::Container> v_box_;
 
 	int selected_level_ = -1;
 };
