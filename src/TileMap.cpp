@@ -1,5 +1,7 @@
 #include "TileMap.h"
 
+#include "Utilities.h"
+
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -68,6 +70,7 @@ TileMap::TileMap(int width, int height, int tile_size, std::shared_ptr<Aegis::Te
 
 void TileMap::Render() const
 {
+	DrawFrameBorder({{0,0}, grid_size_ * tile_size_});
 	for (int col = 0; col < tiles_.size(); ++col) {
 		for (int row = 0; row < tiles_[col].size(); ++row) {
 			Aegis::DrawSubTexture({col * 32.0f, row * 32.0f}, tiles_[col][row]->size_, *tiles_[col][row]->texture_, tiles_[col][row]->texture_coords_);

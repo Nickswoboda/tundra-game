@@ -39,7 +39,7 @@ void GameplayScene::Init()
 
 	camera_.SetPosition({ -144, -24});
 
-	bg_texture_ = Aegis::TextureManager::Load("assets/textures/frame_bg.png");
+	bg_texture_ = Aegis::TextureManager::Load("assets/textures/scene_bg.png");
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
 
