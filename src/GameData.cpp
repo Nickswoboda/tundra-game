@@ -81,20 +81,13 @@ std::vector<std::array<double, 2>> GetStarThresholds(int num_levels)
 std::vector<double> GetRecordTimes(int num_levels)
 {
 	auto values = GetOptionValue("record_times");
-	std::vector<double> records;
-	records.resize(num_levels);
+	std::vector<double> records(num_levels, -1);
 
-	if (values.empty()){
-		for (int i = 0; i < num_levels; ++i){
-			records[i] = -1;
-		}
-	} else {
-		int level = 0;
-		std::stringstream input(values);
-		while (input.good() && level < num_levels){
-			input >> records[level];
-			++level;
-		}
+	int level = 0;
+	std::stringstream input(values);
+	while (input.good() && level < num_levels){
+		input >> records[level];
+		++level;
 	}
 
 	return records; 
@@ -103,9 +96,13 @@ void GameData::Load()
 {
 	num_levels_ = GetNumLevels();
 	star_thresholds_ = GetStarThresholds(num_levels_);
+
+	std::string completed = GetOptionValue("levels_completed");
+	levels_completed_ = completed.empty() ? 0 : std::stoi(completed);
+
 	record_times_ = GetRecordTimes(num_levels_);
 
-	auto first_time = GetOptionValue("first_time");
+	std::string first_time = GetOptionValue("first_time");
 	first_time_playing_ = first_time.empty() ? true : (first_time == "1"); 
 }
 
@@ -114,10 +111,15 @@ void GameData::Save() const
 	std::ofstream file("assets/game_data.txt");
 
 	file << "first_time: " << first_time_playing_ << "\n";
+
 	file << "star_thresholds: ";
 	for (auto& level : star_thresholds_) {
 		file << level[0] << " " << level[1] << " ";
 	}
+	file << "\n";
+
+	file << levels_completed_ << "\n";
+
 	file << "record_times: ";
 	for (auto time : record_times_) {
 		file << time << " ";

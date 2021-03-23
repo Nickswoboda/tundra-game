@@ -78,3 +78,34 @@ void LevelCard::SetPos(Aegis::Vec2 pos)
 	rect_.pos = pos;
 	v_box_->SetPos(pos);
 }
+
+LockedLevelCard::LockedLevelCard(int level)
+	: Aegis::Widget({0,0,160, 128})
+{
+	auto text = std::to_string(level);
+	auto font = Aegis::FontManager::Load("assets/fonts/roboto_regular.ttf", 64);
+	Aegis::Vec2 text_size = font->GetStringPixelSize(text);
+
+	auto rect = Aegis::AABB(Aegis::Vec2{0,0}, text_size);
+	Aegis::CenterAABB(rect, rect_);
+	level_label_ = std::make_shared<Aegis::Label>(text, rect.pos, Aegis::Vec4(0.4f, 0.4f, 0.4f, 1.0f));
+	level_label_->SetFont(font);
+}
+
+void LockedLevelCard::Render() const
+{
+	DrawFrameBorder(rect_);
+	DrawQuad(rect_.pos, rect_.size, {0.72f, 0.71f, 0.74f, 1.0f}); 
+	level_label_->Render();
+}
+
+void LockedLevelCard::OnEvent(Aegis::Event& event)
+{
+}
+
+void LockedLevelCard::SetPos(Aegis::Vec2 pos)
+{
+	Aegis::Vec2 offset = pos - rect_.pos;
+	rect_.pos = pos;
+	level_label_->SetPos(level_label_->GetRect().pos + offset);
+}

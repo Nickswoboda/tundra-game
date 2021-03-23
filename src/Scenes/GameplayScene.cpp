@@ -233,6 +233,9 @@ void GameplayScene::IncrementPelletCount()
 		paused_ = true;
 		Aegis::AudioPlayer::PlaySound(level_complete_sfx_);
 		double completion_time = stopwatch_.GetTimeInSeconds();
+		if (level_ > game_data_.levels_completed_){
+			++game_data_.levels_completed_;
+		}
 		if (game_data_.record_times_[level_-1] < 0 || completion_time < game_data_.record_times_[level_-1]){
 			game_data_.record_times_[level_-1] = completion_time;
 		}
