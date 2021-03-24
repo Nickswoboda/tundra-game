@@ -29,7 +29,7 @@ MenuScene::MenuScene(GameData& game_data)
 	StylizeButton(*options_button, 3, 32);
 	StylizeButton(*exit_button, 3, 32);
 
-	new_game_button->ConnectSignal("pressed", [&]() {manager_->PushScene<GameplayScene>(1, game_data_); Aegis::AudioPlayer::StopSound(bg_music_); });
+	new_game_button->ConnectSignal("pressed", [&]() {manager_->PushScene<GameplayScene>(1, false, game_data_); Aegis::AudioPlayer::StopSound(bg_music_); });
 	level_select_button->ConnectSignal("pressed", [&]() {manager_->PushScene<LevelSelectScene>(game_data_);});
 	options_button->ConnectSignal("pressed", [&]() {manager_->PushScene<OptionsScene>();});
 	exit_button->ConnectSignal("pressed", []() { Aegis::Application::Quit();});

@@ -29,7 +29,7 @@ ScoreDialog::ScoreDialog(GameplayScene& scene)
 		AddButton("Main Menu", [&]() {scene.manager_->PopScene(); });
 	} else {
 		text_->SetText("Congratulations! You won!");
-		AddButton("Next Level", [&]() {scene.manager_->ReplaceScene<GameplayScene>(scene.level_ + 1, scene.game_data_); });
+		AddButton("Next Level", [&]() {scene.manager_->ReplaceScene<GameplayScene>(scene.level_ + 1, false, scene.game_data_); });
 		AddButton("Replay Level", [&]() {scene.SetUpLevel(); });
 		AddButton("Main Menu", [&]() {scene.manager_->PopScene(); });
 	}

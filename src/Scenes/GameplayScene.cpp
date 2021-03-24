@@ -13,11 +13,12 @@ GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map, GameData& game_d
 {
 	Init();
 }
-GameplayScene::GameplayScene(int level, GameData& game_data)
+GameplayScene::GameplayScene(int level, bool is_custom, GameData& game_data)
 	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0), level_(level), game_data_(game_data)
 {
 	auto atlas = Aegis::TextureManager::Load("assets/textures/tile_map.png");
-	std::string level_file = "assets/levels/level_" + std::to_string(level) + ".txt";
+	std::string prefix = is_custom ? "assets/levels/custom_level_" : "assets/levels/level_";
+	std::string level_file = prefix + std::to_string(level) + ".txt";
 	tile_map_ = std::make_shared<TileMap>(level_file, 32, atlas);
 
 	Init();
@@ -51,7 +52,7 @@ void GameplayScene::Init()
 	countdown_label_ = ui_layer_->AddWidget<Aegis::Label>(std::to_string((int)countdown_.GetTimeInSeconds() + 1), Aegis::Vec2(600, 300), Aegis::Vec4(0.0f,0.0f, 0.0f, 1.0f));
 	auto countdown_font = Aegis::FontManager::Load("assets/fonts/roboto_regular.ttf", 128);
 	countdown_label_->SetFont(countdown_font);
-
+ 
 	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(*this);
 	game_over_dialog_ = ui_layer_->AddWidget<GameOverDialog>(*this);
 	score_dialog_ = ui_layer_->AddWidget<ScoreDialog>(*this);

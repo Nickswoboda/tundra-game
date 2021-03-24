@@ -8,7 +8,7 @@ class GameData;
 class LevelSelectScene : public Aegis::Scene
 {
 public:
-	LevelSelectScene(GameData& game_data);
+	LevelSelectScene(GameData& game_data, bool show_custom = false);
 	~LevelSelectScene();
 
 	void Update() override;
@@ -20,4 +20,6 @@ public:
 	std::shared_ptr<Aegis::Container> v_box_;
 
 	int selected_level_ = -1;
+private:
+	void CreateLevelCards(GameData& game_data, bool custom);
 };

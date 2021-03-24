@@ -16,7 +16,7 @@ class GameplayScene : public Aegis::Scene
 {
 public:
 
-	GameplayScene(int level, GameData& game_data);
+	GameplayScene(int level, bool is_custom, GameData& game_data);
 	GameplayScene(std::shared_ptr<TileMap> tile_map, GameData& game_data);
 	~GameplayScene();
 

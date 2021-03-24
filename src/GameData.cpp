@@ -38,13 +38,15 @@ std::string GetOptionValue(const std::string& option)
 	return data.substr(data_start, end_pos - data_start);
 }
 
-int GetNumLevels()
+int GetNumLevels(bool custom)
 {
 	int num_levels = 0;
-	std::string level_file = "assets/levels/level_" + std::to_string(num_levels+1) + ".txt";
+
+	std::string prefix = custom ? "assets/levels/custom_level_" : "assets/levels/level_";
+	std::string level_file = prefix + std::to_string(num_levels+1) + ".txt";
 	while (std::filesystem::exists(level_file)) {
 		++num_levels;
-		level_file = "assets/levels/level_" + std::to_string(num_levels+1) + ".txt";
+		level_file = prefix + std::to_string(num_levels+1) + ".txt";
 	}
 
 	return num_levels;
@@ -94,7 +96,8 @@ std::vector<double> GetRecordTimes(int num_levels)
 }
 void GameData::Load()
 {
-	num_levels_ = GetNumLevels();
+	num_levels_ = GetNumLevels(false);
+	num_custom_levels_ = GetNumLevels(true);
 	star_thresholds_ = GetStarThresholds(num_levels_);
 
 	std::string completed = GetOptionValue("levels_completed");

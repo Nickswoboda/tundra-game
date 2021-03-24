@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 
-LevelEditorScene::LevelEditorScene(GameData& game_data, int level)
+LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custom)
 	:level_num_(level), game_data_(game_data)
 {
 	font_ = Aegis::FontManager::Load("assets/fonts/worksans_regular.ttf", 24);
@@ -17,7 +17,8 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level)
 		tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas); 
 	}
 	else{
-		tile_map_ = std::make_unique<TileMap>("assets/levels/level_" + std::to_string(level) + ".txt", 32, tex_atlas);
+		std::string prefix = is_custom ? "assets/levels/custom_level_" : "assets/levels/level_";
+		tile_map_ = std::make_unique<TileMap>(prefix + std::to_string(level) + ".txt", 32, tex_atlas);
 	}
 
 	bruce_sprite_ = Aegis::Sprite(tex_atlas, { 0, 96, 32, 32 });
