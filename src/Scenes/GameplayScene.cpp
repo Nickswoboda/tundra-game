@@ -54,8 +54,10 @@ void GameplayScene::Init()
 	countdown_label_->SetFont(countdown_font);
  
 	pause_menu_ = ui_layer_->AddWidget<PauseMenu>(*this);
-	game_over_dialog_ = ui_layer_->AddWidget<GameOverDialog>(*this);
-	score_dialog_ = ui_layer_->AddWidget<ScoreDialog>(*this);
+	if (level_ != -1){
+		game_over_dialog_ = ui_layer_->AddWidget<GameOverDialog>(*this);
+		score_dialog_ = ui_layer_->AddWidget<ScoreDialog>(*this);
+	}
 
 	info_dialog_ = ui_layer_->AddWidget<InfoDialog>();
 	info_dialog_->ConnectSignal("closed", [&]() { 
@@ -204,8 +206,8 @@ void GameplayScene::SetUpLevel()
 	pellets_collected_ = 0;
 	score_board_->SetPelletCount(pellets_collected_, total_pellets_);
 
-	//pause for info dialog;
-	paused_ = game_data_.first_time_playing_;
+	info_dialog_->visible_ = game_data_.first_time_playing_;
+	paused_ = info_dialog_->visible_;
 }
 
 void GameplayScene::RemoveLife()
@@ -218,9 +220,13 @@ void GameplayScene::RemoveLife()
 		ResetObjectPositions();
 	}
 	else {
-		game_over_dialog_->visible_ = true;
-		paused_ = true;
-		Aegis::AudioPlayer::PlaySound(game_over_sfx_);
+		if (level_ == -1){
+			manager_->PopScene();
+		} else {
+			paused_ = true;
+			Aegis::AudioPlayer::PlaySound(game_over_sfx_);
+			game_over_dialog_->visible_ = true;
+		}
 	}
 }
 
@@ -231,16 +237,20 @@ void GameplayScene::IncrementPelletCount()
 	score_board_->SetPelletCount(pellets_collected_, total_pellets_);
 
 	if (pellets_collected_ == total_pellets_){
-		paused_ = true;
-		Aegis::AudioPlayer::PlaySound(level_complete_sfx_);
-		double completion_time = stopwatch_.GetTimeInSeconds();
-		if (level_ > game_data_.levels_completed_){
-			++game_data_.levels_completed_;
+		if (level_ == -1){
+			manager_->PopScene();
+		} else {
+			paused_ = true;
+			Aegis::AudioPlayer::PlaySound(level_complete_sfx_);
+			double completion_time = stopwatch_.GetTimeInSeconds();
+			if (level_ > game_data_.levels_completed_){
+				++game_data_.levels_completed_;
+			}
+			if (game_data_.record_times_[level_-1] < 0 || completion_time < game_data_.record_times_[level_-1]){
+				game_data_.record_times_[level_-1] = completion_time;
+			}
+			score_dialog_->Show(completion_time);
 		}
-		if (game_data_.record_times_[level_-1] < 0 || completion_time < game_data_.record_times_[level_-1]){
-			game_data_.record_times_[level_-1] = completion_time;
-		}
-		score_dialog_->Show(completion_time);
 		
 	}
 }

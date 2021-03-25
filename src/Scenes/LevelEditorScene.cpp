@@ -1,31 +1,45 @@
 #include "LevelEditorScene.h"
 
 #include "GameplayScene.h"
+#include "LevelSelectScene.h"
 
 #include <filesystem>
 #include <iostream>
 #include <fstream>
 
+Aegis::Vec4 GetFishTextureCoords(const Aegis::Texture& texture)
+{
+	Aegis::AABB subtex_rect = {96, 96, 32, 32};
+	float x1 = subtex_rect.pos.x / texture.size_.x;
+	float y1 = subtex_rect.pos.y / texture.size_.y;
+	float x2 = (subtex_rect.pos.x + subtex_rect.size.x) / texture.size_.x;
+	float y2 = (subtex_rect.pos.y + subtex_rect.size.y) / texture.size_.y;
+	return { x1, y1, x2, y2 };
+}
+
 LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custom)
 	:level_num_(level), game_data_(game_data)
 {
 	font_ = Aegis::FontManager::Load("assets/fonts/worksans_regular.ttf", 24);
-	auto tex_atlas = Aegis::TextureManager::Load("assets/textures/tile_map.png");
+	tex_atlas_ = Aegis::TextureManager::Load("assets/textures/tile_map.png");
+	fish_texture_coords_ = GetFishTextureCoords(*tex_atlas_);
 
 	if (level == -1){
 		//create empty level
-		tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas); 
+		tile_map_ = std::make_unique<TileMap>(31, 21, 32, tex_atlas_); 
 	}
 	else{
 		std::string prefix = is_custom ? "assets/levels/custom_level_" : "assets/levels/level_";
-		tile_map_ = std::make_unique<TileMap>(prefix + std::to_string(level) + ".txt", 32, tex_atlas);
+		tile_map_ = std::make_unique<TileMap>(prefix + std::to_string(level) + ".txt", 32, tex_atlas_);
 	}
 
-	bruce_sprite_ = Aegis::Sprite(tex_atlas, { 0, 96, 32, 32 });
+	fish_indices_ = tile_map_->pellet_spawn_indices_;
+
+	bruce_sprite_ = Aegis::Sprite(tex_atlas_, { 0, 96, 32, 32 });
 	bruce_sprite_.position_ = tile_map_->bruce_spawn_index_ * 32;
-	brutus_sprite_ = Aegis::Sprite(tex_atlas, { 32, 96, 32, 32 });
+	brutus_sprite_ = Aegis::Sprite(tex_atlas_, { 32, 96, 32, 32 });
 	brutus_sprite_.position_ = tile_map_->brutus_spawn_index_ * 32;
-	bjorn_sprite_ = Aegis::Sprite(tex_atlas, { 64, 96, 32, 32 });
+	bjorn_sprite_ = Aegis::Sprite(tex_atlas_, { 64, 96, 32, 32 });
 	bjorn_sprite_.position_ = tile_map_->bjorn_spawn_index_ * 32;
 
 	//used to center tilemap within window
@@ -55,14 +69,14 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custo
 	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 80, 40 ), "Undo");
 	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 80, 40 ), "Reset");
 	undo_button->ConnectSignal("pressed", [&](){Undo();});
-	reset_button->ConnectSignal("pressed", [&, tex_atlas]() {tile_map_->Clear(); });
+	reset_button->ConnectSignal("pressed", [&]() {tile_map_->Clear(); });
 
 	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB(  50, 450, 80, 40  ), "Preview");
 	auto save_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 450, 80, 40 ), "Save");
 	auto back_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 70, 500, 125, 40 ), "Exit");  
 	preview_button->ConnectSignal("pressed", [&](){PreviewLevel();});
 	save_button->ConnectSignal("pressed", [&](){SaveLevel();});
-	back_button->ConnectSignal("pressed", [&](){manager_->PopScene();});
+	back_button->ConnectSignal("pressed", [&](){manager_->ReplaceScene<LevelSelectScene>(game_data, true);});
 }
 
 LevelEditorScene::~LevelEditorScene()
@@ -135,7 +149,10 @@ void LevelEditorScene::Render(float delta_time)
 	bruce_sprite_.Draw();
 	brutus_sprite_.Draw();
 	bjorn_sprite_.Draw();
-	
+
+	for (auto& index : fish_indices_) {
+		Aegis::DrawSubTexture(index * 32, {16, 16}, *tex_atlas_, fish_texture_coords_);
+	}
 	if (show_error_msg_){
 		Aegis::DrawQuad({200, 300}, {675, 55}, {1.0, 1.0, 1.0, 0.8});
 		Aegis::DrawText("Invalid Level.", {400, 300}, {1.0, 0.1, 0.1, 1.0});

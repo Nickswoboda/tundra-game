@@ -38,6 +38,11 @@ public:
 	Aegis::Sprite brutus_sprite_;
 	Aegis::Sprite bruce_sprite_;
 
+	std::shared_ptr<Aegis::Texture> tex_atlas_;
+	Aegis::Vec4 fish_texture_coords_;
+	std::vector<Aegis::Vec2> fish_indices_;
+	
+
 	std::shared_ptr<Aegis::Label> tile_text_;
 	std::shared_ptr<Aegis::Label> spawn_text_;
 
