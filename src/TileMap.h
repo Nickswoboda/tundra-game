@@ -38,7 +38,7 @@ public:
 	Aegis::Vec2 bruce_spawn_index_;
 	Aegis::Vec2 bjorn_spawn_index_;
 	Aegis::Vec2 brutus_spawn_index_;
-	std::vector<Aegis::Vec2> pellet_spawn_indices_;
+	std::unordered_set<Aegis::Vec2> pellet_spawn_indices_;
 	Aegis::Vec2 grid_size_;
 
 private:

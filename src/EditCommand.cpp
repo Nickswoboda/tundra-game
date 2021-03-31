@@ -46,3 +46,27 @@ void SpawnEditCommand::Undo()
 	}
 
 }
+
+PlaceFishCommand::PlaceFishCommand(TileMap& tile_map, Aegis::Vec2 index)
+	:tile_map_(tile_map), index_(index)
+{ }
+
+void PlaceFishCommand::Execute()
+{
+	if (tile_map_.pellet_spawn_indices_.count(index_)){
+		tile_map_.pellet_spawn_indices_.erase(index_);
+		placed_ = false;
+	} else {
+		tile_map_.pellet_spawn_indices_.emplace(index_);
+	}
+}
+
+void PlaceFishCommand::Undo()
+{
+	if (placed_){
+		tile_map_.pellet_spawn_indices_.erase(index_);
+	} else {
+		tile_map_.pellet_spawn_indices_.emplace(index_);
+	}
+}
+

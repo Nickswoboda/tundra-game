@@ -46,3 +46,15 @@ public:
 	Aegis::Vec2 prev_index_;
 	Aegis::Vec2 new_index_;
 };
+
+class PlaceFishCommand : public EditCommand
+{
+public:
+	PlaceFishCommand(TileMap& tile_map, Aegis::Vec2 index);
+	void Execute() override;
+	void Undo() override;
+
+	TileMap& tile_map_;
+	Aegis::Vec2 index_;
+	bool placed_ = true;
+};

@@ -36,7 +36,7 @@ TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Ae
 			} else if (ch == 'p'){
 				brutus_spawn_index_ = Aegis::Vec2(col, row);
 			} else {
-				pellet_spawn_indices_.emplace_back(col, row);
+				pellet_spawn_indices_.emplace(col, row);
 			}
 
 			tiles_[col++].push_back(&tiles_map_['i']);
@@ -177,15 +177,16 @@ Aegis::Vec2 TileMap::GetGridIndexByPos(const Aegis::Vec2& pos) const
 
 void TileMap::Save(int level_num)
 {
-	std::string new_file_path = "assets/levels/level_" + std::to_string(level_num) + ".txt";
+	std::string prefix = "assets/levels/custom_level_";
+	std::string new_file_path = prefix + std::to_string(level_num) + ".txt";
 
 	if (level_num == -1){
 		level_num = 1;
-		new_file_path = "assets/levels/level_" + std::to_string(level_num) + ".txt";
+		new_file_path = prefix + std::to_string(level_num) + ".txt";
 
 		while (std::filesystem::exists(new_file_path)) {
 			++level_num;
-			new_file_path = "assets/levels/level_" + std::to_string(level_num) + ".txt";
+			new_file_path = prefix + std::to_string(level_num) + ".txt";
 		}
 	}
 
@@ -204,7 +205,9 @@ void TileMap::Save(int level_num)
 			else if (coord == bjorn_spawn_index_) {
 				file << 'j';
 			}
-			else {
+			else if (pellet_spawn_indices_.count(coord)){
+				file << 'f';
+			} else {
 				auto tile = tiles_[col][row];
 				if (tile->is_solid_) file << 'w';
 				else if (tile->is_slippery_) file << 'i';

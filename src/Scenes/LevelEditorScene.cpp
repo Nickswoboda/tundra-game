@@ -33,8 +33,6 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custo
 		tile_map_ = std::make_unique<TileMap>(prefix + std::to_string(level) + ".txt", 32, tex_atlas_);
 	}
 
-	fish_indices_ = tile_map_->pellet_spawn_indices_;
-
 	bruce_sprite_ = Aegis::Sprite(tex_atlas_, { 0, 96, 32, 32 });
 	bruce_sprite_.position_ = tile_map_->bruce_spawn_index_ * 32;
 	brutus_sprite_ = Aegis::Sprite(tex_atlas_, { 32, 96, 32, 32 });
@@ -114,7 +112,16 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 			if (show_error_msg_) show_error_msg_ = false;
 
 			auto index = tile_map_->GetGridIndexByPos(mouse_pos);
-			if (selected_spawn_ != SpawnPoint::None){
+
+			if (mouse_click && mouse_click->button_ == AE_MOUSE_BUTTON_RIGHT){
+				if (tile->is_slippery_){
+					auto command = std::make_shared<PlaceFishCommand>(*tile_map_, index);
+					command->Execute();
+					recorded_edits_.push(command);
+				}
+				recording_edits_ = false;
+			}
+			else if (selected_spawn_ != SpawnPoint::None){
 				//spawns can not be on walls or on top of other entities
 				if (tile_map_->bruce_spawn_index_ != index && tile_map_->bjorn_spawn_index_ != index && tile_map_->bruce_spawn_index_ != index){
 					if (!tile->is_solid_){
@@ -150,7 +157,7 @@ void LevelEditorScene::Render(float delta_time)
 	brutus_sprite_.Draw();
 	bjorn_sprite_.Draw();
 
-	for (auto& index : fish_indices_) {
+	for (auto& index : tile_map_->pellet_spawn_indices_) {
 		Aegis::DrawSubTexture(index * 32, {16, 16}, *tex_atlas_, fish_texture_coords_);
 	}
 	if (show_error_msg_){
@@ -216,7 +223,6 @@ void LevelEditorScene::Undo()
 		while(!recorded_commands.empty()){
 			recorded_commands.top()->Undo();
 			recorded_commands.pop();
-			
 		}
 
 		UpdateObjectPositions();
