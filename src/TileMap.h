@@ -22,7 +22,9 @@ public:
 	const Tile* GetTileByIndex(int col, int row) const;
 	const Tile* GetTileByPos(int x_pos, int y_pos) const;
 	void SetTile(const Aegis::Vec2 index, const Tile& tile);
-
+	void SetTile(const Aegis::Vec2 index, const char token);
+	//used for updating 
+	std::vector<Aegis::Vec2> GetDiagonalTilesIndices(Aegis::Vec2 index) const;
 	std::vector<Aegis::Vec2> GetAdjacentTilesIndices(Aegis::Vec2 index) const;
 	std::vector<const Tile*> GetTilesUnderneath(int x, int y, int w, int h) const;
 	std::vector<const Tile*> GetTilesUnderneath(const Aegis::AABB& rect) const;

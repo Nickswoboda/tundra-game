@@ -115,7 +115,7 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 
 			if (mouse_click && mouse_click->button_ == AE_MOUSE_BUTTON_RIGHT){
 				if (tile->is_slippery_){
-					auto command = std::make_shared<PlaceFishCommand>(*tile_map_, index);
+					auto command = std::make_shared<FishEditCommand>(*tile_map_, index);
 					command->Execute();
 					recorded_edits_.push(command);
 				}

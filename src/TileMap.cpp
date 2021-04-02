@@ -92,11 +92,33 @@ const Tile* TileMap::GetTileByPos(int x_pos, int y_pos) const
 	return GetTileByIndex(x_pos / tile_size_, y_pos / tile_size_);
 }
 
+void TileMap::SetTile(const Aegis::Vec2 index, const char token)
+{
+	tiles_[index.x][index.y] = &tiles_map_[token];
+}
 void TileMap::SetTile(const Aegis::Vec2 index, const Tile& tile)
 {
 	tiles_[index.x][index.y] = &tile;
 }
 
+std::vector<Aegis::Vec2> TileMap::GetDiagonalTilesIndices(Aegis::Vec2 index) const
+{
+	std::vector<Aegis::Vec2> indices;
+	
+	Aegis::Vec2 top_left = {index.x - 1, index.y - 1};
+	if (GetTileByIndex(top_left.x, top_left.y)) indices.push_back(top_left);
+
+	Aegis::Vec2 top_right = {index.x + 1, index.y - 1};
+	if (GetTileByIndex(top_right.x, top_right.y)) indices.push_back(top_right);
+
+	Aegis::Vec2 bot_left = {index.x - 1, index.y + 1};
+	if (GetTileByIndex(bot_left.x, bot_left.y)) indices.push_back(bot_left);
+
+	Aegis::Vec2 bot_right = {index.x + 1, index.y + 1};
+	if (GetTileByIndex(bot_right.x, bot_right.y)) indices.push_back(bot_right);
+	
+	return indices;
+}
 std::vector<Aegis::Vec2> TileMap::GetAdjacentTilesIndices(Aegis::Vec2 index) const 
 {
 	std::vector<Aegis::Vec2> indices;

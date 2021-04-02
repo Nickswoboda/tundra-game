@@ -27,6 +27,7 @@ public:
 	void Execute() override;
 	void Undo() override;
 	
+	void UpdateSurroundingWallTiles();
 	TileMap& tile_map_;
 	const Aegis::Vec2 index_;
 	const Tile& new_tile_;
@@ -47,10 +48,10 @@ public:
 	Aegis::Vec2 new_index_;
 };
 
-class PlaceFishCommand : public EditCommand
+class FishEditCommand : public EditCommand
 {
 public:
-	PlaceFishCommand(TileMap& tile_map, Aegis::Vec2 index);
+	FishEditCommand(TileMap& tile_map, Aegis::Vec2 index);
 	void Execute() override;
 	void Undo() override;
 

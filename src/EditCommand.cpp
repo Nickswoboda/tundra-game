@@ -8,10 +8,88 @@ TileEditCommand::TileEditCommand(TileMap& tile_map, const Aegis::Vec2 index, con
 void TileEditCommand::Execute()
 {
 	tile_map_.SetTile(index_, new_tile_);
+	UpdateSurroundingWallTiles();
 }
 void TileEditCommand::Undo()
 {
 	tile_map_.SetTile(index_, prev_tile_);
+	UpdateSurroundingWallTiles();
+}
+
+void UpdateGroundTile(TileMap& tile_map, Aegis::Vec2 index)
+{
+	if (!(tile_map.GetTileByIndex(index.x, index.y)->is_solid_)){
+		return;
+	}
+	auto top = tile_map.GetTileByIndex(index.x, index.y - 1);
+	auto bot = tile_map.GetTileByIndex(index.x, index.y + 1);
+	auto left = tile_map.GetTileByIndex(index.x - 1, index.y);
+	auto right = tile_map.GetTileByIndex(index.x + 1, index.y);
+
+	if (top && !top->is_solid_){
+		if (left && !left->is_solid_){
+			tile_map.SetTile(index, '8');
+			return;
+		} else if (right && !right->is_solid_){
+			tile_map.SetTile(index, '9');
+			return;
+		} else {
+			tile_map.SetTile(index, '6');
+			return;
+		}
+	} else if (bot && !bot->is_solid_){
+		if (left && !left->is_solid_){
+			tile_map.SetTile(index, 'a');
+			return;
+		} else if (right && !right->is_solid_){
+			tile_map.SetTile(index, 'b');
+			return;
+		} else {
+			tile_map.SetTile(index, '1');
+			return;
+		}
+	}  else if (right && !right->is_solid_){
+			tile_map.SetTile(index, '3');
+			return;
+	} else if (left && !left->is_solid_){
+			tile_map.SetTile(index, '4');
+			return;
+	} else {
+		auto top_left = tile_map.GetTileByIndex(index.x - 1, index.y - 1);
+		if (top_left && !top_left->is_solid_){
+			tile_map.SetTile(index, '7');
+			return;
+		}
+		auto top_right = tile_map.GetTileByIndex(index.x + 1, index.y - 1);
+		if (top_right && !top_right->is_solid_){
+			tile_map.SetTile(index, '5');
+			return;
+		}
+		auto bot_left = tile_map.GetTileByIndex(index.x - 1, index.y + 1);
+		if (bot_left && !bot_left->is_solid_){
+			tile_map.SetTile(index, '2');
+			return;
+		}
+		auto bot_right = tile_map.GetTileByIndex(index.x + 1, index.y + 1);
+		if (bot_right && !bot_right->is_solid_){
+			tile_map.SetTile(index, '0');
+			return;
+		}
+	}
+
+	tile_map.SetTile(index, 'w');
+
+
+}
+void TileEditCommand::UpdateSurroundingWallTiles()
+{
+	UpdateGroundTile(tile_map_, index_);
+	for (auto& tile : tile_map_.GetDiagonalTilesIndices(index_)){
+		UpdateGroundTile(tile_map_, tile);
+	}
+	for (auto& tile : tile_map_.GetAdjacentTilesIndices(index_)){
+		UpdateGroundTile(tile_map_, tile);
+	}
 }
 
 SpawnEditCommand::SpawnEditCommand(TileMap& tile_map, SpawnPoint spawn_point, Aegis::Vec2 new_index)
@@ -47,11 +125,11 @@ void SpawnEditCommand::Undo()
 
 }
 
-PlaceFishCommand::PlaceFishCommand(TileMap& tile_map, Aegis::Vec2 index)
+FishEditCommand::FishEditCommand(TileMap& tile_map, Aegis::Vec2 index)
 	:tile_map_(tile_map), index_(index)
 { }
 
-void PlaceFishCommand::Execute()
+void FishEditCommand::Execute()
 {
 	if (tile_map_.pellet_spawn_indices_.count(index_)){
 		tile_map_.pellet_spawn_indices_.erase(index_);
@@ -61,7 +139,7 @@ void PlaceFishCommand::Execute()
 	}
 }
 
-void PlaceFishCommand::Undo()
+void FishEditCommand::Undo()
 {
 	if (placed_){
 		tile_map_.pellet_spawn_indices_.erase(index_);
