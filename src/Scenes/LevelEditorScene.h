@@ -24,14 +24,9 @@ public:
 	void UpdateObjectPositions();
 	void Undo();
 
-	//tiles can not be placed while a spawn is selected
-	void ChangeSelectedTile(const Tile& tile); 
-	void ChangeSelectedSpawn(SpawnPoint spawn);
-
 	std::shared_ptr<TileMap> tile_map_;
 
 	const Tile* selected_tile_ = nullptr;
-	SpawnPoint selected_spawn_ = SpawnPoint::None;
 
 	std::shared_ptr<Aegis::Font> font_;
 	Aegis::Sprite bjorn_sprite_;
@@ -40,9 +35,6 @@ public:
 
 	std::shared_ptr<Aegis::Texture> tex_atlas_;
 	Aegis::Vec4 fish_texture_coords_;
-
-	std::shared_ptr<Aegis::Label> tile_text_;
-	std::shared_ptr<Aegis::Label> spawn_text_;
 
 	bool show_error_msg_ = false;
 	
