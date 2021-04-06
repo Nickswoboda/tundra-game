@@ -50,7 +50,7 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custo
 	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 80, 40 ), "Undo");
 	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 80, 40 ), "Reset");
 	undo_button->ConnectSignal("pressed", [&](){Undo();});
-	reset_button->ConnectSignal("pressed", [&]() {tile_map_->Clear(); });
+	reset_button->ConnectSignal("pressed", [&]() {tile_map_->Clear(); UpdateObjectPositions();});
 
 	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB(  50, 450, 80, 40  ), "Preview");
 	auto save_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 450, 80, 40 ), "Save");
@@ -66,10 +66,11 @@ LevelEditorScene::~LevelEditorScene()
 
 void LevelEditorScene::OnEvent(Aegis::Event& event)
 {
+	auto key_event = dynamic_cast<Aegis::KeyEvent*>(&event);
 	auto mouse_click = dynamic_cast<Aegis::MouseClickEvent*>(&event);
 	auto mouse_move = dynamic_cast<Aegis::MouseMoveEvent*>(&event);
 
-	if (!mouse_click && !mouse_move){
+	if (!key_event && !mouse_click && !mouse_move){
 		return;
 	}
 
@@ -87,43 +88,50 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 	if (mouse_click){
 		if (show_error_msg_) show_error_msg_ = false;
 
-		recording_edits_ = true;
-		if (mouse_click->action_ == AE_MOUSE_DOUBLE_PRESS && mouse_click->button_ == AE_MOUSE_BUTTON_LEFT){
-			auto command = std::make_shared<TileEditCommand>(*tile_map_, tile_index, tile_map_->tiles_map_['g']);
-			command->Execute();
-			recorded_edits_.push(command);
-		} 
-		if (mouse_click->action_ == AE_BUTTON_RELEASE || mouse_click->action_ == AE_MOUSE_DOUBLE_PRESS){
+		if (mouse_click->action_ == AE_BUTTON_RELEASE){
 			recording_edits_ = false;
-			if (!recorded_edits_.empty()){
-				edit_stack_.push(recorded_edits_);
-			}
-
-			while (!recorded_edits_.empty()){
-				recorded_edits_.pop();
-			}
-			return;
 		} 
-
-		selected_tile_ = nullptr;
 
 		if (mouse_click->action_ == AE_BUTTON_PRESS){
+			selected_tile_ = nullptr;
 			if (mouse_click->button_ == AE_MOUSE_BUTTON_RIGHT){
+				selected_tile_ = &tile_map_->tiles_map_['w']; 
+			} else if (mouse_click->button_ == AE_MOUSE_BUTTON_LEFT){
+				selected_tile_ = &tile_map_->tiles_map_['i']; 
+			}
+			if (selected_tile_){
+				recording_edits_ = true;
+			}
+		}
+	} else if (key_event && !recording_edits_){
+		if (key_event->action_ == AE_BUTTON_RELEASE){
+			if (key_event->key_ == AE_KEY_F){
 				auto command = std::make_shared<FishEditCommand>(*tile_map_, tile_index);
 				command->Execute();
 				recorded_edits_.push(command);
-			} else if (mouse_click->button_ == AE_MOUSE_BUTTON_LEFT){
-				char new_tile_token = tile->is_slippery_ ? 'w' : 'i';
-				selected_tile_ = &tile_map_->tiles_map_[new_tile_token]; 
+			}
+			if (key_event->key_ == AE_KEY_G){
+				auto command = std::make_shared<TileEditCommand>(*tile_map_, tile_index, tile_map_->tiles_map_['g']);
+				command->Execute();
+				recorded_edits_.push(command);
 			}
 		}
 	}
+
 	
 	if (recording_edits_){
 		if (selected_tile_ && selected_tile_ != tile){
 			auto command = std::shared_ptr<EditCommand>(new TileEditCommand(*tile_map_, tile_index, *selected_tile_));
 			command->Execute();
 			recorded_edits_.push(command);
+		}
+	} else {
+		if (!recorded_edits_.empty()){
+			edit_stack_.push(recorded_edits_);
+		}
+
+		while (!recorded_edits_.empty()){
+			recorded_edits_.pop();
 		}
 	}
 }
