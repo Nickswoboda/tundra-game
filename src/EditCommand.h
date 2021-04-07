@@ -4,6 +4,13 @@
 #include "TileMap.h"
 
 
+enum class EditType
+{
+	Tile,
+	Spawn,
+	Fish
+};
+
 class EditCommand
 {
 public:

@@ -61,89 +61,96 @@ LevelEditorScene::~LevelEditorScene()
 {
 }
 
+bool LevelEditorScene::RequestEdit(EditType edit_type, const char new_tile_token)
+{
+	auto mouse_pos = Aegis::Application::GetWindow().GetMousePos() - Aegis::Vec2{270, 24};
+	const Tile* tile = tile_map_->GetTileByPos(mouse_pos.x, mouse_pos.y);
+
+	if (!tile) return false;
+	Aegis::Vec2 tile_index = tile_map_->GetGridIndexByPos(mouse_pos);
+
+	std::shared_ptr<EditCommand> command;
+	switch (edit_type) {
+		case EditType::Tile: {
+			if (new_tile_token != 'g'){
+				selected_tile_token = new_tile_token;
+				recording_edits_ = true;
+			}
+			auto& new_tile = tile_map_->tiles_map_[new_tile_token];
+			command = std::make_shared<TileEditCommand>(*tile_map_, tile_index, new_tile);
+			break;
+		}
+		case EditType::Spawn: { 
+			if (!grabbed_sprite_){
+				return (GrabEntityAtIndex(tile_index));
+			}
+			if (tile->is_slippery_){
+				command = std::make_shared<SpawnEditCommand>(*tile_map_, spawn_being_edited_, tile_index);
+			}
+			break;
+		}
+		case EditType::Fish: { 
+			if (tile->is_slippery_){
+				command = std::make_shared<FishEditCommand>(*tile_map_, tile_index);
+			}
+			break;
+		}
+	}
+
+	if (command){
+		command->Execute();
+		recorded_edits_.push(command);
+		return true;
+	} else {
+		return false;
+	}
+}
+
 void LevelEditorScene::OnEvent(Aegis::Event& event)
 {
 	auto key_event = dynamic_cast<Aegis::KeyEvent*>(&event);
+	if (key_event && !recording_edits_){
+		if (key_event->action_ == AE_BUTTON_RELEASE){
+			if (key_event->key_ == AE_KEY_F){
+				RequestEdit(EditType::Fish);
+				PushEditsOntoStack();
+			}
+			if (key_event->key_ == AE_KEY_G){
+				RequestEdit(EditType::Tile, 'g');
+				PushEditsOntoStack();
+			}
+		}
+		return;
+	}
+
 	auto mouse_click = dynamic_cast<Aegis::MouseClickEvent*>(&event);
-	auto mouse_move = dynamic_cast<Aegis::MouseMoveEvent*>(&event);
-
-	if (!key_event && !mouse_click && !mouse_move){
-		return;
-	}
-
-	//using GetMousePos because it takes resolution into account
-	//have to substract camera position otherwise mouse_pos is off
-	auto mouse_pos = Aegis::Application::GetWindow().GetMousePos() - Aegis::Vec2(270, 24);
-	const Tile* tile = tile_map_->GetTileByPos(mouse_pos.x, mouse_pos.y);
-
-	if (!tile){
-		return;
-	}
-
-	auto tile_index = tile_map_->GetGridIndexByPos(mouse_pos);
-
-	if (mouse_move && dragged_sprite_){
-		dragged_sprite_->position_ = mouse_pos - (dragged_sprite_->GetRect().size / 2);
-	} else if (mouse_click){
-		if (show_error_msg_) show_error_msg_ = false;
-
+	if (mouse_click){
 		if (mouse_click->action_ == AE_BUTTON_RELEASE){
-			if (dragged_sprite_){
-				if (tile->is_slippery_){
-					auto command = std::make_shared<SpawnEditCommand>(*tile_map_, spawn_being_edited_, tile_index);
-					command->Execute();
-					recorded_edits_.push(command);
-				}
-				dragged_sprite_ = nullptr;
+			if (grabbed_sprite_){
+				RequestEdit(EditType::Spawn);
 				UpdateObjectPositions();
 			}
-			selected_tile_ = nullptr;
-			recording_edits_ = false;
+			PushEditsOntoStack();
 		} 
 
 		if (mouse_click->action_ == AE_BUTTON_PRESS){
-			selected_tile_ = nullptr;
 			if (mouse_click->button_ == AE_MOUSE_BUTTON_RIGHT){
-				selected_tile_ = &tile_map_->tiles_map_['w']; 
+				RequestEdit(EditType::Tile, 'w');
 			} else if (mouse_click->button_ == AE_MOUSE_BUTTON_LEFT){
-				if (GrabEntityAtIndex(tile_index)){
-					return;
+				if (!RequestEdit(EditType::Spawn)){
+					RequestEdit(EditType::Tile, ('i'));
 				}
-				selected_tile_ = &tile_map_->tiles_map_['i']; 
-			}
-			if (selected_tile_){
-				recording_edits_ = true;
 			}
 		}
-	} else if (key_event && !recording_edits_){
-		if (key_event->action_ == AE_BUTTON_RELEASE){
-			if (key_event->key_ == AE_KEY_F){
-				auto command = std::make_shared<FishEditCommand>(*tile_map_, tile_index);
-				command->Execute();
-				recorded_edits_.push(command);
-			}
-			if (key_event->key_ == AE_KEY_G){
-				auto command = std::make_shared<TileEditCommand>(*tile_map_, tile_index, tile_map_->tiles_map_['g']);
-				command->Execute();
-				recorded_edits_.push(command);
-			}
-		}
+		return;
 	}
 
-	
-	if (recording_edits_){
-		if (selected_tile_ && selected_tile_ != tile){
-			auto command = std::shared_ptr<EditCommand>(new TileEditCommand(*tile_map_, tile_index, *selected_tile_));
-			command->Execute();
-			recorded_edits_.push(command);
-		}
-	} else {
-		if (!recorded_edits_.empty()){
-			edit_stack_.push(recorded_edits_);
-		}
-
-		while (!recorded_edits_.empty()){
-			recorded_edits_.pop();
+	auto mouse_move = dynamic_cast<Aegis::MouseMoveEvent*>(&event);
+	if (mouse_move){
+		if (grabbed_sprite_){
+			MoveGrabbedSprite();
+		} else if (recording_edits_){
+			RequestEdit(EditType::Tile, selected_tile_token);
 		}
 	}
 }
@@ -166,24 +173,34 @@ void LevelEditorScene::Render(float delta_time)
 	for (auto& index : tile_map_->pellet_spawn_indices_) {
 		Aegis::DrawSubTexture(index * 32, {16, 16}, *tex_atlas_, fish_texture_coords_);
 	}
-	if (show_error_msg_){
-		Aegis::DrawQuad({200, 300}, {675, 55}, {1.0, 1.0, 1.0, 0.8});
-		Aegis::DrawText("Invalid Level.", {400, 300}, {1.0, 0.1, 0.1, 1.0});
-		Aegis::DrawText("Bruce must be able to reach all ice tiles and both bears.", {200, 330}, {1.0, 0.1, 0.1, 1.0});
+}
+
+void LevelEditorScene::PushEditsOntoStack()
+{
+	if (!recorded_edits_.empty()){
+		edit_stack_.push(recorded_edits_);
 	}
+
+	while (!recorded_edits_.empty()){
+		recorded_edits_.pop();
+	}
+	recording_edits_ = false;
+}
+
+void LevelEditorScene::MoveGrabbedSprite()
+{
+	auto mouse_pos = Aegis::Application::GetWindow().GetMousePos() - Aegis::Vec2{270, 24};
+	grabbed_sprite_->position_ = mouse_pos - (grabbed_sprite_->GetRect().size / 2);
 }
 
 bool LevelEditorScene::GrabEntityAtIndex(Aegis::Vec2 index)
 {
 	for (const auto& [spawn, idx] : tile_map_->spawn_indices_){
 		if (idx == index){
-			selected_tile_ = nullptr;
-			dragged_sprite_ = &sprites_[spawn];
+			grabbed_sprite_ = &sprites_[spawn];
 			spawn_being_edited_ = spawn;
 
-			auto mouse_pos = Aegis::Application::GetWindow().GetMousePos() - Aegis::Vec2(270, 24);
-			dragged_sprite_->position_ = mouse_pos - (dragged_sprite_->GetRect().size / 2);
-
+			MoveGrabbedSprite();
 			return true;
 		}
 	}
@@ -223,18 +240,17 @@ void LevelEditorScene::PreviewLevel()
 		manager_->PushScene<GameplayScene>(tile_map_, game_data_);
 	}
 	else{
-		show_error_msg_ = true;
+		//show error dialog
 	}
 }
 
 void LevelEditorScene::SaveLevel()
 {
-	if (!IsLevelValid()){
-		show_error_msg_ = true;
-		return;
+	if (IsLevelValid()){
+		tile_map_->Save(level_num_);
 	}
 	else{
-		tile_map_->Save(level_num_);
+		//show error dialog
 	}
 }
 
@@ -257,6 +273,8 @@ void LevelEditorScene::Undo()
 
 void LevelEditorScene::UpdateObjectPositions()
 {
+	grabbed_sprite_ = nullptr;
+
 	for (auto& [spawn, sprite] : sprites_){
 		sprite.position_ = tile_map_->spawn_indices_[spawn] * 32;
 	}
