@@ -178,9 +178,9 @@ void GameplayScene::MovePlayer(Aegis::Vec2 dir)
 
 void GameplayScene::ResetObjectPositions()
 {
-	player_.SetPosition(tile_map_->bruce_spawn_index_ * tile_map_->tile_size_);
-	brutus_.SetPosition(tile_map_->brutus_spawn_index_ * tile_map_->tile_size_);
-	bjorn_.SetPosition(tile_map_->bjorn_spawn_index_ * tile_map_->tile_size_);
+	player_.SetPosition(tile_map_->spawn_indices_[SpawnPoint::Bruce] * tile_map_->tile_size_);
+	brutus_.SetPosition(tile_map_->spawn_indices_[SpawnPoint::Brutus] * tile_map_->tile_size_);
+	bjorn_.SetPosition(tile_map_->spawn_indices_[SpawnPoint::Bjorn] * tile_map_->tile_size_);
 
 	player_.target_grid_index_ = player_.GetGridIndex();
 	player_.queued_movement_ = {-1, -1};

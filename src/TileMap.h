@@ -6,6 +6,16 @@
 #include "GameObject.h"
 
 #include <memory>
+#include <unordered_map>
+
+enum class SpawnPoint
+{
+	None,
+	Bjorn,
+	Brutus,
+	Bruce
+};
+
 class TileMap
 {
 public:
@@ -17,6 +27,7 @@ public:
 	void Save(int level_num = -1);
 
 	void Render() const;
+	void DrawGridLines() const;
 	void Clear();
 
 	const Tile* GetTileByIndex(int col, int row) const;
@@ -36,10 +47,9 @@ public:
 	std::shared_ptr<Aegis::Texture> tile_atlas_;
 	int tile_size_;
 	std::unordered_map<char, Tile> tiles_map_;
+	//stored in col major ordering to coincide with rendering customs
 	std::vector<std::vector<const Tile*>> tiles_;
-	Aegis::Vec2 bruce_spawn_index_;
-	Aegis::Vec2 bjorn_spawn_index_;
-	Aegis::Vec2 brutus_spawn_index_;
+	std::unordered_map<SpawnPoint, Aegis::Vec2> spawn_indices_;
 	std::unordered_set<Aegis::Vec2> pellet_spawn_indices_;
 	Aegis::Vec2 grid_size_;
 

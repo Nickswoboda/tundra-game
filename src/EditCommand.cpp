@@ -95,34 +95,17 @@ void TileEditCommand::UpdateSurroundingWallTiles()
 SpawnEditCommand::SpawnEditCommand(TileMap& tile_map, SpawnPoint spawn_point, Aegis::Vec2 new_index)
 	: tile_map_(tile_map), spawn_point_(spawn_point),  new_index_(new_index) 
 {
-	switch (spawn_point_){
-		case SpawnPoint::Bjorn: prev_index_ = tile_map_.bjorn_spawn_index_; break;
-		case SpawnPoint::Brutus: prev_index_ = tile_map_.brutus_spawn_index_; break;
-		case SpawnPoint::Bruce: prev_index_ = tile_map_.bruce_spawn_index_; break;
-		case SpawnPoint::None: break;
-	}
+	prev_index_ = tile_map_.spawn_indices_[spawn_point_];
 }
 
 void SpawnEditCommand::Execute()
 {
-	switch (spawn_point_){
-		case SpawnPoint::Bjorn: tile_map_.bjorn_spawn_index_ = new_index_; break;
-		case SpawnPoint::Brutus: tile_map_.brutus_spawn_index_ = new_index_; break;
-		case SpawnPoint::Bruce:  tile_map_.bruce_spawn_index_ = new_index_; break;
-		case SpawnPoint::None: break;
-	}
-
+	tile_map_.spawn_indices_[spawn_point_] = new_index_;
 }
 
 void SpawnEditCommand::Undo()
 {
-	switch (spawn_point_){
-		case SpawnPoint::Bjorn: tile_map_.bjorn_spawn_index_ = prev_index_; break;
-		case SpawnPoint::Brutus: tile_map_.brutus_spawn_index_ = prev_index_; break;
-		case SpawnPoint::Bruce:  tile_map_.bruce_spawn_index_ = prev_index_; break;
-		case SpawnPoint::None: break;
-	}
-
+	tile_map_.spawn_indices_[spawn_point_] = prev_index_;
 }
 
 FishEditCommand::FishEditCommand(TileMap& tile_map, Aegis::Vec2 index)

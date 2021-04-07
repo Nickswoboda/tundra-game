@@ -20,7 +20,6 @@ Aegis::Vec4 GetFishTextureCoords(const Aegis::Texture& texture)
 LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custom)
 	:level_num_(level), game_data_(game_data)
 {
-	font_ = Aegis::FontManager::Load("assets/fonts/worksans_regular.ttf", 24);
 	tex_atlas_ = Aegis::TextureManager::Load("assets/textures/tile_map.png");
 	fish_texture_coords_ = GetFishTextureCoords(*tex_atlas_);
 
@@ -33,13 +32,11 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custo
 		tile_map_ = std::make_unique<TileMap>(prefix + std::to_string(level) + ".txt", 32, tex_atlas_);
 	}
 
-	bruce_sprite_ = Aegis::Sprite(tex_atlas_, { 0, 96, 32, 32 });
-	bruce_sprite_.position_ = tile_map_->bruce_spawn_index_ * 32;
-	brutus_sprite_ = Aegis::Sprite(tex_atlas_, { 32, 96, 32, 32 });
-	brutus_sprite_.position_ = tile_map_->brutus_spawn_index_ * 32;
-	bjorn_sprite_ = Aegis::Sprite(tex_atlas_, { 64, 96, 32, 32 });
-	bjorn_sprite_.position_ = tile_map_->bjorn_spawn_index_ * 32;
 
+	sprites_[SpawnPoint::Bruce] = Aegis::Sprite(tex_atlas_, { 0, 96, 32, 32 });
+	sprites_[SpawnPoint::Brutus] = Aegis::Sprite(tex_atlas_, { 32, 96, 32, 32 });
+	sprites_[SpawnPoint::Bjorn] = Aegis::Sprite(tex_atlas_, { 64, 96, 32, 32 });
+	UpdateObjectPositions();
 	//used to center tilemap within window
 	camera_.SetPosition({-270, -24});
 
@@ -85,10 +82,22 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 
 	auto tile_index = tile_map_->GetGridIndexByPos(mouse_pos);
 
-	if (mouse_click){
+	if (mouse_move && dragged_sprite_){
+		dragged_sprite_->position_ = mouse_pos - (dragged_sprite_->GetRect().size / 2);
+	} else if (mouse_click){
 		if (show_error_msg_) show_error_msg_ = false;
 
 		if (mouse_click->action_ == AE_BUTTON_RELEASE){
+			if (dragged_sprite_){
+				if (tile->is_slippery_){
+					auto command = std::make_shared<SpawnEditCommand>(*tile_map_, spawn_being_edited_, tile_index);
+					command->Execute();
+					recorded_edits_.push(command);
+				}
+				dragged_sprite_ = nullptr;
+				UpdateObjectPositions();
+			}
+			selected_tile_ = nullptr;
 			recording_edits_ = false;
 		} 
 
@@ -97,6 +106,9 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 			if (mouse_click->button_ == AE_MOUSE_BUTTON_RIGHT){
 				selected_tile_ = &tile_map_->tiles_map_['w']; 
 			} else if (mouse_click->button_ == AE_MOUSE_BUTTON_LEFT){
+				if (GrabEntityAtIndex(tile_index)){
+					return;
+				}
 				selected_tile_ = &tile_map_->tiles_map_['i']; 
 			}
 			if (selected_tile_){
@@ -144,12 +156,12 @@ void LevelEditorScene::Update()
 void LevelEditorScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
-	Aegis::Renderer2D::SetFont(font_);
 	tile_map_->Render();
+	tile_map_->DrawGridLines();
 
-	bruce_sprite_.Draw();
-	brutus_sprite_.Draw();
-	bjorn_sprite_.Draw();
+	for (const auto& [spawn, sprite] : sprites_){
+		sprite.Draw();
+	}
 
 	for (auto& index : tile_map_->pellet_spawn_indices_) {
 		Aegis::DrawSubTexture(index * 32, {16, 16}, *tex_atlas_, fish_texture_coords_);
@@ -161,14 +173,34 @@ void LevelEditorScene::Render(float delta_time)
 	}
 }
 
+bool LevelEditorScene::GrabEntityAtIndex(Aegis::Vec2 index)
+{
+	for (const auto& [spawn, idx] : tile_map_->spawn_indices_){
+		if (idx == index){
+			selected_tile_ = nullptr;
+			dragged_sprite_ = &sprites_[spawn];
+			spawn_being_edited_ = spawn;
+
+			auto mouse_pos = Aegis::Application::GetWindow().GetMousePos() - Aegis::Vec2(270, 24);
+			dragged_sprite_->position_ = mouse_pos - (dragged_sprite_->GetRect().size / 2);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool LevelEditorScene::IsLevelValid()
 {
 	//All Ice tiles and bears must be reachable by player to be considered valid
-	auto reachable_indices = tile_map_->GetReachableTileIndices(tile_map_->bruce_spawn_index_);
-	if (!reachable_indices[tile_map_->brutus_spawn_index_.x][tile_map_->brutus_spawn_index_.y]){
+	auto reachable_indices = tile_map_->GetReachableTileIndices(tile_map_->spawn_indices_[SpawnPoint::Bruce]);
+	auto brutus_index = tile_map_->spawn_indices_[SpawnPoint::Brutus];
+	if (!reachable_indices[brutus_index.x][brutus_index.y]){
 		return false;
 	}
-	if (!reachable_indices[tile_map_->bjorn_spawn_index_.x][tile_map_->bjorn_spawn_index_.y]){
+	auto bjorn_index = tile_map_->spawn_indices_[SpawnPoint::Bjorn];
+	if (!reachable_indices[bjorn_index.x][bjorn_index.y]){
 		return false;
 	}
 
@@ -225,7 +257,7 @@ void LevelEditorScene::Undo()
 
 void LevelEditorScene::UpdateObjectPositions()
 {
-	bjorn_sprite_.position_ = tile_map_->bjorn_spawn_index_ * 32;
-	brutus_sprite_.position_ = tile_map_->brutus_spawn_index_ * 32;
-	bruce_sprite_.position_ = tile_map_->bruce_spawn_index_ * 32;
+	for (auto& [spawn, sprite] : sprites_){
+		sprite.position_ = tile_map_->spawn_indices_[spawn] * 32;
+	}
 }

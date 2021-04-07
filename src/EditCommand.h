@@ -3,13 +3,6 @@
 #include "Tile.h"
 #include "TileMap.h"
 
-enum class SpawnPoint
-{
-	None,
-	Bjorn,
-	Brutus,
-	Bruce
-};
 
 class EditCommand
 {

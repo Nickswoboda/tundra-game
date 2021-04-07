@@ -24,14 +24,16 @@ public:
 	void UpdateObjectPositions();
 	void Undo();
 
+	bool GrabEntityAtIndex(Aegis::Vec2 index);
+
 	std::shared_ptr<TileMap> tile_map_;
 
 	const Tile* selected_tile_ = nullptr;
 
-	std::shared_ptr<Aegis::Font> font_;
-	Aegis::Sprite bjorn_sprite_;
-	Aegis::Sprite brutus_sprite_;
-	Aegis::Sprite bruce_sprite_;
+	std::unordered_map<SpawnPoint, Aegis::Sprite> sprites_;
+
+	SpawnPoint spawn_being_edited_ = SpawnPoint::None;
+	Aegis::Sprite* dragged_sprite_ = nullptr;
 
 	std::shared_ptr<Aegis::Texture> tex_atlas_;
 	Aegis::Vec4 fish_texture_coords_;

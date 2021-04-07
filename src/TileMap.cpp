@@ -30,11 +30,11 @@ TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Ae
 
 		if (ch == 's' || ch =='j' || ch == 'p' || ch == 'f'){
 			if (ch == 's'){
-				bruce_spawn_index_ = Aegis::Vec2( col, row ); 
+				spawn_indices_[SpawnPoint::Bruce] = Aegis::Vec2( col, row ); 
 			} else if (ch == 'j'){
-				bjorn_spawn_index_ = Aegis::Vec2(col, row);
+				spawn_indices_[SpawnPoint::Bjorn] = Aegis::Vec2( col, row ); 
 			} else if (ch == 'p'){
-				brutus_spawn_index_ = Aegis::Vec2(col, row);
+				spawn_indices_[SpawnPoint::Brutus] = Aegis::Vec2( col, row ); 
 			} else {
 				pellet_spawn_indices_.emplace(col, row);
 			}
@@ -55,8 +55,8 @@ TileMap::TileMap(int width, int height, int tile_size, std::shared_ptr<Aegis::Te
 	: tile_atlas_(atlas), tile_size_(tile_size)
 {
 	LoadTiles();
-	brutus_spawn_index_ = {1, 0};
-	bjorn_spawn_index_ = {2, 0};
+	spawn_indices_[SpawnPoint::Brutus] = { 1, 0 };
+	spawn_indices_[SpawnPoint::Bjorn] = { 2, 0 };
 	for (int i = 0; i < width; ++i){
 		std::vector<const Tile*> col;
 		for (int j = 0; j < height; ++j){
@@ -218,16 +218,17 @@ void TileMap::Save(int level_num)
 		for (int col = 0; col < grid_size_.x; ++col) {
 			auto coord = Aegis::Vec2(col, row);
 
-			if (coord == brutus_spawn_index_) {
-				file << 'p';
+			for (const auto& [spawn, index] : spawn_indices_){
+				if (coord == index){
+					switch (spawn){
+						case SpawnPoint::Brutus: file << 'p'; break;
+						case SpawnPoint::Bruce: file << 'p'; break;
+						case SpawnPoint::Bjorn: file << 'p'; break;
+					}
+					continue;
+				}
 			}
-			else if (coord == bruce_spawn_index_) {
-				file << 's';
-			}
-			else if (coord == bjorn_spawn_index_) {
-				file << 'j';
-			}
-			else if (pellet_spawn_indices_.count(coord)){
+			if (pellet_spawn_indices_.count(coord)){
 				file << 'f';
 			} else {
 				auto tile = tiles_[col][row];
@@ -273,9 +274,22 @@ void TileMap::Clear()
 		}
 	}
 
-	bruce_spawn_index_ = { 0, 0 };
-	brutus_spawn_index_ = { 1, 0 };
-	bjorn_spawn_index_ = { 2, 0 };
+	spawn_indices_[SpawnPoint::Bruce] = { 0, 0 };
+	spawn_indices_[SpawnPoint::Brutus] = { 1, 0 };
+	spawn_indices_[SpawnPoint::Bjorn] = { 2, 0 };
 
 	pellet_spawn_indices_.clear();
 } 
+
+void TileMap::DrawGridLines() const
+{
+	Aegis::Vec2 line_lengths = grid_size_ * 32;
+	Aegis::Vec4 grid_color = { 0.0f, 0.0f, 0.0f, 0.2f };
+	for (int i = 0; i <= grid_size_.x; ++i){
+		Aegis::DrawQuad({i * 32.0f - 1, 0}, {2, line_lengths.y}, grid_color);
+	}
+
+	for (int i = 0; i <= grid_size_.y; ++i){
+		Aegis::DrawQuad({0, i * 32.0f - 1}, {line_lengths.x, 2}, grid_color);
+	}
+}
