@@ -2,7 +2,7 @@
 
 #include "src/Aegis.h"
 
-#include "../Particle.h"
+#include "Particle.h"
 
 class GameData;
 

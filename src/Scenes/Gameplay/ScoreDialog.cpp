@@ -1,8 +1,8 @@
 #include "ScoreDialog.h"
 
-#include "Utilities.h"
-#include "Scenes/GameplayScene.h"
-#include "Scenes/LevelSelectScene.h"
+#include "../../Utilities.h"
+#include "GameplayScene.h"
+#include "../LevelSelect/LevelSelectScene.h"
 
 ScoreDialog::ScoreDialog(GameplayScene& scene)
 	:Aegis::Dialog("", {0,0, 350, 200}), star_thresholds_(scene.game_data_.star_thresholds_[scene.level_ - 1])

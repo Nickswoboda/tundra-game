@@ -1,5 +1,5 @@
 #include "InfoDialog.h"
-#include "Utilities.h"
+#include "../../Utilities.h"
 
 InfoDialog::InfoDialog()
 {

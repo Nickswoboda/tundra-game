@@ -1,7 +1,7 @@
 #include "GameOverDialog.h"
 
-#include "Scenes/GameplayScene.h"
-#include "Utilities.h"
+#include "GameplayScene.h"
+#include "../../Utilities.h"
 
 
 GameOverDialog::GameOverDialog(GameplayScene& scene)

@@ -1,10 +1,10 @@
 #include "MenuScene.h"
 
-#include "GameplayScene.h"
-#include "LevelSelectScene.h"
-#include "OptionsScene.h"
-#include "LevelEditorScene.h"
-#include "../Utilities.h"
+#include "../Gameplay/GameplayScene.h"
+#include "../LevelSelect/LevelSelectScene.h"
+#include "../Options/OptionsScene.h"
+#include "../LevelEditor/LevelEditorScene.h"
+#include "../../Utilities.h"
 
 #include <iostream>
 

@@ -1,7 +1,7 @@
 #include "LevelEditorScene.h"
 
-#include "GameplayScene.h"
-#include "LevelSelectScene.h"
+#include "../Gameplay/GameplayScene.h"
+#include "../LevelSelect/LevelSelectScene.h"
 
 #include <filesystem>
 #include <iostream>

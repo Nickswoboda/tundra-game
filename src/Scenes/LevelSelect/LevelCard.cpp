@@ -1,6 +1,6 @@
 #include "LevelCard.h"
 
-#include "Utilities.h"
+#include "../../Utilities.h"
 
 int GetNumStarsEarned(const std::array<double, 2>& star_thresholds, const double time)
 {

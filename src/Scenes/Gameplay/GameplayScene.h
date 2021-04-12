@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../GameObject.h"
-#include "../TileMap.h" 
-#include "../PauseMenu.h"
-#include "../ScoreDialog.h"
-#include "../GameData.h"
-#include "../InfoDialog.h"
-#include "../GameOverDialog.h"
-#include "../ScoreBoard.h"
+#include "../../GameObject.h"
+#include "../../TileMap.h" 
+#include "../Gameplay/PauseMenu.h"
+#include "../Gameplay/ScoreDialog.h"
+#include "../../GameData.h"
+#include "../Gameplay/InfoDialog.h"
+#include "../Gameplay/GameOverDialog.h"
+#include "../Gameplay/ScoreBoard.h"
 
 #include <stack>
 #include <memory>

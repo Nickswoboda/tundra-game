@@ -1,7 +1,7 @@
 #include "PauseMenu.h"
-#include "Scenes/GameplayScene.h"
-#include "Scenes/OptionsScene.h"
-#include "Utilities.h"
+#include "GameplayScene.h"
+#include "../Options/OptionsScene.h"
+#include "../../Utilities.h"
 
 PauseMenu::PauseMenu(GameplayScene& scene)
 {

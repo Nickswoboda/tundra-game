@@ -1,6 +1,6 @@
  #pragma once
 
-#include "../LevelEditor.h"
+#include "../LevelEditor/LevelEditor.h"
 
 class GameData;
 

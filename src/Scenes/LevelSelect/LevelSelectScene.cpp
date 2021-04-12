@@ -1,9 +1,9 @@
 #include "LevelSelectScene.h"
 
-#include "GameplayScene.h"
-#include "LevelEditorScene.h"
-#include "../LevelCard.h"
-#include "../Utilities.h"
+#include "../Gameplay/GameplayScene.h"
+#include "../LevelEditor/LevelEditorScene.h"
+#include "LevelCard.h"
+#include "../../Utilities.h"
 
 #include <filesystem>
 

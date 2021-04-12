@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TileMap.h"
+#include "../../TileMap.h"
 #include "EditCommand.h"
 #include "TileEditor.h"
 

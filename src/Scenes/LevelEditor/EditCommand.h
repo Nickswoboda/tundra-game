@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Tile.h"
-#include "TileMap.h"
+#include "../../Tile.h"
+#include "../../TileMap.h"
 #include "TileEditor.h"
 
 enum class EditType

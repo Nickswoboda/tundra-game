@@ -1,8 +1,8 @@
 #include "GameplayScene.h"
-#include "OptionsScene.h"
-#include "LevelSelectScene.h"
-#include "../PathFinding.h"
-#include "../Utilities.h"
+#include "../Options/OptionsScene.h"
+#include "../LevelSelect/LevelSelectScene.h"
+#include "../../PathFinding.h"
+#include "../../Utilities.h"
 
 #include <fstream>
 #include <iostream>
