@@ -92,10 +92,6 @@ const Tile* TileMap::GetTileByPos(Aegis::Vec2 pos) const
 	return GetTileByIndex(pos / tile_size_);
 }
 
-void TileMap::SetTile(const Aegis::Vec2 index, int flags)
-{
-	SetTile(index, tile_tokens_by_flags_[flags]);
-}
 void TileMap::SetTile(const Aegis::Vec2 index, const char token)
 {
 	tiles_[index.x][index.y] = &tiles_by_token[token];
@@ -121,25 +117,6 @@ std::vector<Aegis::Vec2> TileMap::GetAdjacentTilesIndices(Aegis::Vec2 index) con
 	Aegis::Vec2 right = {index.x + 1, index.y};
 	if (GetTileByIndex(right)) indices.push_back(right);
 	
-	return indices;
-}
-
-std::vector<Aegis::Vec2> TileMap::GetSurroundingTilesIndices(Aegis::Vec2 index) const
-{
-	std::vector<Aegis::Vec2> indices = GetAdjacentTilesIndices(index);
-
-	Aegis::Vec2 top_left = index + Aegis::Vec2{-1, -1};
-	if (GetTileByIndex(top_left)) indices.push_back(top_left);
-
-	Aegis::Vec2 top_right = index + Aegis::Vec2{1, -1};
-	if (GetTileByIndex(top_right)) indices.push_back(top_right);
-	
-	Aegis::Vec2 bot_left = index + Aegis::Vec2{-1, 1};
-	if (GetTileByIndex(bot_left)) indices.push_back(bot_left);
-
-	Aegis::Vec2 bot_right = index + Aegis::Vec2{1, 1};
-	if (GetTileByIndex(bot_right)) indices.push_back(bot_right);
-
 	return indices;
 }
 
@@ -246,20 +223,6 @@ void TileMap::LoadTiles()
 	tiles_by_token.emplace('i', Tile(tile_atlas_, {32, 32, 32, 32}, false, true));
 	tiles_by_token.emplace('w', Tile(tile_atlas_, {96, 64, 32, 32}, true, false));
 	tiles_by_token.emplace('g', Tile(tile_atlas_, {128, 64, 32, 32}, false, false));
-
-	tile_tokens_by_flags_.emplace(None, 'w');
-	tile_tokens_by_flags_.emplace(Top, '6');
-	tile_tokens_by_flags_.emplace(Bottom, '1');
-	tile_tokens_by_flags_.emplace(Left, '4');
-	tile_tokens_by_flags_.emplace(Right, '3');
-	tile_tokens_by_flags_.emplace(TopLeft, '7');
-	tile_tokens_by_flags_.emplace(TopRight, '5');
-	tile_tokens_by_flags_.emplace(BottomLeft, '2');
-	tile_tokens_by_flags_.emplace(BottomRight, '0');
-	tile_tokens_by_flags_.emplace(Top | Left, '8');
-	tile_tokens_by_flags_.emplace(Top | Right, '9');
-	tile_tokens_by_flags_.emplace(Bottom | Left, 'a');
-	tile_tokens_by_flags_.emplace(Bottom | Right, 'b');
 }
 
 void TileMap::Clear()
@@ -277,57 +240,3 @@ void TileMap::Clear()
 
 	pellet_spawn_indices_.clear();
 } 
-
-void TileMap::DrawGridLines() const
-{
-	Aegis::Vec2 line_lengths = grid_size_ * 32;
-	Aegis::Vec4 grid_color = { 0.0f, 0.0f, 0.0f, 0.2f };
-	for (int i = 0; i <= grid_size_.x; ++i){
-		Aegis::DrawQuad({i * 32.0f - 1, 0}, {2, line_lengths.y}, grid_color);
-	}
-
-	for (int i = 0; i <= grid_size_.y; ++i){
-		Aegis::DrawQuad({0, i * 32.0f - 1}, {line_lengths.x, 2}, grid_color);
-	}
-}
-
-int TileMap::GetIceNeighborFlags(Aegis::Vec2 index) const
-{
-	int flags = 0;
-
-	auto top = GetTileByIndex(index + Aegis::Vec2{0, -1});
-	if (top && !top->is_solid_){
-		flags |= IceNeighborFlags::Top;
-	}
-
-	auto bot = GetTileByIndex(index + Aegis::Vec2{0, 1});
-	if (bot && !bot->is_solid_){
-		flags |= IceNeighborFlags::Bottom;
-	}
-	auto left = GetTileByIndex(index + Aegis::Vec2{-1, 0});
-	if (left && !left->is_solid_){
-		flags |= IceNeighborFlags::Left;
-	}
-	auto right = GetTileByIndex(index + Aegis::Vec2{1, 0});
-	if (right && !right->is_solid_){
-		flags |= IceNeighborFlags::Right;
-	}
-	auto top_left = GetTileByIndex(index + Aegis::Vec2{-1, -1});
-	if (top_left && !top_left->is_solid_){
-		flags |= IceNeighborFlags::TopLeft;
-	}
-	auto top_right = GetTileByIndex(index + Aegis::Vec2{1, -1});
-	if (top_right && !top_right->is_solid_){
-		flags |= IceNeighborFlags::TopRight;
-	}
-	auto bot_left = GetTileByIndex(index + Aegis::Vec2{-1, 1});
-	if (bot_left && !bot_left->is_solid_){
-		flags |= IceNeighborFlags::BottomLeft;
-	}
-	auto bot_right = GetTileByIndex(index + Aegis::Vec2{1, 1});
-	if (bot_right && !bot_right->is_solid_){
-		flags |= IceNeighborFlags::BottomRight;
-	}
-
-	return flags;
-}

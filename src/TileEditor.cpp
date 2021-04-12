@@ -1,0 +1,123 @@
+#include "TileEditor.h"
+
+int GetSimplifiedFlags(int flags){
+	if (flags & Top){
+		flags &= ~TopLeft;
+		flags &= ~TopRight;
+	}
+	if (flags & Bottom){
+		flags &= ~BottomLeft;
+		flags &= ~BottomRight;
+	}
+	if (flags & Left){
+		flags &= ~TopLeft;
+		flags &= ~BottomLeft;
+	}
+	if (flags & Right){
+		flags &= ~TopRight;
+		flags &= ~BottomRight;
+	}
+	
+	return flags;
+}
+
+TileEditor::TileEditor(TileMap& tile_map)
+	:tile_map_(tile_map)
+{
+	tile_tokens_by_flags_.emplace(None, 'w');
+	tile_tokens_by_flags_.emplace(Top, '6');
+	tile_tokens_by_flags_.emplace(Bottom, '1');
+	tile_tokens_by_flags_.emplace(Left, '4');
+	tile_tokens_by_flags_.emplace(Right, '3');
+	tile_tokens_by_flags_.emplace(TopLeft, '7');
+	tile_tokens_by_flags_.emplace(TopRight, '5');
+	tile_tokens_by_flags_.emplace(BottomLeft, '2');
+	tile_tokens_by_flags_.emplace(BottomRight, '0');
+	tile_tokens_by_flags_.emplace(Top | Left, '8');
+	tile_tokens_by_flags_.emplace(Top | Right, '9');
+	tile_tokens_by_flags_.emplace(Bottom | Left, 'a');
+	tile_tokens_by_flags_.emplace(Bottom | Right, 'b');
+}
+
+void TileEditor::DrawGridLines() const
+{
+	Aegis::Vec2 line_lengths = tile_map_.grid_size_ * 32;
+	Aegis::Vec4 grid_color = { 0.0f, 0.0f, 0.0f, 0.2f };
+	for (int i = 0; i <= tile_map_.grid_size_.x; ++i){
+		Aegis::DrawQuad({i * 32.0f - 1, 0}, {2, line_lengths.y}, grid_color);
+	}
+
+	for (int i = 0; i <= tile_map_.grid_size_.y; ++i){
+		Aegis::DrawQuad({0, i * 32.0f - 1}, {line_lengths.x, 2}, grid_color);
+	}
+}
+
+void TileEditor::SetTile(Aegis::Vec2 index, const Tile& tile)
+{
+	tile_map_.SetTile(index, tile);
+	UpdateSurroundingWallTiles(index);
+}
+
+int TileEditor::GetIceNeighborFlags(Aegis::Vec2 index) const
+{
+	int flags = 0;
+
+	auto top = tile_map_.GetTileByIndex(index + Aegis::Vec2{0, -1});
+	if (top && !top->is_solid_){
+		flags |= IceNeighborFlags::Top;
+	}
+
+	auto bot = tile_map_.GetTileByIndex(index + Aegis::Vec2{0, 1});
+	if (bot && !bot->is_solid_){
+		flags |= IceNeighborFlags::Bottom;
+	}
+	auto left = tile_map_.GetTileByIndex(index + Aegis::Vec2{-1, 0});
+	if (left && !left->is_solid_){
+		flags |= IceNeighborFlags::Left;
+	}
+	auto right = tile_map_.GetTileByIndex(index + Aegis::Vec2{1, 0});
+	if (right && !right->is_solid_){
+		flags |= IceNeighborFlags::Right;
+	}
+	auto top_left = tile_map_.GetTileByIndex(index + Aegis::Vec2{-1, -1});
+	if (top_left && !top_left->is_solid_){
+		flags |= IceNeighborFlags::TopLeft;
+	}
+	auto top_right = tile_map_.GetTileByIndex(index + Aegis::Vec2{1, -1});
+	if (top_right && !top_right->is_solid_){
+		flags |= IceNeighborFlags::TopRight;
+	}
+	auto bot_left = tile_map_.GetTileByIndex(index + Aegis::Vec2{-1, 1});
+	if (bot_left && !bot_left->is_solid_){
+		flags |= IceNeighborFlags::BottomLeft;
+	}
+	auto bot_right = tile_map_.GetTileByIndex(index + Aegis::Vec2{1, 1});
+	if (bot_right && !bot_right->is_solid_){
+		flags |= IceNeighborFlags::BottomRight;
+	}
+
+	return flags;
+}
+
+void TileEditor::UpdateTile(Aegis::Vec2 index)
+{
+	if (!tile_map_.GetTileByIndex(index)->is_solid_) return;
+	
+	auto flags = GetSimplifiedFlags(GetIceNeighborFlags(index));
+	if (!tile_tokens_by_flags_.count(flags)){
+		return;
+	}
+
+	tile_map_.SetTile(index, tile_tokens_by_flags_[flags]);
+}
+
+void TileEditor::UpdateSurroundingWallTiles(Aegis::Vec2 index)
+{
+	std::array<int, 3> dir{-1, 0, 1};
+	
+	for (auto x = 0; x < dir.size(); ++x){
+		for (auto y = 0; y < dir.size(); ++y){
+			UpdateTile(index + Aegis::Vec2(dir[x], dir[y]));
+		}
+	}
+}

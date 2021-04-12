@@ -2,7 +2,7 @@
 
 #include "Tile.h"
 #include "TileMap.h"
-
+#include "TileEditor.h"
 
 enum class EditType
 {
@@ -22,13 +22,12 @@ public:
 class TileEditCommand : public EditCommand
 {
 public:
-	TileEditCommand(TileMap& tile_map, const Aegis::Vec2 index, const Tile& new_tile);
+	TileEditCommand(TileEditor& editor_, const Aegis::Vec2 index, const Tile& new_tile);
 
 	void Execute() override;
 	void Undo() override;
 	
-	void UpdateSurroundingWallTiles();
-	TileMap& tile_map_;
+	TileEditor& editor_;
 	const Aegis::Vec2 index_;
 	const Tile& new_tile_;
 	const Tile& prev_tile_;

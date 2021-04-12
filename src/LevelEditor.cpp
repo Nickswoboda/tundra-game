@@ -11,7 +11,7 @@ Aegis::Vec4 GetFishTextureCoords(const Aegis::Texture& texture)
 }
 
 LevelEditor::LevelEditor(TileMap& tile_map)
-	:tile_map_(tile_map)
+	:tile_map_(tile_map), tile_editor_(tile_map)
 {
 	sprite_sheet_ = Aegis::TextureManager::Load("assets/textures/tile_map.png");
 	fish_texture_coords_ = GetFishTextureCoords(*sprite_sheet_);
@@ -28,7 +28,7 @@ LevelEditor::LevelEditor(TileMap& tile_map)
 void LevelEditor::Render(float dt)
 {
 	tile_map_.Render();
-	tile_map_.DrawGridLines();
+	tile_editor_.DrawGridLines();
 
 	for (const auto& [spawn, sprite] : sprites_){
 		sprite.Draw();
@@ -85,6 +85,8 @@ void LevelEditor::OnMouseClick(int action, int button)
 			if (!RequestEdit(EditType::Spawn)){
 				current_tile_token_ = 'i';
 				RequestEdit(EditType::Tile);
+			} else {
+				UpdateSpritePositions();
 			}
 		}
 	}
@@ -108,7 +110,7 @@ bool LevelEditor::RequestEdit(EditType edit_type)
 			if (tile != &new_tile && tile_index.x > 0 && tile_index.y > 0
 				&& tile_index.x < tile_map_.grid_size_.x - 1
 				&& tile_index.y < tile_map_.grid_size_.y - 1){
-				command = std::make_shared<TileEditCommand>(tile_map_, tile_index, new_tile);
+				command = std::make_shared<TileEditCommand>(tile_editor_, tile_index, new_tile);
 			}
 
 			break;
@@ -119,8 +121,8 @@ bool LevelEditor::RequestEdit(EditType edit_type)
 			}
 			else if (tile->is_slippery_){
 				command = std::make_shared<SpawnEditCommand>(tile_map_, current_spawn_, tile_index);
-				current_spawn_ = SpawnPoint::None;
 			}
+			current_spawn_ = SpawnPoint::None;
 			break;
 		}
 		case EditType::Fish: { 

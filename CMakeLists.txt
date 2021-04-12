@@ -18,6 +18,7 @@ add_executable (Tundra
 	"src/Utilities.cpp"
 	"src/LevelCard.cpp"
 	"src/LevelEditor.cpp"
+	"src/TileEditor.cpp"
 	"src/GameOverDialog.cpp"
 	"src/Scenes/MenuScene.cpp"
 	"src/Scenes/OptionsScene.cpp" 

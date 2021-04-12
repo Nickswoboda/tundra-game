@@ -2,6 +2,7 @@
 
 #include "TileMap.h"
 #include "EditCommand.h"
+#include "TileEditor.h"
 
 #include <stack>
 
@@ -29,6 +30,7 @@ private:
 	void UpdateSpritePositions();
 
 	TileMap& tile_map_;
+	TileEditor tile_editor_;
 	char current_tile_token_;
 
 	std::shared_ptr<Aegis::Texture> sprite_sheet_;
