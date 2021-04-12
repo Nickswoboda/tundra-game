@@ -10,85 +10,63 @@ void TileEditCommand::Execute()
 	tile_map_.SetTile(index_, new_tile_);
 	UpdateSurroundingWallTiles();
 }
+
 void TileEditCommand::Undo()
 {
 	tile_map_.SetTile(index_, prev_tile_);
 	UpdateSurroundingWallTiles();
 }
 
-void UpdateGroundTile(TileMap& tile_map, Aegis::Vec2 index)
+int GetSimplifiedFlags(int flags){
+	if (flags & Top){
+		flags &= ~TopLeft;
+		flags &= ~TopRight;
+	}
+	if (flags & Bottom){
+		flags &= ~BottomLeft;
+		flags &= ~BottomRight;
+	}
+	if (flags & Left){
+		flags &= ~TopLeft;
+		flags &= ~BottomLeft;
+	}
+	if (flags & Right){
+		flags &= ~TopRight;
+		flags &= ~BottomRight;
+	}
+	
+	return flags;
+}
+
+void InvalidateSurroundingIceTiles(TileMap& tile_map, Aegis::Vec2 index)
 {
-	if (!(tile_map.GetTileByIndex(index.x, index.y)->is_solid_)){
+	auto surrounding = tile_map.GetSurroundingTilesIndices(index);
+	for (const auto& idx : surrounding){
+		if (tile_map.GetTileByIndex(idx)->is_slippery_){
+			tile_map.invalid_tiles_.insert(idx);
+		}
+	}
+}
+void UpdateTile(TileMap& tile_map, Aegis::Vec2 index)
+{
+	if (!tile_map.GetTileByIndex(index)->is_solid_) return;
+	
+	auto flags = GetSimplifiedFlags(tile_map.GetIceNeighborFlags(index));
+	if (!tile_map.tile_tokens_by_flags_.count(flags)){
 		return;
 	}
-	auto top = tile_map.GetTileByIndex(index.x, index.y - 1);
-	auto bot = tile_map.GetTileByIndex(index.x, index.y + 1);
-	auto left = tile_map.GetTileByIndex(index.x - 1, index.y);
-	auto right = tile_map.GetTileByIndex(index.x + 1, index.y);
 
-	if (top && !top->is_solid_){
-		if (left && !left->is_solid_){
-			tile_map.SetTile(index, '8');
-			return;
-		} else if (right && !right->is_solid_){
-			tile_map.SetTile(index, '9');
-			return;
-		} else {
-			tile_map.SetTile(index, '6');
-			return;
-		}
-	} else if (bot && !bot->is_solid_){
-		if (left && !left->is_solid_){
-			tile_map.SetTile(index, 'a');
-			return;
-		} else if (right && !right->is_solid_){
-			tile_map.SetTile(index, 'b');
-			return;
-		} else {
-			tile_map.SetTile(index, '1');
-			return;
-		}
-	}  else if (right && !right->is_solid_){
-			tile_map.SetTile(index, '3');
-			return;
-	} else if (left && !left->is_solid_){
-			tile_map.SetTile(index, '4');
-			return;
-	} else {
-		auto top_left = tile_map.GetTileByIndex(index.x - 1, index.y - 1);
-		if (top_left && !top_left->is_solid_){
-			tile_map.SetTile(index, '7');
-			return;
-		}
-		auto top_right = tile_map.GetTileByIndex(index.x + 1, index.y - 1);
-		if (top_right && !top_right->is_solid_){
-			tile_map.SetTile(index, '5');
-			return;
-		}
-		auto bot_left = tile_map.GetTileByIndex(index.x - 1, index.y + 1);
-		if (bot_left && !bot_left->is_solid_){
-			tile_map.SetTile(index, '2');
-			return;
-		}
-		auto bot_right = tile_map.GetTileByIndex(index.x + 1, index.y + 1);
-		if (bot_right && !bot_right->is_solid_){
-			tile_map.SetTile(index, '0');
-			return;
-		}
-	}
-
-	tile_map.SetTile(index, 'w');
-
-
+	tile_map.SetTile(index, flags);
 }
+
 void TileEditCommand::UpdateSurroundingWallTiles()
 {
-	UpdateGroundTile(tile_map_, index_);
-	for (auto& tile : tile_map_.GetDiagonalTilesIndices(index_)){
-		UpdateGroundTile(tile_map_, tile);
-	}
-	for (auto& tile : tile_map_.GetAdjacentTilesIndices(index_)){
-		UpdateGroundTile(tile_map_, tile);
+	std::array<int, 3> dir{-1, 0, 1};
+	
+	for (auto x = 0; x < dir.size(); ++x){
+		for (auto y = 0; y < dir.size(); ++y){
+			UpdateTile(tile_map_, index_ + Aegis::Vec2(dir[x], dir[y]));
+		}
 	}
 }
 

@@ -8,10 +8,10 @@ Aegis::Vec2 GetSlidingTargetTile(const TileMap& tile_map, const Aegis::Vec2& sta
 
 	//Check each tile, if ice, go to next tile. If ground, stop, if wall or edge of map, go back one tile
 	pos += dir;
-	const Tile* tile = tile_map.GetTileByIndex(pos.x, pos.y); 
+	const Tile* tile = tile_map.GetTileByIndex(pos); 
 	while (tile && tile->is_slippery_){
 		pos += dir;
-		tile = tile_map.GetTileByIndex(pos.x, pos.y); 
+		tile = tile_map.GetTileByIndex(pos); 
 	}
 	if (!tile || tile->is_solid_){
 		pos -= dir;
@@ -76,7 +76,7 @@ std::vector<Aegis::Vec2> GetNeighborTilesMoving(const TileMap& tile_map, const A
 
 	std::vector<Aegis::Vec2> neighbors;
 	for (auto index : adjacent_indices){
-		if (!tile_map.GetTileByIndex(index.x, index.y)->is_solid_){
+		if (!tile_map.GetTileByIndex(index)->is_solid_){
 			neighbors.push_back(index);
 		}
 	}

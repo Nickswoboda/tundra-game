@@ -39,9 +39,9 @@ TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Ae
 				pellet_spawn_indices_.emplace(col, row);
 			}
 
-			tiles_[col++].push_back(&tiles_map_['i']);
-		} else if (tiles_map_.count(ch)){
-			tiles_[col++].push_back(&tiles_map_[ch]);
+			tiles_[col++].push_back(&tiles_by_token['i']);
+		} else if (tiles_by_token.count(ch)){
+			tiles_[col++].push_back(&tiles_by_token[ch]);
 		} else if (ch != '\n'){
 			std::cout << ch << " is not a recognized tile symbol. File: " << file_path << "\n";
 		}
@@ -60,7 +60,7 @@ TileMap::TileMap(int width, int height, int tile_size, std::shared_ptr<Aegis::Te
 	for (int i = 0; i < width; ++i){
 		std::vector<const Tile*> col;
 		for (int j = 0; j < height; ++j){
-			col.push_back(&tiles_map_['w']);
+			col.push_back(&tiles_by_token['w']);
 		}
 		tiles_.push_back(col);
 	}
@@ -78,91 +78,69 @@ void TileMap::Render() const
 	}
 }
 
-const Tile* TileMap::GetTileByIndex(int col, int row) const
+const Tile* TileMap::GetTileByIndex(Aegis::Vec2 index) const
 {
-	if (row >= grid_size_.y || row < 0 || col >= grid_size_.x || col < 0) {
+	if (index.y >= grid_size_.y || index.y < 0 || index.x >= grid_size_.x || index.x < 0) {
 		return nullptr;
 	}
 
-	return tiles_[col][row];
+	return tiles_[index.x][index.y];
 }
 
-const Tile* TileMap::GetTileByPos(int x_pos, int y_pos) const
+const Tile* TileMap::GetTileByPos(Aegis::Vec2 pos) const
 {
-	return GetTileByIndex(x_pos / tile_size_, y_pos / tile_size_);
+	return GetTileByIndex(pos / tile_size_);
 }
 
+void TileMap::SetTile(const Aegis::Vec2 index, int flags)
+{
+	SetTile(index, tile_tokens_by_flags_[flags]);
+}
 void TileMap::SetTile(const Aegis::Vec2 index, const char token)
 {
-	tiles_[index.x][index.y] = &tiles_map_[token];
+	tiles_[index.x][index.y] = &tiles_by_token[token];
 }
 void TileMap::SetTile(const Aegis::Vec2 index, const Tile& tile)
 {
 	tiles_[index.x][index.y] = &tile;
 }
 
-std::vector<Aegis::Vec2> TileMap::GetDiagonalTilesIndices(Aegis::Vec2 index) const
-{
-	std::vector<Aegis::Vec2> indices;
-	
-	Aegis::Vec2 top_left = {index.x - 1, index.y - 1};
-	if (GetTileByIndex(top_left.x, top_left.y)) indices.push_back(top_left);
-
-	Aegis::Vec2 top_right = {index.x + 1, index.y - 1};
-	if (GetTileByIndex(top_right.x, top_right.y)) indices.push_back(top_right);
-
-	Aegis::Vec2 bot_left = {index.x - 1, index.y + 1};
-	if (GetTileByIndex(bot_left.x, bot_left.y)) indices.push_back(bot_left);
-
-	Aegis::Vec2 bot_right = {index.x + 1, index.y + 1};
-	if (GetTileByIndex(bot_right.x, bot_right.y)) indices.push_back(bot_right);
-	
-	return indices;
-}
 std::vector<Aegis::Vec2> TileMap::GetAdjacentTilesIndices(Aegis::Vec2 index) const 
 {
 	std::vector<Aegis::Vec2> indices;
 	
 	Aegis::Vec2 up = {index.x, index.y - 1};
-	if (GetTileByIndex(up.x, up.y)) indices.push_back(up);
+	if (GetTileByIndex(up)) indices.push_back(up);
 
 	Aegis::Vec2 down = {index.x, index.y + 1};
-	if (GetTileByIndex(down.x, down.y)) indices.push_back(down);
+	if (GetTileByIndex(down)) indices.push_back(down);
 
 	Aegis::Vec2 left = {index.x - 1, index.y};
-	if (GetTileByIndex(left.x, left.y)) indices.push_back(left);
+	if (GetTileByIndex(left)) indices.push_back(left);
 
 	Aegis::Vec2 right = {index.x + 1, index.y};
-	if (GetTileByIndex(right.x, right.y)) indices.push_back(right);
+	if (GetTileByIndex(right)) indices.push_back(right);
 	
 	return indices;
 }
 
-std::vector<const Tile*> TileMap::GetTilesUnderneath(int x, int y, int w, int h) const 
+std::vector<Aegis::Vec2> TileMap::GetSurroundingTilesIndices(Aegis::Vec2 index) const
 {
-	std::vector<const Tile*> temp;
+	std::vector<Aegis::Vec2> indices = GetAdjacentTilesIndices(index);
 
-	int left_index = std::max(0.0f, (float)x / tile_size_);
-	int right_index = std::min(grid_size_.x, (float)(x + w - 1) / tile_size_);
-	int top_index = std::max(0.0f, (float)y / tile_size_);
-	int bottom_index = std::min(grid_size_.y,(float) (y + h - 1) / tile_size_);
+	Aegis::Vec2 top_left = index + Aegis::Vec2{-1, -1};
+	if (GetTileByIndex(top_left)) indices.push_back(top_left);
 
+	Aegis::Vec2 top_right = index + Aegis::Vec2{1, -1};
+	if (GetTileByIndex(top_right)) indices.push_back(top_right);
+	
+	Aegis::Vec2 bot_left = index + Aegis::Vec2{-1, 1};
+	if (GetTileByIndex(bot_left)) indices.push_back(bot_left);
 
-	for (int i = left_index; i <= right_index; ++i) {
-		for (int j = top_index; j <= bottom_index; ++j) {
-			const Tile* tile = GetTileByIndex(i, j);
-			if (tile != nullptr) {
-				temp.push_back(tiles_[i][j]);
-			}
-		}
-	}
+	Aegis::Vec2 bot_right = index + Aegis::Vec2{1, 1};
+	if (GetTileByIndex(bot_right)) indices.push_back(bot_right);
 
-	return temp;
-}
-
-std::vector<const Tile*> TileMap::GetTilesUnderneath(const Aegis::AABB& rect) const
-{
-	return GetTilesUnderneath(rect.pos.x, rect.pos.y, rect.size.x, rect.size.y);
+	return indices;
 }
 
 std::vector<std::vector<bool>> TileMap::GetReachableTileIndices(Aegis::Vec2 start_index) const
@@ -194,6 +172,11 @@ Aegis::Vec2 TileMap::GetGridIndexByPos(const Aegis::Vec2& pos) const
 {
 	auto index = pos / tile_size_;
 	//want to truncate for positioning
+	
+	if (index.y >= grid_size_.y || index.y < 0 || index.x >= grid_size_.x || index.x < 0) {
+		return {-1, -1};
+	}
+
 	return Aegis::Vec2((int)index.x, (int)index.y);
 }
 
@@ -248,21 +231,35 @@ void TileMap::Save(int level_num)
 
 void TileMap::LoadTiles()
 {
-	tiles_map_.emplace('0', Tile(tile_atlas_, {0, 0, 32, 32}, true, false));
-	tiles_map_.emplace('1', Tile(tile_atlas_, {32, 0, 32, 32}, true, false));
-	tiles_map_.emplace('2', Tile(tile_atlas_, {64, 0, 32, 32}, true, false));
-	tiles_map_.emplace('3', Tile(tile_atlas_, {0, 32, 32, 32}, true, false));
-	tiles_map_.emplace('4', Tile(tile_atlas_, {64, 32, 32, 32}, true, false));
-	tiles_map_.emplace('5', Tile(tile_atlas_, {0, 64, 32, 32}, true, false));
-	tiles_map_.emplace('6', Tile(tile_atlas_, {32, 64, 32, 32}, true, false));
-	tiles_map_.emplace('7', Tile(tile_atlas_, {64, 64, 32, 32}, true, false));
-	tiles_map_.emplace('8', Tile(tile_atlas_, { 96, 0, 32, 32 }, true, false));
-	tiles_map_.emplace('9', Tile(tile_atlas_, { 128, 0, 32, 32 }, true, false));
-	tiles_map_.emplace('a', Tile(tile_atlas_, { 96, 32, 32, 32 }, true, false));
-	tiles_map_.emplace('b', Tile(tile_atlas_, { 128, 32, 32, 32 }, true, false));
-	tiles_map_.emplace('i', Tile(tile_atlas_, {32, 32, 32, 32}, false, true));
-	tiles_map_.emplace('w', Tile(tile_atlas_, {96, 64, 32, 32}, true, false));
-	tiles_map_.emplace('g', Tile(tile_atlas_, {128, 64, 32, 32}, false, false));
+	tiles_by_token.emplace('0', Tile(tile_atlas_, {0, 0, 32, 32}, true, false));
+	tiles_by_token.emplace('1', Tile(tile_atlas_, {32, 0, 32, 32}, true, false));
+	tiles_by_token.emplace('2', Tile(tile_atlas_, {64, 0, 32, 32}, true, false));
+	tiles_by_token.emplace('3', Tile(tile_atlas_, {0, 32, 32, 32}, true, false));
+	tiles_by_token.emplace('4', Tile(tile_atlas_, {64, 32, 32, 32}, true, false));
+	tiles_by_token.emplace('5', Tile(tile_atlas_, {0, 64, 32, 32}, true, false));
+	tiles_by_token.emplace('6', Tile(tile_atlas_, {32, 64, 32, 32}, true, false));
+	tiles_by_token.emplace('7', Tile(tile_atlas_, {64, 64, 32, 32}, true, false));
+	tiles_by_token.emplace('8', Tile(tile_atlas_, { 96, 0, 32, 32 }, true, false));
+	tiles_by_token.emplace('9', Tile(tile_atlas_, { 128, 0, 32, 32 }, true, false));
+	tiles_by_token.emplace('a', Tile(tile_atlas_, { 96, 32, 32, 32 }, true, false));
+	tiles_by_token.emplace('b', Tile(tile_atlas_, { 128, 32, 32, 32 }, true, false));
+	tiles_by_token.emplace('i', Tile(tile_atlas_, {32, 32, 32, 32}, false, true));
+	tiles_by_token.emplace('w', Tile(tile_atlas_, {96, 64, 32, 32}, true, false));
+	tiles_by_token.emplace('g', Tile(tile_atlas_, {128, 64, 32, 32}, false, false));
+
+	tile_tokens_by_flags_.emplace(None, 'w');
+	tile_tokens_by_flags_.emplace(Top, '6');
+	tile_tokens_by_flags_.emplace(Bottom, '1');
+	tile_tokens_by_flags_.emplace(Left, '4');
+	tile_tokens_by_flags_.emplace(Right, '3');
+	tile_tokens_by_flags_.emplace(TopLeft, '7');
+	tile_tokens_by_flags_.emplace(TopRight, '5');
+	tile_tokens_by_flags_.emplace(BottomLeft, '2');
+	tile_tokens_by_flags_.emplace(BottomRight, '0');
+	tile_tokens_by_flags_.emplace(Top | Left, '8');
+	tile_tokens_by_flags_.emplace(Top | Right, '9');
+	tile_tokens_by_flags_.emplace(Bottom | Left, 'a');
+	tile_tokens_by_flags_.emplace(Bottom | Right, 'b');
 }
 
 void TileMap::Clear()
@@ -270,7 +267,7 @@ void TileMap::Clear()
 	for (auto& row : tiles_)
 	{
 		for (auto& tile : row) {
-			tile = &tiles_map_['w'];
+			tile = &tiles_by_token['w'];
 		}
 	}
 
@@ -292,4 +289,45 @@ void TileMap::DrawGridLines() const
 	for (int i = 0; i <= grid_size_.y; ++i){
 		Aegis::DrawQuad({0, i * 32.0f - 1}, {line_lengths.x, 2}, grid_color);
 	}
+}
+
+int TileMap::GetIceNeighborFlags(Aegis::Vec2 index) const
+{
+	int flags = 0;
+
+	auto top = GetTileByIndex(index + Aegis::Vec2{0, -1});
+	if (top && !top->is_solid_){
+		flags |= IceNeighborFlags::Top;
+	}
+
+	auto bot = GetTileByIndex(index + Aegis::Vec2{0, 1});
+	if (bot && !bot->is_solid_){
+		flags |= IceNeighborFlags::Bottom;
+	}
+	auto left = GetTileByIndex(index + Aegis::Vec2{-1, 0});
+	if (left && !left->is_solid_){
+		flags |= IceNeighborFlags::Left;
+	}
+	auto right = GetTileByIndex(index + Aegis::Vec2{1, 0});
+	if (right && !right->is_solid_){
+		flags |= IceNeighborFlags::Right;
+	}
+	auto top_left = GetTileByIndex(index + Aegis::Vec2{-1, -1});
+	if (top_left && !top_left->is_solid_){
+		flags |= IceNeighborFlags::TopLeft;
+	}
+	auto top_right = GetTileByIndex(index + Aegis::Vec2{1, -1});
+	if (top_right && !top_right->is_solid_){
+		flags |= IceNeighborFlags::TopRight;
+	}
+	auto bot_left = GetTileByIndex(index + Aegis::Vec2{-1, 1});
+	if (bot_left && !bot_left->is_solid_){
+		flags |= IceNeighborFlags::BottomLeft;
+	}
+	auto bot_right = GetTileByIndex(index + Aegis::Vec2{1, 1});
+	if (bot_right && !bot_right->is_solid_){
+		flags |= IceNeighborFlags::BottomRight;
+	}
+
+	return flags;
 }
