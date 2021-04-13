@@ -2,6 +2,7 @@
 
 #include "../Gameplay/GameplayScene.h"
 #include "../LevelSelect/LevelSelectScene.h"
+#include "../../PathFinding.h"
 
 #include <filesystem>
 #include <iostream>
@@ -76,27 +77,23 @@ void LevelEditorScene::Render(float delta_time)
 
 bool LevelEditorScene::IsLevelValid()
 {
-	//All Ice tiles and bears must be reachable by player to be considered valid
-	auto reachable_indices = tile_map_->GetReachableTileIndices(tile_map_->spawn_indices_[SpawnPoint::Bruce]);
+	//1. Allows for proper pathfinding for bears
+	auto bruce_index = tile_map_->spawn_indices_[SpawnPoint::Bruce];
 	auto brutus_index = tile_map_->spawn_indices_[SpawnPoint::Brutus];
-	if (!reachable_indices[brutus_index.x][brutus_index.y]){
+	
+	if (GetTargetTileCoordBFS(*tile_map_, brutus_index, bruce_index, false) == brutus_index){
 		return false;
 	}
 	auto bjorn_index = tile_map_->spawn_indices_[SpawnPoint::Bjorn];
-	if (!reachable_indices[bjorn_index.x][bjorn_index.y]){
+	if (GetTargetTileCoordBFS(*tile_map_, bjorn_index, bruce_index, true) == bjorn_index){
 		return false;
 	}
-
-	for (int i = 0; i < tile_map_->grid_size_.x; ++i){
-		for (int j = 0; j < tile_map_->grid_size_.y; ++j){
-			if (tile_map_->GetTileByIndex(Aegis::Vec2(i, j))->is_slippery_){
-				if (!reachable_indices[i][j]){
-					return false;
-				}
-			}
+	//2. All fish are reachable
+	for (const auto& index : tile_map_->pellet_spawn_indices_){
+		if (GetTargetTileCoordBFS(*tile_map_, bruce_index, index, true) == bruce_index){
+			return false;
 		}
 	}
-
 	return true;
 }
 
