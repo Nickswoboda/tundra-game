@@ -1,8 +1,10 @@
  #pragma once
 
-#include "../LevelEditor/LevelEditor.h"
+#include "LevelEditor.h"
+#include "EditorErrorDialog.h"
 
 class GameData;
+
 
 class LevelEditorScene : public Aegis::Scene
 {
@@ -15,12 +17,13 @@ public:
 	void Render(float delta_time) override;
 	void OnEvent(Aegis::Event& event) override;
 
-	bool IsLevelValid();
+	Error IsLevelValid();
 	void PreviewLevel();
 	void SaveLevel();
 	
 	std::shared_ptr<TileMap> tile_map_;
 	std::unique_ptr<LevelEditor> level_editor_;
+	std::shared_ptr<EditorErrorDialog> error_dialog_;
 
 	int level_num_;
 

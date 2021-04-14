@@ -6,25 +6,26 @@ project ("Tundra")
 add_executable (Tundra 
 	"src/main.cpp" 
 	"src/TileMap.cpp"
-	"src/Scenes/Menu/Particle.cpp"
 	"src/GameObject.cpp"
-	"src/Scenes/LevelEditor/EditCommand.cpp"
+	"src/GameData.cpp"
+	"src/PathFinding.cpp"
+	"src/Utilities.cpp"
+	"src/Scenes/Menu/MenuScene.cpp"
+	"src/Scenes/Menu/Particle.cpp"
+	"src/Scenes/Gameplay/GameplayScene.cpp" 
 	"src/Scenes/Gameplay/PauseMenu.cpp"
 	"src/Scenes/Gameplay/ScoreDialog.cpp"
-	"src/GameData.cpp"
 	"src/Scenes/Gameplay/InfoDialog.cpp"
-	"src/PathFinding.cpp"
 	"src/Scenes/Gameplay/ScoreBoard.cpp"
-	"src/Utilities.cpp"
+	"src/Scenes/Gameplay/GameOverDialog.cpp"
+	"src/Scenes/LevelSelect/LevelSelectScene.cpp"
 	"src/Scenes/LevelSelect/LevelCard.cpp"
+	"src/Scenes/LevelEditor/LevelEditorScene.cpp"
+	"src/Scenes/LevelEditor/EditCommand.cpp"
 	"src/Scenes/LevelEditor/LevelEditor.cpp"
 	"src/Scenes/LevelEditor/TileEditor.cpp"
-	"src/Scenes/Gameplay/GameOverDialog.cpp"
-	"src/Scenes/Menu/MenuScene.cpp"
-	"src/Scenes/Options/OptionsScene.cpp" 
-	"src/Scenes/Gameplay/GameplayScene.cpp" 
-	"src/Scenes/LevelEditor/LevelEditorScene.cpp"
-	"src/Scenes/LevelSelect/LevelSelectScene.cpp") 
+	"src/Scenes/LevelEditor/EditorErrorDialog.cpp"
+	"src/Scenes/Options/OptionsScene.cpp")
 
 
 add_subdirectory("dependencies/Aegis")

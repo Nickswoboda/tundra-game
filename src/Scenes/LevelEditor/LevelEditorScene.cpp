@@ -28,9 +28,9 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custo
 	camera_.SetPosition({-270, -24});
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>(); 
-	auto ui_font = Aegis::FontManager::Load("assets/fonts/worksans_regular.ttf", 20);
-	ui_layer_->SetFont(ui_font);
 	
+	error_dialog_ = ui_layer_->AddWidget<EditorErrorDialog>();
+
 	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 80, 40 ), "Undo");
 	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 80, 40 ), "Reset");
 	undo_button->ConnectSignal("pressed", [&](){level_editor_->Undo();});
@@ -42,10 +42,13 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custo
 	preview_button->ConnectSignal("pressed", [&](){PreviewLevel();});
 	save_button->ConnectSignal("pressed", [&](){SaveLevel();});
 	back_button->ConnectSignal("pressed", [&](){manager_->ReplaceScene<LevelSelectScene>(game_data, true);});
+
 }
 
 void LevelEditorScene::OnEvent(Aegis::Event& event)
 {
+	if (error_dialog_->visible_) return;
+
 	auto key_event = dynamic_cast<Aegis::KeyEvent*>(&event);
 	if (key_event && key_event->action_ == AE_BUTTON_RELEASE){
 		level_editor_->OnKeyRelease(key_event->key_);
@@ -75,45 +78,47 @@ void LevelEditorScene::Render(float delta_time)
 	level_editor_->Render(delta_time);
 }
 
-bool LevelEditorScene::IsLevelValid()
+Error LevelEditorScene::IsLevelValid()
 {
 	//1. Allows for proper pathfinding for bears
 	auto bruce_index = tile_map_->spawn_indices_[SpawnPoint::Bruce];
 	auto brutus_index = tile_map_->spawn_indices_[SpawnPoint::Brutus];
 	
+	std::string error_msg;
 	if (GetTargetTileCoordBFS(*tile_map_, brutus_index, bruce_index, false) == brutus_index){
-		return false;
+		return Error::PathFinding;
 	}
 	auto bjorn_index = tile_map_->spawn_indices_[SpawnPoint::Bjorn];
 	if (GetTargetTileCoordBFS(*tile_map_, bjorn_index, bruce_index, true) == bjorn_index){
-		return false;
+		return Error::PathFinding;
 	}
 	//2. All fish are reachable
 	for (const auto& index : tile_map_->pellet_spawn_indices_){
 		if (GetTargetTileCoordBFS(*tile_map_, bruce_index, index, true) == bruce_index){
-			return false;
+			return Error::FishReachability;
 		}
 	}
-	return true;
+
+	return Error::None;
 }
 
 void LevelEditorScene::PreviewLevel()
 {
-	if (IsLevelValid()){
+	Error error = IsLevelValid();
+	if (error == Error::None){
 		manager_->PushScene<GameplayScene>(tile_map_, game_data_);
-	}
-	else{
-		//show error dialog
+	} else {
+		error_dialog_->Show(error);
 	}
 }
 
 void LevelEditorScene::SaveLevel()
 {
-	if (IsLevelValid()){
+	Error error = IsLevelValid();
+	if (error == Error::None){
 		tile_map_->Save(level_num_);
-	}
-	else{
-		//show error dialog
+	} else {
+		error_dialog_->Show(error);
 	}
 }
 
