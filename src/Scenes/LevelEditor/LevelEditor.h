@@ -30,6 +30,8 @@ private:
 	void UpdateSpritePositions();
 
 	TileMap& tile_map_;
+	Aegis::Vec2 tile_map_pos_;
+
 	TileEditor tile_editor_;
 	char current_tile_token_;
 

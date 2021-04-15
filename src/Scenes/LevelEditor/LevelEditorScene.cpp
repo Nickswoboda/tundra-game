@@ -3,6 +3,7 @@
 #include "../Gameplay/GameplayScene.h"
 #include "../LevelSelect/LevelSelectScene.h"
 #include "../../PathFinding.h"
+#include "../../Utilities.h"
 
 #include <filesystem>
 #include <iostream>
@@ -24,24 +25,42 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custo
 
 	level_editor_ = std::make_unique<LevelEditor>(*tile_map_);
 
-	//used to center tilemap within window
 	camera_.SetPosition({-270, -24});
+	bg_texture_ = Aegis::TextureManager::Load("assets/textures/scene_bg.png");
+	//used to center tilemap within window
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>(); 
 	
 	error_dialog_ = ui_layer_->AddWidget<EditorErrorDialog>();
+	controls_dialog_ = ui_layer_->AddWidget<EditorControlsDialog>();
 
-	auto undo_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 80, 40 ), "Undo");
-	auto reset_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 80, 40 ), "Reset");
+	Aegis::AABB rect{0, 0, 265, 600};
+	Aegis::CenterAABBVertically(rect, Aegis::Application::GetWindow().GetViewport());
+	auto button_box = ui_layer_->AddWidget<Aegis::Container>(rect, Aegis::Container::Vertical, 2, Aegis::Alignment::Center);
+
+	auto editor_buttons_box = button_box->AddWidget<Aegis::Container>(Aegis::AABB(50, 300, 150, 120), Aegis::Container::Vertical, 2);
+	auto undo_button = editor_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 150, 50 ), "Undo");
+	auto reset_button = editor_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 150, 50 ), "Reset");
 	undo_button->ConnectSignal("pressed", [&](){level_editor_->Undo();});
 	reset_button->ConnectSignal("pressed", [&]() {level_editor_->ResetTileMap();});
 
-	auto preview_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB(  50, 450, 80, 40  ), "Preview");
-	auto save_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 140, 450, 80, 40 ), "Save");
-	auto back_button = ui_layer_->AddWidget<Aegis::Button>(Aegis::AABB( 70, 500, 125, 40 ), "Exit");  
+
+	auto validity_buttons_box = button_box->AddWidget<Aegis::Container>(Aegis::AABB(50, 300, 150, 120), Aegis::Container::Vertical, 2);
+	auto preview_button = validity_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB(  50, 450, 150, 50  ), "Preview");
+	auto save_button = validity_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 140, 450, 150, 50 ), "Save");
+	auto controls_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 70, 500, 150, 50 ), "Controls");  
+	auto back_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 70, 500, 150, 50 ), "Exit");  
 	preview_button->ConnectSignal("pressed", [&](){PreviewLevel();});
 	save_button->ConnectSignal("pressed", [&](){SaveLevel();});
+	controls_button->ConnectSignal("pressed", [&](){controls_dialog_->visible_ = true;});
 	back_button->ConnectSignal("pressed", [&](){manager_->ReplaceScene<LevelSelectScene>(game_data, true);});
+
+	StylizeButton(*undo_button, 3, 16);
+	StylizeButton(*reset_button, 3, 16);
+	StylizeButton(*preview_button, 3, 16);
+	StylizeButton(*save_button, 3, 16);
+	StylizeButton(*controls_button, 3, 16);
+	StylizeButton(*back_button, 3, 16);
 
 }
 
@@ -69,12 +88,12 @@ void LevelEditorScene::OnEvent(Aegis::Event& event)
 
 void LevelEditorScene::Update()
 {
-
 }
 
 void LevelEditorScene::Render(float delta_time)
 {
 	Aegis::Renderer2D::SetProjection(camera_.view_projection_matrix_);
+	Aegis::DrawQuad({-270,-24}, *bg_texture_);
 	level_editor_->Render(delta_time);
 }
 

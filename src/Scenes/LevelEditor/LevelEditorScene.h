@@ -2,6 +2,7 @@
 
 #include "LevelEditor.h"
 #include "EditorErrorDialog.h"
+#include "EditorControlsDialog.h"
 
 class GameData;
 
@@ -24,6 +25,8 @@ public:
 	std::shared_ptr<TileMap> tile_map_;
 	std::unique_ptr<LevelEditor> level_editor_;
 	std::shared_ptr<EditorErrorDialog> error_dialog_;
+	std::shared_ptr<EditorControlsDialog> controls_dialog_;
+	std::shared_ptr<Aegis::Texture> bg_texture_;
 
 	int level_num_;
 

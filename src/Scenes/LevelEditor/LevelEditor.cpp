@@ -35,7 +35,7 @@ void LevelEditor::Render(float dt)
 	}
 
 	for (auto& index : tile_map_.pellet_spawn_indices_) {
-		Aegis::DrawSubTexture(index * 32, {16, 16}, *sprite_sheet_, fish_texture_coords_);
+		Aegis::DrawSubTexture((index * 32) + Aegis::Vec2(8,8), {16, 16}, *sprite_sheet_, fish_texture_coords_);
 	}
 
 	for (const auto& index : tile_map_.invalid_tiles_){

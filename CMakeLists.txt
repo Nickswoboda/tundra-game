@@ -25,6 +25,7 @@ add_executable (Tundra
 	"src/Scenes/LevelEditor/LevelEditor.cpp"
 	"src/Scenes/LevelEditor/TileEditor.cpp"
 	"src/Scenes/LevelEditor/EditorErrorDialog.cpp"
+	"src/Scenes/LevelEditor/EditorControlsDialog.cpp"
 	"src/Scenes/Options/OptionsScene.cpp")
 
 
