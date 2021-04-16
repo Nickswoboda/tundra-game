@@ -26,6 +26,9 @@ public:
 	std::unique_ptr<LevelEditor> level_editor_;
 	std::shared_ptr<EditorErrorDialog> error_dialog_;
 	std::shared_ptr<EditorControlsDialog> controls_dialog_;
+
+	std::shared_ptr<Aegis::SpinBox> first_star_time_;
+	std::shared_ptr<Aegis::SpinBox> second_star_time_;
 	std::shared_ptr<Aegis::Texture> bg_texture_;
 
 	int level_num_;

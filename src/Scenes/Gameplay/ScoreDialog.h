@@ -20,5 +20,5 @@ private:
 	std::unique_ptr<Aegis::Container> score_container_;
 	std::shared_ptr<Aegis::Label> time_label_;
 	std::array<std::shared_ptr<Aegis::SpriteWidget>, 3> star_sprites_;
-	const std::array<double, 2>& star_thresholds_;
+	const std::array<int, 2>& star_thresholds_;
 };

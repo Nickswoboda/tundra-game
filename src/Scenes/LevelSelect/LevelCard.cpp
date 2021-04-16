@@ -2,7 +2,7 @@
 
 #include "../../Utilities.h"
 
-int GetNumStarsEarned(const std::array<double, 2>& star_thresholds, const double time)
+int GetNumStarsEarned(const std::array<int, 2>& star_thresholds, const double time)
 {
 	if (time < 0) return 0;
 
@@ -15,7 +15,7 @@ int GetNumStarsEarned(const std::array<double, 2>& star_thresholds, const double
 	}
 }
 
-LevelCard::LevelCard(int level, const std::array<double, 2>& star_thresholds, const double fastest_time)
+LevelCard::LevelCard(int level, const std::array<int, 2>& star_thresholds, const double fastest_time)
 	:Aegis::Widget({0,0, 160, 128})
 {
 	AddSignal("pressed");

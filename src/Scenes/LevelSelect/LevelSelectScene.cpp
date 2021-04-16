@@ -90,7 +90,7 @@ void LevelSelectScene::CreateLevelCards(GameData& game_data, bool custom)
 			std::shared_ptr<LevelCard> card;
 			//custom levels currently do not have record times/stars
 			if (custom){
-				card = level_row_box->AddWidget<LevelCard>(i+1, std::array<double, 2>{}, -1);
+				card = level_row_box->AddWidget<LevelCard>(i+1, std::array<int, 2>{}, -1);
 			} else {
 				card = level_row_box->AddWidget<LevelCard>(i+1, game_data.star_thresholds_[i], game_data.record_times_[i]);
 			}
@@ -118,6 +118,8 @@ void DeleteCustomLevel(int level, GameData& game_data)
 	}
 
 	--game_data.num_custom_levels_;
+	game_data.custom_star_thresholds_.erase(game_data.custom_star_thresholds_.begin() + level-1);
+	game_data.custom_record_times_.erase(game_data.custom_record_times_.begin() + level-1);
 }
 
 

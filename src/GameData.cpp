@@ -52,11 +52,11 @@ int GetNumLevels(bool custom)
 	return num_levels;
 }
 
-std::vector<std::array<double, 2>> GetStarThresholds(int num_levels)
+std::vector<std::array<int, 2>> GetStarThresholds(int num_levels)
 {
 	auto values = GetOptionValue("star_thresholds");
 
-	std::vector<std::array<double, 2>> thresholds;
+	std::vector<std::array<int, 2>> thresholds;
 	thresholds.resize(num_levels);
 
 	if (values.empty()) {
@@ -69,7 +69,7 @@ std::vector<std::array<double, 2>> GetStarThresholds(int num_levels)
 
 		int level = 0;
 		while (input.good() && level < num_levels) {
-			std::array<double, 2> temp;
+			std::array<int, 2> temp;
 			input >> temp[0];
 			input >> temp[1];
 			thresholds[level] = temp;

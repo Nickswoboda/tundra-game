@@ -38,6 +38,8 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custo
 	Aegis::CenterAABBVertically(rect, Aegis::Application::GetWindow().GetViewport());
 	auto button_box = ui_layer_->AddWidget<Aegis::Container>(rect, Aegis::Container::Vertical, 2, Aegis::Alignment::Center);
 
+	first_star_time_ = button_box->AddWidget<Aegis::SpinBox>(120, 10);
+	second_star_time_ = button_box->AddWidget<Aegis::SpinBox>(60, 10);
 	auto editor_buttons_box = button_box->AddWidget<Aegis::Container>(Aegis::AABB(50, 300, 150, 120), Aegis::Container::Vertical, 2);
 	auto undo_button = editor_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 150, 50 ), "Undo");
 	auto reset_button = editor_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 150, 50 ), "Reset");
@@ -66,7 +68,7 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custo
 
 void LevelEditorScene::OnEvent(Aegis::Event& event)
 {
-	if (error_dialog_->visible_) return;
+	if (error_dialog_->visible_ || controls_dialog_->visible_) return;
 
 	auto key_event = dynamic_cast<Aegis::KeyEvent*>(&event);
 	if (key_event && key_event->action_ == AE_BUTTON_RELEASE){
@@ -136,6 +138,9 @@ void LevelEditorScene::SaveLevel()
 	Error error = IsLevelValid();
 	if (error == Error::None){
 		tile_map_->Save(level_num_);
+		++game_data_.num_custom_levels_;
+		std::array<int, 2> star_times = {first_star_time_->GetValue(), second_star_time_->GetValue()}; 
+		game_data_.custom_star_thresholds_.push_back(star_times);
 	} else {
 		error_dialog_->Show(error);
 	}
