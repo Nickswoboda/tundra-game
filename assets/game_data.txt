@@ -1,4 +1,0 @@
-first_time: 1
-star_thresholds: 60 120 60 120
-levels_completed: 0
-

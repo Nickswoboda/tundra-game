@@ -41,6 +41,9 @@ void EditorErrorDialog::Show(Error error)
 		case Error::PathFinding: 
 			error_label_->SetText("Bears are unable to pathfind to Bruce.");
 			break;
+		case Error::NoFish:
+			error_label_->SetText("There must be at least 1 fish.");
+			break;
 		case Error::FishReachability:
 			error_label_->SetText("Bruce is unable to reach all fish.");
 			break;

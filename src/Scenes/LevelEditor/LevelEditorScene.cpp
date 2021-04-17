@@ -114,6 +114,10 @@ Error LevelEditorScene::IsLevelValid()
 		return Error::PathFinding;
 	}
 	//2. All fish are reachable
+	if (tile_map_->pellet_spawn_indices_.empty()){
+		return Error::NoFish;
+	}
+
 	for (const auto& index : tile_map_->pellet_spawn_indices_){
 		if (GetTargetTileCoordBFS(*tile_map_, bruce_index, index, true) == bruce_index){
 			return Error::FishReachability;

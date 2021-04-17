@@ -5,8 +5,14 @@
 #include "../LevelSelect/LevelSelectScene.h"
 
 ScoreDialog::ScoreDialog(GameplayScene& scene)
-	:Aegis::Dialog("", {0,0, 350, 200}), star_thresholds_(scene.game_data_.star_thresholds_[scene.level_ - 1])
+	:Aegis::Dialog("", {0,0, 350, 200})
 {
+	if (scene.custom_level_){
+		star_thresholds_ = scene.game_data_.custom_star_thresholds_[scene.level_ - 1];
+	}else {
+		star_thresholds_ = scene.game_data_.star_thresholds_[scene.level_ - 1];
+	}
+
 	Aegis::AABB rect {0,0, 300, 200};
 	Aegis::CenterAABB(rect, Aegis::Application::GetWindow().GetViewport());
 	SetPos(rect.pos);

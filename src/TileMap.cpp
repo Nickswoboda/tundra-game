@@ -23,6 +23,7 @@ TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Ae
 
 		if ( ch == '\n'){
 			++row; col = 0;
+			continue; 
 		}
 		if (tiles_.size() <= col) {
 			tiles_.push_back(std::vector<const Tile*>());
@@ -48,7 +49,7 @@ TileMap::TileMap(const std::string& file_path, int tile_size, std::shared_ptr<Ae
 	}
 
 	grid_size_.x = tiles_.size();
-	grid_size_.y = tiles_[grid_size_.x - 1].size();
+	grid_size_.y = tiles_[0].size();
 }
 
 TileMap::TileMap(int width, int height, int tile_size, std::shared_ptr<Aegis::Texture> atlas)
@@ -178,16 +179,19 @@ void TileMap::Save(int level_num)
 		for (int col = 0; col < grid_size_.x; ++col) {
 			auto coord = Aegis::Vec2(col, row);
 
+			bool is_spawn = false;
 			for (const auto& [spawn, index] : spawn_indices_){
 				if (coord == index){
 					switch (spawn){
 						case SpawnPoint::Brutus: file << 'p'; break;
-						case SpawnPoint::Bruce: file << 'p'; break;
-						case SpawnPoint::Bjorn: file << 'p'; break;
+						case SpawnPoint::Bruce: file << 's'; break;
+						case SpawnPoint::Bjorn: file << 'j'; break;
 					}
+					is_spawn = true;
 					continue;
 				}
 			}
+			if (is_spawn) continue;
 			if (pellet_spawn_indices_.count(coord)){
 				file << 'f';
 			} else {

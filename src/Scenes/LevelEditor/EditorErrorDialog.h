@@ -8,6 +8,7 @@ enum class Error
 {
 	None,
 	PathFinding,		//Bears unable to locate Bruce
+	NoFish,
 	FishReachability    //Bruce unable to reach all fish
 };
 

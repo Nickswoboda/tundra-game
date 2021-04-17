@@ -43,6 +43,7 @@ public:
 
 	//-1 indicates level editor preview
 	int level_ = -1;
+	bool custom_level_ = false;
 	std::shared_ptr<TileMap> tile_map_;
 	std::shared_ptr<Aegis::Texture> bg_texture_;
 	std::vector<Pellet> pellets_;

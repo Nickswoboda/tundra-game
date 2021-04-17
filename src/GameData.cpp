@@ -52,9 +52,9 @@ int GetNumLevels(bool custom)
 	return num_levels;
 }
 
-std::vector<std::array<int, 2>> GetStarThresholds(int num_levels)
+std::vector<std::array<int, 2>> GetStarThresholds(int num_levels, bool custom)
 {
-	auto values = GetOptionValue("star_thresholds");
+	auto values = GetOptionValue(custom ? "custom_star_thresholds" : "star_thresholds");
 
 	std::vector<std::array<int, 2>> thresholds;
 	thresholds.resize(num_levels);
@@ -80,9 +80,9 @@ std::vector<std::array<int, 2>> GetStarThresholds(int num_levels)
 	return thresholds; 
 }
 
-std::vector<double> GetRecordTimes(int num_levels)
+std::vector<double> GetRecordTimes(int num_levels, bool custom)
 {
-	auto values = GetOptionValue("record_times");
+	auto values = GetOptionValue(custom ? "custom_record_times" : "record_times");
 	std::vector<double> records(num_levels, -1);
 
 	int level = 0;
@@ -98,12 +98,14 @@ void GameData::Load()
 {
 	num_levels_ = GetNumLevels(false);
 	num_custom_levels_ = GetNumLevels(true);
-	star_thresholds_ = GetStarThresholds(num_levels_);
+	star_thresholds_ = GetStarThresholds(num_levels_, true);
+	custom_star_thresholds_ = GetStarThresholds(num_custom_levels_, true);
 
 	std::string completed = GetOptionValue("levels_completed");
 	levels_completed_ = completed.empty() ? 0 : std::stoi(completed);
 
-	record_times_ = GetRecordTimes(num_levels_);
+	record_times_ = GetRecordTimes(num_levels_, false);
+	custom_record_times_ = GetRecordTimes(num_levels_, true);
 
 	std::string first_time = GetOptionValue("first_time");
 	first_time_playing_ = first_time.empty() ? true : (first_time == "1"); 
@@ -121,10 +123,21 @@ void GameData::Save() const
 	}
 	file << "\n";
 
+	file << "custom_star_thresholds: ";
+	for (auto& level : custom_star_thresholds_) {
+		file << level[0] << " " << level[1] << " ";
+	}
+	file << "\n";
+
 	file << levels_completed_ << "\n";
 
 	file << "record_times: ";
 	for (auto time : record_times_) {
+		file << time << " ";
+	}
+	file << "\n";
+	file << "custom_record_times: ";
+	for (auto time : custom_record_times_) {
 		file << time << " ";
 	}
 	file << "\n";

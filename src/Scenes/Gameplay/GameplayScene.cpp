@@ -14,7 +14,7 @@ GameplayScene::GameplayScene(std::shared_ptr<TileMap> tile_map, GameData& game_d
 	Init();
 }
 GameplayScene::GameplayScene(int level, bool is_custom, GameData& game_data)
-	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0), level_(level), game_data_(game_data)
+	:player_(0, 0), brutus_(0, 0), bjorn_(0, 0), level_(level), custom_level_(is_custom), game_data_(game_data)
 {
 	auto atlas = Aegis::TextureManager::Load("assets/textures/tile_map.png");
 	std::string prefix = is_custom ? "assets/levels/custom_level_" : "assets/levels/level_";
