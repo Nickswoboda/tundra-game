@@ -48,7 +48,7 @@ LevelSelectScene::LevelSelectScene(GameData& game_data, bool show_custom)
 		auto delete_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Delete");
 
 		new_button->ConnectSignal("pressed", [&]() { if (game_data.num_custom_levels_ < 12) manager_->ReplaceScene<LevelEditorScene>(game_data); });
-		edit_button->ConnectSignal("pressed", [&]() {manager_->ReplaceScene<LevelEditorScene>(game_data, selected_level_, true); });
+		edit_button->ConnectSignal("pressed", [&]() {manager_->ReplaceScene<LevelEditorScene>(game_data, selected_level_); });
 		delete_button->ConnectSignal("pressed", [&]() {
 			DeleteCustomLevel(selected_level_, game_data); 
 			manager_->ReplaceScene<LevelSelectScene>(game_data, true);
@@ -107,6 +107,10 @@ void DeleteCustomLevel(int level, GameData& game_data)
 	if (level == -1 || level > game_data.num_custom_levels_) {
 		return;
 	}
+	game_data.custom_star_thresholds_.erase(game_data.custom_star_thresholds_.begin() + level-1);
+	game_data.custom_record_times_.erase(game_data.custom_record_times_.begin() + level-1);
+	--game_data.num_custom_levels_;
+
 	std::string prefix = "assets/levels/custom_level_";
 
 	std::filesystem::remove(prefix + std::to_string(level) + ".txt");
@@ -116,10 +120,6 @@ void DeleteCustomLevel(int level, GameData& game_data)
 		std::filesystem::rename(prefix + std::to_string(level) + ".txt", prefix + std::to_string(level-1) + ".txt");
 		++level;
 	}
-
-	--game_data.num_custom_levels_;
-	game_data.custom_star_thresholds_.erase(game_data.custom_star_thresholds_.begin() + level-1);
-	game_data.custom_record_times_.erase(game_data.custom_record_times_.begin() + level-1);
 }
 
 

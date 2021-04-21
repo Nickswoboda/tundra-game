@@ -129,10 +129,10 @@ void GameData::Save() const
 	}
 	file << "\n";
 
-	file << levels_completed_ << "\n";
+	file <<  "levels_completed: " << levels_completed_ << "\n";
 
 	file << "record_times: ";
-	for (auto time : record_times_) {
+	for (auto time : record_times_) { 
 		file << time << " ";
 	}
 	file << "\n";

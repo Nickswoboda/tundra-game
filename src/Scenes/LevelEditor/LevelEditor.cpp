@@ -205,3 +205,4 @@ void LevelEditor::UpdateSpritePositions()
 		sprite.position_ = tile_map_.spawn_indices_[spawn] * 32;
 	}
 }
+

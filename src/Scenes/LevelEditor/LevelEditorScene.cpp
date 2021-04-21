@@ -10,7 +10,7 @@
 #include <fstream>
 
 
-LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custom)
+LevelEditorScene::LevelEditorScene(GameData& game_data, int level)
 	:level_num_(level), game_data_(game_data)
 {
 	auto sprite_sheet_ = Aegis::TextureManager::Load("assets/textures/tile_map.png");
@@ -19,7 +19,7 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custo
 		tile_map_ = std::make_unique<TileMap>(31, 21, 32, sprite_sheet_); 
 	}
 	else{
-		std::string prefix = is_custom ? "assets/levels/custom_level_" : "assets/levels/level_";
+		std::string prefix = "assets/levels/custom_level_";
 		tile_map_ = std::make_unique<TileMap>(prefix + std::to_string(level) + ".txt", 32, sprite_sheet_);
 	}
 
@@ -38,8 +38,15 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level, bool is_custo
 	Aegis::CenterAABBVertically(rect, Aegis::Application::GetWindow().GetViewport());
 	auto button_box = ui_layer_->AddWidget<Aegis::Container>(rect, Aegis::Container::Vertical, 2, Aegis::Alignment::Center);
 
-	first_star_time_ = button_box->AddWidget<Aegis::SpinBox>(120, 10);
-	second_star_time_ = button_box->AddWidget<Aegis::SpinBox>(60, 10);
+	if (level == -1){
+		first_star_time_ = button_box->AddWidget<Aegis::SpinBox>(120, 10);
+		second_star_time_ = button_box->AddWidget<Aegis::SpinBox>(60, 10);
+	} else {
+		auto star_times = game_data.custom_star_thresholds_[level-1];
+		first_star_time_ = button_box->AddWidget<Aegis::SpinBox>(star_times[0], 10);
+		second_star_time_ = button_box->AddWidget<Aegis::SpinBox>(star_times[1], 10);
+	}
+
 	auto editor_buttons_box = button_box->AddWidget<Aegis::Container>(Aegis::AABB(50, 300, 150, 120), Aegis::Container::Vertical, 2);
 	auto undo_button = editor_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 150, 50 ), "Undo");
 	auto reset_button = editor_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 150, 50 ), "Reset");
@@ -142,9 +149,15 @@ void LevelEditorScene::SaveLevel()
 	Error error = IsLevelValid();
 	if (error == Error::None){
 		tile_map_->Save(level_num_);
-		++game_data_.num_custom_levels_;
 		std::array<int, 2> star_times = {first_star_time_->GetValue(), second_star_time_->GetValue()}; 
-		game_data_.custom_star_thresholds_.push_back(star_times);
+		//if new level
+		if (level_num_ == -1){
+			++game_data_.num_custom_levels_;
+			game_data_.custom_star_thresholds_.push_back(star_times);
+			game_data_.custom_record_times_.push_back(-1);
+		} else {
+			game_data_.custom_star_thresholds_[level_num_ - 1] = star_times;
+		}
 	} else {
 		error_dialog_->Show(error);
 	}

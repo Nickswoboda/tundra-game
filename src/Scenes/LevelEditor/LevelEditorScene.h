@@ -11,7 +11,7 @@ class LevelEditorScene : public Aegis::Scene
 {
 public:
 	//-1 indicates that level will be empty
-	LevelEditorScene(GameData& game_data, int level = -1, bool is_custom = false);
+	LevelEditorScene(GameData& game_data, int level = -1);
 	~LevelEditorScene() = default;
 
 	void Update() override;
