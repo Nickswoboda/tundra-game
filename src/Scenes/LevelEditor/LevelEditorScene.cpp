@@ -148,13 +148,14 @@ void LevelEditorScene::SaveLevel()
 {
 	Error error = IsLevelValid();
 	if (error == Error::None){
-		tile_map_->Save(level_num_);
+		level_editor_->Save(level_num_);
 		std::array<int, 2> star_times = {first_star_time_->GetValue(), second_star_time_->GetValue()}; 
 		//if new level
 		if (level_num_ == -1){
 			++game_data_.num_custom_levels_;
 			game_data_.custom_star_thresholds_.push_back(star_times);
 			game_data_.custom_record_times_.push_back(-1);
+			level_num_ = game_data_.num_custom_levels_;
 		} else {
 			game_data_.custom_star_thresholds_[level_num_ - 1] = star_times;
 		}

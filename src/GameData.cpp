@@ -105,7 +105,7 @@ void GameData::Load()
 	levels_completed_ = completed.empty() ? 0 : std::stoi(completed);
 
 	record_times_ = GetRecordTimes(num_levels_, false);
-	custom_record_times_ = GetRecordTimes(num_levels_, true);
+	custom_record_times_ = GetRecordTimes(num_custom_levels_, true);
 
 	std::string first_time = GetOptionValue("first_time");
 	first_time_playing_ = first_time.empty() ? true : (first_time == "1"); 
