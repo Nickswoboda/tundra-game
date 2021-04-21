@@ -2,7 +2,6 @@
 
 #include "Utilities.h"
 
-#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -156,58 +155,6 @@ Aegis::Vec2 TileMap::GetGridIndexByPos(const Aegis::Vec2& pos) const
 	}
 
 	return Aegis::Vec2((int)index.x, (int)index.y);
-}
-
-void TileMap::Save(int level_num)
-{
-	std::string prefix = "assets/levels/custom_level_";
-	std::string new_file_path = prefix + std::to_string(level_num) + ".txt";
-
-	if (level_num == -1){
-		level_num = 1;
-		new_file_path = prefix + std::to_string(level_num) + ".txt";
-
-		while (std::filesystem::exists(new_file_path)) {
-			++level_num;
-			new_file_path = prefix + std::to_string(level_num) + ".txt";
-		}
-	}
-
-	std::ofstream file(new_file_path);
-
-	for (int row = 0; row < grid_size_.y; ++row) {
-		for (int col = 0; col < grid_size_.x; ++col) {
-			auto coord = Aegis::Vec2(col, row);
-
-			bool is_spawn = false;
-			for (const auto& [spawn, index] : spawn_indices_){
-				if (coord == index){
-					switch (spawn){
-						case SpawnPoint::Brutus: file << 'p'; break;
-						case SpawnPoint::Bruce: file << 's'; break;
-						case SpawnPoint::Bjorn: file << 'j'; break;
-					}
-					is_spawn = true;
-					continue;
-				}
-			}
-			if (is_spawn) continue;
-			if (pellet_spawn_indices_.count(coord)){
-				file << 'f';
-			} else {
-				auto tile = tiles_[col][row];
-				if (tile->is_solid_) file << 'w';
-				else if (tile->is_slippery_) file << 'i';
-				else file << 'g';
-			}
-		}
-
-		//don't print newline on last row
-		if (row != grid_size_.y - 1) {
-			file << '\n';
-		}
-	}
-	file.close();
 }
 
 void TileMap::LoadTiles()

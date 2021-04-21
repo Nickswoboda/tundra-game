@@ -21,6 +21,8 @@ class TileEditor
 {
 public:
 	TileEditor(TileMap& tile_map);
+
+	void CalculateIceNeighborFlags();
 	void DrawGridLines() const;
 	int GetIceNeighborFlags(Aegis::Vec2 index) const;
 
@@ -28,8 +30,11 @@ public:
 	void UpdateTile(Aegis::Vec2 index);
 	void SetTile(Aegis::Vec2 index, const Tile& tile);
 
+	void Save(int level_num);
+
 	TileMap& tile_map_;
 	std::unordered_map<int, char> tile_tokens_by_flags_;
+	std::vector<std::vector<int>> ice_flags_;
 };
 
 

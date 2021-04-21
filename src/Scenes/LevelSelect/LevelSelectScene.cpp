@@ -109,7 +109,7 @@ void DeleteCustomLevel(int level, GameData& game_data)
 	}
 	game_data.custom_star_thresholds_.erase(game_data.custom_star_thresholds_.begin() + level-1);
 	game_data.custom_record_times_.erase(game_data.custom_record_times_.begin() + level-1);
-	--game_data.num_custom_levels_;
+	--game_data.num_custom_levels_; 
 
 	std::string prefix = "assets/levels/custom_level_";
 

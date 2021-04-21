@@ -25,6 +25,11 @@ LevelEditor::LevelEditor(TileMap& tile_map)
 	}
 }
 
+void LevelEditor::Save(int num_level)
+{
+	tile_editor_.Save(num_level);
+}
+
 void LevelEditor::Render(float dt)
 {
 	tile_map_.Render();

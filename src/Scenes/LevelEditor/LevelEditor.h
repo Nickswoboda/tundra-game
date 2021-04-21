@@ -19,6 +19,7 @@ public:
 
 	void Undo();
 	void ResetTileMap();
+	void Save(int num_level);
 
 private:
 	bool RequestEdit(EditType type);
