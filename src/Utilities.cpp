@@ -21,15 +21,29 @@ std::string FormatTime(double time_in_seconds)
 
 void StylizeButton(Aegis::Button& button, int border_size, int font_size)
 {
-	button.SetStateBgColor(Aegis::Button::Normal, { 0.37f, 0.5f,  0.72f, 1.0f });
-	button.SetStateBgColor(Aegis::Button::Pressed, { 0.37f, 0.5f,  0.72f, 1.0f });
-	button.SetStateBgColor(Aegis::Button::Hovered, { 0.45f, 0.58f, 0.78f, 1.0f });
+	button.SetStateBgColor(Aegis::Button::Normal, k_button_color);
+	button.SetStateBgColor(Aegis::Button::Pressed, k_button_color);
+	button.SetStateBgColor(Aegis::Button::Hovered, k_button_hover_color);
 	button.border_size_ = border_size;
 
 	button.SetFont(Aegis::FontManager::Load("assets/fonts/roboto_bold.ttf", font_size));
 
 	auto hover_sfx = Aegis::AudioPlayer::LoadSound("assets/audio/button_hover.ogg");
 	button.ConnectSignal("entered", [hover_sfx]() {Aegis::AudioPlayer::PlaySound(hover_sfx, 40); });
+}
+
+void StylizeSpinBox(Aegis::SpinBox& box, int border_size, int font_size)
+{
+	box.SetSize({150, 50});
+	box.border_size_ = border_size;
+	box.SetFont(Aegis::FontManager::Load("assets/fonts/roboto_bold.ttf", font_size));
+	box.bg_color_ = k_button_color;
+	box.SetButtonBorderSize(1);
+	
+	Aegis::Vec4 color = k_button_color - Aegis::Vec4(0.1f, 0.1f, 0.1f, 0.0f);
+	box.SetButtonStateBgColor(Aegis::Button::Normal, color);
+	box.SetButtonStateBgColor(Aegis::Button::Pressed, color);
+	box.SetButtonStateBgColor(Aegis::Button::Hovered, k_button_hover_color);
 }
 
 void DrawFrameBorder(const Aegis::AABB& rect)

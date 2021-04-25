@@ -47,6 +47,9 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level)
 		second_star_time_ = button_box->AddWidget<Aegis::SpinBox>(star_times[1], 10);
 	}
 
+	StylizeSpinBox(*first_star_time_, 3, 16);
+	StylizeSpinBox(*second_star_time_, 3, 16);
+
 	auto editor_buttons_box = button_box->AddWidget<Aegis::Container>(Aegis::AABB(50, 300, 150, 120), Aegis::Container::Vertical, 2);
 	auto undo_button = editor_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 150, 50 ), "Undo");
 	auto reset_button = editor_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 150, 50 ), "Reset");
