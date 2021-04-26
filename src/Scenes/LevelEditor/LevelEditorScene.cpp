@@ -38,24 +38,38 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level)
 	Aegis::CenterAABBVertically(rect, Aegis::Application::GetWindow().GetViewport());
 	auto button_box = ui_layer_->AddWidget<Aegis::Container>(rect, Aegis::Container::Vertical, 2, Aegis::Alignment::Center);
 
-	if (level == -1){
-		first_star_time_ = button_box->AddWidget<Aegis::SpinBox>(120, 10);
-		second_star_time_ = button_box->AddWidget<Aegis::SpinBox>(60, 10);
-	} else {
-		auto star_times = game_data.custom_star_thresholds_[level-1];
-		first_star_time_ = button_box->AddWidget<Aegis::SpinBox>(star_times[0], 10);
-		second_star_time_ = button_box->AddWidget<Aegis::SpinBox>(star_times[1], 10);
-	}
+	auto threshold_box = button_box->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 150, 150), Aegis::Container::Vertical, 2, Aegis::Alignment::Center);
+	auto label = threshold_box->AddWidget<Aegis::Label>("Star Thresholds:", Aegis::Vec2());
+	label->SetFont(Aegis::FontManager::Load("assets/fonts/roboto_bold.ttf", 18));
 
-	StylizeSpinBox(*first_star_time_, 3, 16);
-	StylizeSpinBox(*second_star_time_, 3, 16);
+	auto two_star_box = threshold_box->AddWidget<Aegis::Container>(Aegis::AABB(0, 0, 150, 50), Aegis::Container::Horizontal, 0, Aegis::Alignment::Center);
+	auto two_sprite_box = two_star_box->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 50, 50), Aegis::Container::Horizontal, 0, Aegis::Alignment::Center);
+	for (auto i = 0; i < 2; ++i){
+		auto star = std::make_shared<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet_, Aegis::AABB(0, 128, 32, 32));
+		star->SetScale({0.5f, 0.5f});
+		two_sprite_box->AddWidget(star);
+	}
+	int second_star_time = level == -1 ? 120 : game_data_.custom_star_thresholds_[level-1][0];
+	two_star_spinbox_ = two_star_box->AddWidget<Aegis::SpinBox>(second_star_time, 10);
+
+	auto three_star_box = threshold_box->AddWidget<Aegis::Container>(Aegis::AABB(0, 0, 150, 50), Aegis::Container::Horizontal, 0, Aegis::Alignment::Center);
+	auto three_sprite_box = three_star_box->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 50, 50), Aegis::Container::Horizontal, 0, Aegis::Alignment::Center);
+	for (auto i = 0; i < 3; ++i){
+		auto star = std::make_shared<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet_, Aegis::AABB(0, 128, 32, 32));
+		star->SetScale({0.5f, 0.5f});
+		three_sprite_box->AddWidget(star);
+	}
+	int third_star_time = level == -1 ? 60 : game_data_.custom_star_thresholds_[level-1][1];
+	three_star_spinbox_ = three_star_box->AddWidget<Aegis::SpinBox>(third_star_time, 10);
+
+	StylizeSpinBox(*two_star_spinbox_, 3, 16);
+	StylizeSpinBox(*three_star_spinbox_, 3, 16);
 
 	auto editor_buttons_box = button_box->AddWidget<Aegis::Container>(Aegis::AABB(50, 300, 150, 120), Aegis::Container::Vertical, 2);
 	auto undo_button = editor_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 150, 50 ), "Undo");
 	auto reset_button = editor_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 150, 50 ), "Reset");
 	undo_button->ConnectSignal("pressed", [&](){level_editor_->Undo();});
 	reset_button->ConnectSignal("pressed", [&]() {level_editor_->ResetTileMap();});
-
 
 	auto validity_buttons_box = button_box->AddWidget<Aegis::Container>(Aegis::AABB(50, 300, 150, 120), Aegis::Container::Vertical, 2);
 	auto preview_button = validity_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB(  50, 450, 150, 50  ), "Preview");
@@ -73,7 +87,6 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level)
 	StylizeButton(*save_button, 3, 16);
 	StylizeButton(*controls_button, 3, 16);
 	StylizeButton(*back_button, 3, 16);
-
 }
 
 void LevelEditorScene::OnEvent(Aegis::Event& event)
@@ -152,7 +165,7 @@ void LevelEditorScene::SaveLevel()
 	Error error = IsLevelValid();
 	if (error == Error::None){
 		level_editor_->Save(level_num_);
-		std::array<int, 2> star_times = {first_star_time_->GetValue(), second_star_time_->GetValue()}; 
+		std::array<int, 2> star_times = {two_star_spinbox_->GetValue(), three_star_spinbox_->GetValue()}; 
 		//if new level
 		if (level_num_ == -1){
 			++game_data_.num_custom_levels_;

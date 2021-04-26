@@ -87,7 +87,6 @@ void ScoreDialog::Show(double time)
 	}
 
 	time_label_->SetText(FormatTime(time));
-	score_container_->UpdateWidgets();
 	visible_ = true;
 }
 

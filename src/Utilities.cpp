@@ -34,7 +34,8 @@ void StylizeButton(Aegis::Button& button, int border_size, int font_size)
 
 void StylizeSpinBox(Aegis::SpinBox& box, int border_size, int font_size)
 {
-	box.SetSize({150, 50});
+	box.SetSuffix("s");
+	box.SetSize({100, 50});
 	box.border_size_ = border_size;
 	box.SetFont(Aegis::FontManager::Load("assets/fonts/roboto_bold.ttf", font_size));
 	box.bg_color_ = k_button_color;

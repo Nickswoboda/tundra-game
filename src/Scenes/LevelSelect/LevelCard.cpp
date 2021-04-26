@@ -41,8 +41,6 @@ LevelCard::LevelCard(int level, const std::array<int, 2>& star_thresholds, const
 
 	label1->SetFont(font);
 	label2->SetFont(font);
-
-	v_box_->UpdateWidgets();
 }
 
 void LevelCard::Render() const
