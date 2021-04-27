@@ -32,7 +32,7 @@ LevelSelectScene::LevelSelectScene(GameData& game_data, bool show_custom)
 	auto play_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Play");
 	auto back_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Back");
 
-	play_button->ConnectSignal("pressed", [&]() { if (selected_level_ != -1) manager_->ReplaceScene<GameplayScene>(selected_level_, show_custom, game_data); });
+	play_button->ConnectSignal("pressed", [&, show_custom]() { if (selected_level_ != -1) manager_->ReplaceScene<GameplayScene>(selected_level_, show_custom, game_data); });
 	back_button->ConnectSignal("pressed", [&]() { manager_->PopScene();});
 	StylizeButton(*play_button, 3, 24);
 	StylizeButton(*back_button, 3, 24);
