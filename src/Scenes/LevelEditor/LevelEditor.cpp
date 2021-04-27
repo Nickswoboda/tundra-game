@@ -106,6 +106,8 @@ bool LevelEditor::RequestEdit(EditType edit_type)
 	Aegis::Vec2 tile_index = tile_map_.GetGridIndexByPos(mouse_pos);
 
 	std::shared_ptr<EditCommand> command;
+	std::shared_ptr<EditCommand> remove_fish;
+
 	switch (edit_type) {
 		case EditType::Tile: {
 			if (current_tile_token_ != 'g'){
@@ -116,6 +118,9 @@ bool LevelEditor::RequestEdit(EditType edit_type)
 				&& tile_index.x < tile_map_.grid_size_.x - 1
 				&& tile_index.y < tile_map_.grid_size_.y - 1){
 				command = std::make_shared<TileEditCommand>(tile_editor_, tile_index, new_tile);
+				if (tile_map_.pellet_spawn_indices_.count(tile_index)){
+						remove_fish = std::make_shared<FishEditCommand>(tile_map_, tile_index);
+				}
 			}
 
 			break;
@@ -124,8 +129,20 @@ bool LevelEditor::RequestEdit(EditType edit_type)
 			if (current_spawn_ == SpawnPoint::None){
 				return (GrabEntityAtIndex(tile_index));
 			}
-			else if (tile->is_slippery_){
-				command = std::make_shared<SpawnEditCommand>(tile_map_, current_spawn_, tile_index);
+
+			if (tile->is_slippery_){
+				bool tile_occupied = false;
+				for (const auto& [key, index] : tile_map_.spawn_indices_){
+					if (index == tile_index){
+						tile_occupied = true;
+					}
+				}
+				if (!tile_occupied){
+					command = std::make_shared<SpawnEditCommand>(tile_map_, current_spawn_, tile_index);
+					if (tile_map_.pellet_spawn_indices_.count(tile_index)){
+							remove_fish = std::make_shared<FishEditCommand>(tile_map_, tile_index);
+					}
+				}
 			}
 			current_spawn_ = SpawnPoint::None;
 			break;
@@ -141,6 +158,10 @@ bool LevelEditor::RequestEdit(EditType edit_type)
 	if (command){
 		command->Execute();
 		recorded_edits_.push(command);
+		if (remove_fish){
+			remove_fish->Execute();
+			recorded_edits_.push(remove_fish);
+		}
 		return true;
 	} else {
 		return false;
