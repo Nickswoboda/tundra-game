@@ -10,6 +10,7 @@ add_executable (Tundra
 	"src/GameData.cpp"
 	"src/PathFinding.cpp"
 	"src/Utilities.cpp"
+	"src/ErrorDialog.cpp"
 	"src/Scenes/Menu/MenuScene.cpp"
 	"src/Scenes/Menu/Particle.cpp"
 	"src/Scenes/Gameplay/GameplayScene.cpp" 
@@ -24,7 +25,6 @@ add_executable (Tundra
 	"src/Scenes/LevelEditor/EditCommand.cpp"
 	"src/Scenes/LevelEditor/LevelEditor.cpp"
 	"src/Scenes/LevelEditor/TileEditor.cpp"
-	"src/Scenes/LevelEditor/EditorErrorDialog.cpp"
 	"src/Scenes/LevelEditor/EditorControlsDialog.cpp"
 	"src/Scenes/Options/OptionsScene.cpp")
 

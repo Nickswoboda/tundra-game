@@ -31,7 +31,7 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level)
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>(); 
 	
-	error_dialog_ = ui_layer_->AddWidget<EditorErrorDialog>();
+	error_dialog_ = ui_layer_->AddWidget<ErrorDialog>();
 	controls_dialog_ = ui_layer_->AddWidget<EditorControlsDialog>();
 
 	Aegis::AABB rect{0, 0, 265, 600};

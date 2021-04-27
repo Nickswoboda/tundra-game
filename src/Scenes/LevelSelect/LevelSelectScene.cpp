@@ -47,7 +47,13 @@ LevelSelectScene::LevelSelectScene(GameData& game_data, bool show_custom)
 		auto edit_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Edit");
 		auto delete_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Delete");
 
-		new_button->ConnectSignal("pressed", [&]() { if (game_data.num_custom_levels_ < 12) manager_->ReplaceScene<LevelEditorScene>(game_data); });
+		err_dialog_ = ui_layer_->AddWidget<ErrorDialog>();
+		new_button->ConnectSignal("pressed", [&]() { 
+				if (game_data.num_custom_levels_ < 12){
+					manager_->ReplaceScene<LevelEditorScene>(game_data);
+				} else {
+					err_dialog_->Show(Error::TooManyCustomLevels);
+				}});
 		edit_button->ConnectSignal("pressed", [&]() {manager_->ReplaceScene<LevelEditorScene>(game_data, selected_level_); });
 		delete_button->ConnectSignal("pressed", [&]() {
 			DeleteCustomLevel(selected_level_, game_data); 
