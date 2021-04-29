@@ -15,8 +15,11 @@ public:
 	void Render(float delta_time) override;
 	void OnEvent(Aegis::Event& event) override;
 
+	void OnAttach() override;
+
 	std::shared_ptr<Aegis::Texture> title_background_;
 	std::shared_ptr<Aegis::Container> v_box_;
+	std::shared_ptr<Aegis::Checkbox> mute_button_;
 
 	std::shared_ptr<ParticleEngine> snow_engine_;
 

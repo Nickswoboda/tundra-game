@@ -27,10 +27,15 @@ GameplayScene::GameplayScene(int level, bool is_custom, GameData& game_data)
 GameplayScene::~GameplayScene()
 {
 	Aegis::AudioPlayer::StopSound(bg_music_);
+	auto menu_bgm = Aegis::AudioPlayer::LoadSound("assets/audio/menu_bgm.ogg");
+	Aegis::AudioPlayer::PlaySound(menu_bgm);
 }
 
 void GameplayScene::Init()
 {
+	auto menu_bgm = Aegis::AudioPlayer::LoadSound("assets/audio/menu_bgm.ogg");
+	Aegis::AudioPlayer::StopSound(menu_bgm);
+
 	bg_music_ = Aegis::AudioPlayer::LoadSound("assets/audio/gameplay_bgm.ogg", true, true);
 	fish_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/fish_collect.ogg");
 	death_sfx_ = Aegis::AudioPlayer::LoadSound("assets/audio/death.ogg");
