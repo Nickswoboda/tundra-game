@@ -31,7 +31,7 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level)
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>(); 
 	
-	error_dialog_ = ui_layer_->AddWidget<ErrorDialog>();
+	popup_ = ui_layer_->AddWidget<PopUpDialog>();
 	controls_dialog_ = ui_layer_->AddWidget<EditorControlsDialog>();
 
 	Aegis::AABB rect{0, 0, 265, 600};
@@ -91,7 +91,7 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level)
 
 void LevelEditorScene::OnEvent(Aegis::Event& event)
 {
-	if (error_dialog_->visible_ || controls_dialog_->visible_) return;
+	if (popup_->visible_ || controls_dialog_->visible_) return;
 
 	auto key_event = dynamic_cast<Aegis::KeyEvent*>(&event);
 	if (key_event && key_event->action_ == AE_BUTTON_RELEASE){
@@ -160,7 +160,7 @@ void LevelEditorScene::PreviewLevel()
 	if (error == Error::None){
 		manager_->PushScene<GameplayScene>(tile_map_, game_data_);
 	} else {
-		error_dialog_->Show(error);
+		popup_->Show(error);
 	}
 }
 
@@ -179,8 +179,9 @@ void LevelEditorScene::SaveLevel()
 		} else {
 			game_data_.custom_star_thresholds_[level_num_ - 1] = star_times;
 		}
+		popup_->Show("Save Successful.");
 	} else {
-		error_dialog_->Show(error);
+		popup_->Show(error);
 	}
 }
 

@@ -14,14 +14,16 @@ enum class Error
 	InvalidTiles
 };
 
-class ErrorDialog : public Aegis::Dialog
+class PopUpDialog : public Aegis::Dialog
 {
 public:
-	ErrorDialog();
+	PopUpDialog();
 
 	void Render() const override;
 
 	void Show(Error error);
+	void Show(const std::string& text);
+
 private:
 	void AddButton(const std::string& label, std::function<void()> callback) override;
 };

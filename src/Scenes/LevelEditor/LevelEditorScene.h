@@ -1,7 +1,7 @@
  #pragma once
 
 #include "LevelEditor.h"
-#include "../../ErrorDialog.h"
+#include "../../PopUpDialog.h"
 #include "EditorControlsDialog.h"
 
 class GameData;
@@ -24,7 +24,7 @@ public:
 	
 	std::shared_ptr<TileMap> tile_map_;
 	std::unique_ptr<LevelEditor> level_editor_;
-	std::shared_ptr<ErrorDialog> error_dialog_;
+	std::shared_ptr<PopUpDialog> popup_;
 	std::shared_ptr<EditorControlsDialog> controls_dialog_;
 
 	std::shared_ptr<Aegis::SpinBox> two_star_spinbox_;

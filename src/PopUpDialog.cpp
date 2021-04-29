@@ -1,8 +1,8 @@
-#include "ErrorDialog.h"
+#include "PopUpDialog.h"
 
 #include "Utilities.h"
 
-ErrorDialog::ErrorDialog()
+PopUpDialog::PopUpDialog()
 	:Aegis::Dialog("", {0, 0, 350, 200})
 {
 	auto temp_rect = rect_;
@@ -13,10 +13,9 @@ ErrorDialog::ErrorDialog()
 	bg_color_ = k_bg_color;
 
 	text_->SetFont(Aegis::FontManager::Load("assets/fonts/roboto_regular.ttf", 20));
-	text_->color_ = {1.0f, 0.2f, 0.2f, 1.0f};
 }
 
-void ErrorDialog::Render() const
+void PopUpDialog::Render() const
 {
 	if (!visible_) return;
 
@@ -24,8 +23,9 @@ void ErrorDialog::Render() const
 	Dialog::Render();
 }
 
-void ErrorDialog::Show(Error error)
+void PopUpDialog::Show(Error error)
 {
+	text_->color_ = {1.0f, 0.2f, 0.2f, 1.0f};
 	switch (error){
 		case Error::PathFinding: 
 			text_->SetText("Bears are unable to pathfind to Bruce.");
@@ -51,7 +51,17 @@ void ErrorDialog::Show(Error error)
 	visible_ = true;
 }
 
-void ErrorDialog::AddButton(const std::string& label, std::function<void()> callback)
+void PopUpDialog::Show(const std::string& text)
+{
+	text_->color_ = {1.0f, 1.0f, 1.0f, 1.0f};
+	text_->SetText(text);
+	auto temp_rect = text_->GetRect();
+	Aegis::CenterAABBHorizontally(temp_rect, rect_);
+	text_->SetPos(temp_rect.pos);
+
+	visible_ = true;
+}
+void PopUpDialog::AddButton(const std::string& label, std::function<void()> callback)
 {
 	auto button = button_container_->AddWidget<Aegis::Button>(Aegis::AABB(0,0, 100, 40), label);
 	button->ConnectSignal("pressed", [&visible = visible_, callback]{visible = false; callback();});

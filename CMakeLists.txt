@@ -10,7 +10,7 @@ add_executable (Tundra
 	"src/GameData.cpp"
 	"src/PathFinding.cpp"
 	"src/Utilities.cpp"
-	"src/ErrorDialog.cpp"
+	"src/PopUpDialog.cpp"
 	"src/Scenes/Menu/MenuScene.cpp"
 	"src/Scenes/Menu/Particle.cpp"
 	"src/Scenes/Gameplay/GameplayScene.cpp" 
