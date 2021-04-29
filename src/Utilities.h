@@ -7,6 +7,7 @@ std::string FormatTime(double time_in_seconds);
 
 void StylizeButton(Aegis::Button& button, int border_size, int font_size);
 void StylizeSpinBox(Aegis::SpinBox& box, int border_size, int font_size);
+void StylizeCheckbox(Aegis::Checkbox& box, int border_size, int font_size);
 
 void DrawFrameBorder(const Aegis::AABB& rect);
 

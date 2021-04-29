@@ -1,19 +1,20 @@
 #pragma once
 
+#include "../../GameData.h"
+
 #include "src/Aegis.h"
 
 class OptionsScene : public Aegis::Scene
 {
 public:
-	OptionsScene();
+	OptionsScene(GameData& game_data);
 	~OptionsScene();
 
 	void Update() override;
 	void Render(float delta_time) override;
 	void OnEvent(Aegis::Event& event) override;
 
-	void SetResolution(int x, int y);
-
-	std::shared_ptr<Aegis::Font> title_font_;
-	std::shared_ptr<Aegis::Font> button_font_;
+private:
+	std::shared_ptr<Aegis::Container> v_box_;
+	std::shared_ptr<Aegis::Texture> bg_texture_;
 };

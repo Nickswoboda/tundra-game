@@ -21,4 +21,8 @@ public:
 	int num_custom_levels_ = 0;
 	std::vector<std::array<int, 2>> custom_star_thresholds_;
 	std::vector<double> custom_record_times_;
+
+	int volume_ = 100;
+	bool muted_ = false;
+	bool vsync_ = false;
 };

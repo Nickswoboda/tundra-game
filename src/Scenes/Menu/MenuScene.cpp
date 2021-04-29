@@ -31,14 +31,17 @@ MenuScene::MenuScene(GameData& game_data)
 
 	new_game_button->ConnectSignal("pressed", [&]() {manager_->PushScene<GameplayScene>(1, false, game_data_); Aegis::AudioPlayer::StopSound(bg_music_); });
 	level_select_button->ConnectSignal("pressed", [&]() {manager_->PushScene<LevelSelectScene>(game_data_);});
-	options_button->ConnectSignal("pressed", [&]() {manager_->PushScene<OptionsScene>();});
+	options_button->ConnectSignal("pressed", [&]() {manager_->PushScene<OptionsScene>(game_data_);});
 	exit_button->ConnectSignal("pressed", []() { Aegis::Application::Quit();});
 
-	auto mute_button = ui_layer_->AddWidget<Aegis::Checkbox>("", Aegis::AABB(1200, 650, 50, 50));
-	mute_button->ConnectSignal("checked", [](){Aegis::AudioPlayer::SetMasterVolume(0);});
-	mute_button->ConnectSignal("unchecked", [](){Aegis::AudioPlayer::SetMasterVolume(100);});
-	mute_button->SetTexture(false, Aegis::TextureManager::Load("assets/textures/audio_on.png"));
-	mute_button->SetTexture(true, Aegis::TextureManager::Load("assets/textures/audio_off.png"));
+	auto mute_button = ui_layer_->AddWidget<Aegis::Checkbox>("");
+	mute_button->SetPos({ 1200, 650 });
+	mute_button->SetSize({ 50, 50 });
+	mute_button->ConnectSignal("checked", [&](){Aegis::AudioPlayer::SetMasterVolume(0); game_data_.muted_ = true;});
+	mute_button->ConnectSignal("unchecked", [&](){Aegis::AudioPlayer::SetMasterVolume(game_data_.volume_); game_data.muted_ = false;});
+	mute_button->SetState(game_data.muted_);
+	mute_button->SetStateTexture(false, Aegis::TextureManager::Load("assets/textures/audio_on.png"));
+	mute_button->SetStateTexture(true, Aegis::TextureManager::Load("assets/textures/audio_off.png"));
 	
 	snow_engine_ = std::make_unique<ParticleEngine>(512, Aegis::Vec2(-200, -700), Aegis::Vec2(Aegis::Application::GetWindow().GetSize().x, 0), Aegis::Vec2(0.2, 2), Aegis::Vec2(1, 3));
 	bg_music_ = Aegis::AudioPlayer::LoadSound("assets/audio/menu_bgm.ogg", true, true);

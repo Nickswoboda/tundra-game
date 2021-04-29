@@ -47,6 +47,13 @@ void StylizeSpinBox(Aegis::SpinBox& box, int border_size, int font_size)
 	box.SetButtonStateBgColor(Aegis::Button::Hovered, k_button_hover_color);
 }
 
+void StylizeCheckbox(Aegis::Checkbox& box, int border_size, int font_size)
+{
+	box.SetSize({36, 36});
+	box.SetFont(Aegis::FontManager::Load("assets/fonts/roboto_bold.ttf", font_size));
+	box.SetStateColor(true, k_button_color);
+}
+
 void DrawFrameBorder(const Aegis::AABB& rect)
 {
 	Aegis::Vec4 brown{ 0.61f, 0.39f, 0.20f, 1.0f};

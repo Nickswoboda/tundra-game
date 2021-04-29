@@ -29,7 +29,7 @@ PauseMenu::PauseMenu(GameplayScene& scene)
 	resume_button->ConnectSignal("pressed", [&]() {scene.Resume(); });
 	retry_button->ConnectSignal("pressed", [&]() {scene.SetUpLevel(); scene.Resume(); });
 	info_button->ConnectSignal("pressed", [&]() {scene.info_dialog_->visible_ = true; });
-	options_button->ConnectSignal("pressed", [&]() {scene.manager_->PushScene<OptionsScene>(); });
+	options_button->ConnectSignal("pressed", [&]() {scene.manager_->PushScene<OptionsScene>(scene.game_data_); });
 	quit_button->ConnectSignal("pressed", [&]() {scene.manager_->PopScene(); });
 
 	visible_ = false;

@@ -109,6 +109,16 @@ void GameData::Load()
 
 	std::string first_time = GetOptionValue("first_time");
 	first_time_playing_ = first_time.empty() ? true : (first_time == "1"); 
+
+	std::string volume = GetOptionValue("volume");
+	volume_ = volume.empty() ? 100 : std::stoi(volume);
+
+	std::string muted = GetOptionValue("muted");
+	muted_ = muted.empty() ? false : (muted == "1"); 
+
+	Aegis::AudioPlayer::SetMasterVolume(muted_ ? 0 : volume_);
+	std::string vsync = GetOptionValue("vsync");
+	vsync_ = vsync.empty() ? false : (vsync == "1"); 
 }
 
 void GameData::Save() const
@@ -141,5 +151,9 @@ void GameData::Save() const
 		file << time << " ";
 	}
 	file << "\n";
+
+	file <<  "volume: " << volume_ << "\n";
+	file <<  "muted: " << muted_ << "\n";
+	file <<  "vsync: " << vsync_ << "\n";
 }
 
