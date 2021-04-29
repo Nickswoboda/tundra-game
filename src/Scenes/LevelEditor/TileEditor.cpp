@@ -132,7 +132,7 @@ void TileEditor::UpdateTile(Aegis::Vec2 index)
 
 void TileEditor::UpdateSurroundingWallTiles(Aegis::Vec2 index)
 {
-	bool is_ice = tile_map_.GetTileByIndex(index)->is_slippery_;
+	bool is_ice = !tile_map_.GetTileByIndex(index)->is_solid_;
 
 	if (is_ice){
 		ice_flags_[index.x-1][index.y] |= IceNeighborFlags::Right;
@@ -220,4 +220,23 @@ void TileEditor::Save(int level_num)
 		}
 	}
 	file.close();
+}
+
+std::unordered_set<Aegis::Vec2> TileEditor::GetInvalidTiles() const
+{
+	std::unordered_set<Aegis::Vec2> invalid_tiles;
+
+	for (int row = 0; row < ice_flags_[0].size(); ++row) {
+		for (int col = 0; col < ice_flags_.size(); ++col) {
+			auto tile = tile_map_.tiles_[col][row];
+			if (!tile->is_solid_) continue;
+			
+			auto tile_flags = GetSimplifiedFlags(ice_flags_[col][row]);
+			if (!tile_tokens_by_flags_.count(tile_flags)){
+				invalid_tiles.insert(Aegis::Vec2(col, row));
+			}
+		}
+	}
+
+	return invalid_tiles;
 }

@@ -39,6 +39,9 @@ void ErrorDialog::Show(Error error)
 		case Error::TooManyCustomLevels:
 			text_->SetText("You can only have 12 custom levels.");
 			break;
+		case Error::InvalidTiles:
+			text_->SetText("One or more wall tiles are invalid.");
+			break;
 	}
 
 	auto temp_rect = text_->GetRect();

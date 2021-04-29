@@ -3,6 +3,7 @@
 #include "../../TileMap.h"
 
 #include <unordered_map>
+#include <unordered_set>
 
 enum IceNeighborFlags
 {
@@ -31,6 +32,8 @@ public:
 	void SetTile(Aegis::Vec2 index, const Tile& tile);
 
 	void Save(int level_num);
+
+	std::unordered_set<Aegis::Vec2> GetInvalidTiles() const;
 
 	TileMap& tile_map_;
 	std::unordered_map<int, char> tile_tokens_by_flags_;

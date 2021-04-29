@@ -45,7 +45,6 @@ public:
 	std::vector<std::vector<const Tile*>> tiles_;
 	std::unordered_map<SpawnPoint, Aegis::Vec2> spawn_indices_;
 	std::unordered_set<Aegis::Vec2> pellet_spawn_indices_;
-	std::unordered_set<Aegis::Vec2> invalid_tiles_;
 	Aegis::Vec2 grid_size_;
 
 private:

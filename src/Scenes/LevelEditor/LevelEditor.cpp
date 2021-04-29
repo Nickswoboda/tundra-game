@@ -43,7 +43,7 @@ void LevelEditor::Render(float dt)
 		Aegis::DrawSubTexture((index * 32) + Aegis::Vec2(8,8), {16, 16}, *sprite_sheet_, fish_texture_coords_);
 	}
 
-	for (const auto& index : tile_map_.invalid_tiles_){
+	for (const auto& index : invalid_tiles_) {
 		Aegis::DrawQuad(index * 32, {32, 32}, {1.0f, 0.0f, 0.0f, 0.3f});
 	}
 }
@@ -162,6 +162,8 @@ bool LevelEditor::RequestEdit(EditType edit_type)
 			remove_fish->Execute();
 			recorded_edits_.push(remove_fish);
 		}
+
+		invalid_tiles_.clear();
 		return true;
 	} else {
 		return false;
@@ -232,3 +234,8 @@ void LevelEditor::UpdateSpritePositions()
 	}
 }
 
+bool LevelEditor::TilesAreValid()
+{
+	invalid_tiles_ = tile_editor_.GetInvalidTiles();
+	return invalid_tiles_.empty();
+}

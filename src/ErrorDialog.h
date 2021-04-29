@@ -10,7 +10,8 @@ enum class Error
 	PathFinding,		//Bears unable to locate Bruce
 	NoFish,
 	FishReachability,   //Bruce unable to reach all fish
-	TooManyCustomLevels
+	TooManyCustomLevels,
+	InvalidTiles
 };
 
 class ErrorDialog : public Aegis::Dialog

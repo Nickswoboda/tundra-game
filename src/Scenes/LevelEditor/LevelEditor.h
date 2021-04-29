@@ -21,6 +21,8 @@ public:
 	void ResetTileMap();
 	void Save(int num_level);
 
+	bool TilesAreValid();
+
 private:
 	bool RequestEdit(EditType type);
 	void PushEditsOntoStack();
@@ -35,6 +37,7 @@ private:
 
 	TileEditor tile_editor_;
 	char current_tile_token_;
+	std::unordered_set<Aegis::Vec2> invalid_tiles_;
 
 	std::shared_ptr<Aegis::Texture> sprite_sheet_;
 	Aegis::Vec4 fish_texture_coords_;

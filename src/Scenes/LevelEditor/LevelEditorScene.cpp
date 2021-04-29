@@ -147,6 +147,10 @@ Error LevelEditorScene::IsLevelValid()
 		}
 	}
 
+	if (!level_editor_->TilesAreValid()){
+		return Error::InvalidTiles;
+	}
+
 	return Error::None;
 }
 
