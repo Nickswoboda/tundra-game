@@ -3,19 +3,11 @@ Tundra is a Pac-Man inspired arcade game. Play as Bruce the seal and try to catc
 
 Tundra has been created as a sandbox to test and guide the development of the [Aegis game development library](https://github.com/nickswoboda/Aegis).
 
-**NOTE: Tundra is still in the early stages of development**
-
+![tundra-ss](https://user-images.githubusercontent.com/41607512/116711395-a8a50c00-a987-11eb-9d92-08cc2826a9c4.png)
 ## Features
-### Current
-- Enemy AI/pathfinding
-- Scoring
+- Multiple Levels
+- Time-based star system
 - Level Editor
-- Lives
-### To do
-- Scores
-- Add more levels
-- Improve art/add sound
-
 
 ## Build from source
 - Download source code
