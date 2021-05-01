@@ -225,6 +225,12 @@ void LevelEditor::ResetTileMap()
 {
 	tile_map_.Clear();
 	UpdateSpritePositions();
+
+	for (auto& row : tile_editor_.ice_flags_){
+		for (auto& col : row){
+			col = 0;
+		}
+	}
 }
 
 void LevelEditor::UpdateSpritePositions()

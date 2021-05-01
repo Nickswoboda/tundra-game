@@ -59,7 +59,7 @@ std::vector<std::array<int, 2>> GetStarThresholds(int num_levels, bool custom)
 	std::vector<std::array<int, 2>> thresholds;
 	thresholds.resize(num_levels);
 
-	if (values.empty()) {
+	if (values.size() != num_levels) {
 		for (int i = 0; i < num_levels; ++i) {
 			thresholds[i] = { 60, 120 };
 		}

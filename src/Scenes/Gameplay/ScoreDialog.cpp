@@ -64,18 +64,18 @@ void ScoreDialog::OnEvent(Aegis::Event& event)
 	}
 }
 
-int ScoreDialog::GetNumStarsEarned(double time) const 
+int ScoreDialog::GetNumStarsEarned(double time) const
 {
-	if (time <= star_thresholds_[0]){
+	if (time <= star_thresholds_[1]){
 		return 3;
-	} else if (time <= star_thresholds_[1]){
+	} else if (time <= star_thresholds_[0]){
 		return 2;
 	} else {
 		return 1;
 	}
 }
 
-void ScoreDialog::Show(double time)
+void ScoreDialog::Show(double time) 
 {
 	int num_stars = GetNumStarsEarned(time);
 	for (int i = 0; i < 3; ++i){
