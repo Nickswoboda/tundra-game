@@ -13,7 +13,12 @@ OptionsScene::OptionsScene(GameData& game_data)
 	auto viewport = Aegis::Application::GetWindow().GetViewport();
 	auto rect = Aegis::AABB{0, 0, 250, 400};
 	Aegis::CenterAABB(rect, viewport);
-	v_box_ = ui_layer_->AddWidget<Aegis::Container>(rect, Aegis::Container::Vertical, 16, Aegis::Alignment::HCenter);
+	v_box_ = ui_layer_->AddWidget<Aegis::VContainer>();
+	v_box_->SetPos(rect.pos);
+	v_box_->SetSize(rect.size);
+	v_box_->SetPadding(16);
+	v_box_->SetAlignment(Aegis::Alignment::HCenter);
+
 
 	auto title_label = ui_layer_->AddWidget<Aegis::Label>("Options", Aegis::Vec2(0, 16));
 	title_label->SetFont(title_font_);
@@ -21,7 +26,11 @@ OptionsScene::OptionsScene(GameData& game_data)
 	Aegis::CenterAABBHorizontally(label_rect, viewport);
 	title_label->SetPos(label_rect.pos);
 
-	auto volume_box = v_box_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 250, 40), Aegis::Container::Horizontal, 8, Aegis::Alignment::Center);
+	auto volume_box = v_box_->AddWidget<Aegis::HContainer>();
+	volume_box->SetSize({250, 40});
+	volume_box->SetPadding(8);
+	volume_box->SetAlignment(Aegis::Alignment::Center);
+
 	auto volume_label = volume_box->AddWidget<Aegis::Label>("Volume:", Aegis::Vec2());
 	volume_label->SetFont(Aegis::FontManager::Load("assets/fonts/roboto_bold.ttf", 32));
 
@@ -37,7 +46,9 @@ OptionsScene::OptionsScene(GameData& game_data)
 				Aegis::AudioPlayer::SetMasterVolume(volume);
 			} });
 
-	auto checkbox_box = v_box_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 150, 250), Aegis::Container::Vertical, 24);
+	auto checkbox_box = v_box_->AddWidget<Aegis::VContainer>();
+	checkbox_box->SetSize({150, 250});
+	checkbox_box->SetPadding(16);
 
 	auto mute_checkbox = checkbox_box->AddWidget<Aegis::Checkbox>("Mute");
 	mute_checkbox->ConnectSignal("checked", [&game_data](){Aegis::AudioPlayer::SetMasterVolume(0); game_data.muted_ = true;});

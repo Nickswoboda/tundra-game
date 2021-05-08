@@ -18,6 +18,6 @@ public:
 	std::shared_ptr<Aegis::Label> pellet_count_label_;
 	std::shared_ptr<Aegis::Label> time_label_;
 
-	std::unique_ptr<Aegis::Container> v_box_;
+	Aegis::VContainer v_box_;
 	std::unique_ptr<Aegis::SpriteWidget> bg_;
 };

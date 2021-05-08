@@ -13,5 +13,5 @@ public:
 private:
 	std::shared_ptr<Aegis::Button> close_button_;
 	std::shared_ptr<Aegis::Texture> bg_;
-	std::shared_ptr<Aegis::Container> v_box_;
+	Aegis::VContainer v_box_;
 };

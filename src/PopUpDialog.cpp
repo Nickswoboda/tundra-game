@@ -63,7 +63,7 @@ void PopUpDialog::Show(const std::string& text)
 }
 void PopUpDialog::AddButton(const std::string& label, std::function<void()> callback)
 {
-	auto button = button_container_->AddWidget<Aegis::Button>(Aegis::AABB(0,0, 100, 40), label);
+	auto button = button_container_.AddWidget<Aegis::Button>(Aegis::AABB(0,0, 100, 40), label);
 	button->ConnectSignal("pressed", [&visible = visible_, callback]{visible = false; callback();});
 	StylizeButton(*button, 2, 16);
 }

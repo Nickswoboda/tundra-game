@@ -17,7 +17,11 @@ LevelSelectScene::LevelSelectScene(GameData& game_data, bool show_custom)
 
 	Aegis::AABB rect = {0,0, 760, 720};
 	Aegis::CenterAABBHorizontally(rect, Aegis::Application::GetWindow().GetViewport());
-	v_box_ = ui_layer_->AddWidget<Aegis::Container>(rect, Aegis::Container::Vertical, 16, Aegis::Alignment::HCenter );
+	v_box_ = ui_layer_->AddWidget<Aegis::VContainer>();
+	v_box_->SetPos(rect.pos);
+	v_box_->SetSize(rect.size);
+	v_box_->SetPadding(16);
+	v_box_->SetAlignment(Aegis::Alignment::HCenter);
 
 	auto title_font = Aegis::FontManager::Load("assets/fonts/roboto_bold.ttf", 64);
 	std::string title_text = show_custom ? "Custom Levels" : "Level Select";
@@ -28,7 +32,11 @@ LevelSelectScene::LevelSelectScene(GameData& game_data, bool show_custom)
 
 	CreateLevelCards(game_data, show_custom);
 
-	auto button_box = v_box_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 760, 50), Aegis::Container::Horizontal, 16, Aegis::Alignment::Center);
+	auto button_box = v_box_->AddWidget<Aegis::HContainer>();
+	button_box->SetSize({760, 50});
+	button_box->SetPadding(16);
+	button_box->SetAlignment(Aegis::Alignment::Center);
+
 	auto play_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Play");
 	auto back_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Back");
 
@@ -42,7 +50,11 @@ LevelSelectScene::LevelSelectScene(GameData& game_data, bool show_custom)
 		custom_levels_button->ConnectSignal("pressed", [&]() {manager_->PushScene<LevelSelectScene>(game_data, true);});
 		StylizeButton(*custom_levels_button, 3, 24);
 	} else {
-		auto button_box = v_box_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 760, 50), Aegis::Container::Horizontal, 16, Aegis::Alignment::Center);
+		auto button_box = v_box_->AddWidget<Aegis::HContainer>();
+		button_box->SetSize({760, 50});
+		button_box->SetPadding(16);
+		button_box->SetAlignment(Aegis::Alignment::Center);
+
 		auto new_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "New");
 		auto edit_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Edit");
 		auto delete_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Delete");
@@ -85,12 +97,18 @@ void LevelSelectScene::OnEvent(Aegis::Event& event)
 
 void LevelSelectScene::CreateLevelCards(GameData& game_data, bool custom)
 {
-	auto level_card_box = v_box_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 760, 480), Aegis::Container::Vertical, 24, Aegis::Alignment::HCenter );
+	auto level_card_box = v_box_->AddWidget<Aegis::VContainer>();
+	level_card_box->SetSize({760, 480});
+	level_card_box->SetPadding(24);
+	level_card_box->SetAlignment(Aegis::Alignment::HCenter);
+
 	std::shared_ptr<Aegis::Container> level_row_box;
 	int num_levels = custom ? game_data.num_custom_levels_ : game_data.num_levels_;
 	for (int i = 0; i < num_levels; ++i){
 		if (i % 4 == 0){
-			level_row_box = level_card_box->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 760, 128), Aegis::Container::Horizontal, 24);
+			level_row_box = level_card_box->AddWidget<Aegis::HContainer>();
+			level_row_box->SetSize({760, 128});
+			level_row_box->SetPadding(24);
 		}
 		if (custom || i <= game_data.levels_completed_){
 			std::shared_ptr<LevelCard> card;
@@ -127,5 +145,4 @@ void DeleteCustomLevel(int level, GameData& game_data)
 		++level;
 	}
 }
-
 

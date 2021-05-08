@@ -19,9 +19,16 @@ ScoreDialog::ScoreDialog(GameplayScene& scene)
 
 	Aegis::Vec2 score_pos = {rect_.pos.x, rect_.pos.y + (rect_.size.y / 3)};
 	Aegis::Vec2 score_size = rect_.size / Aegis::Vec2(1, 2);
-	score_container_ = std::make_unique<Aegis::Container>(Aegis::AABB(score_pos, score_size), Aegis::Container::Vertical, 5, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter); 
-	time_label_ = score_container_->AddWidget<Aegis::Label>("", Aegis::Vec2(0,0));
-	auto star_container = score_container_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 200, 50), Aegis::Container::Horizontal, 5, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
+	score_container_.SetPos(score_pos);
+	score_container_.SetSize(score_size);
+	score_container_.SetPadding(5);
+	score_container_.SetAlignment(Aegis::Alignment::Center);
+
+	time_label_ = score_container_.AddWidget<Aegis::Label>("", Aegis::Vec2(0,0));
+	auto star_container = score_container_.AddWidget<Aegis::HContainer>();
+	star_container->SetSize({200, 50});
+	star_container->SetPadding(5);
+	star_container->SetAlignment(Aegis::Alignment::Center);
 	auto sprite_sheet = Aegis::TextureManager::Load("assets/textures/tile_map.png");
 	for (int i = 0; i < 3; ++i){
 		star_sprites_[i] = star_container->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(), sprite_sheet, Aegis::AABB(0, 128, 32, 32));
@@ -52,15 +59,15 @@ void ScoreDialog::Render() const
 	if (visible_){
 		DrawFrameBorder(rect_);
 		Dialog::Render();
-		score_container_->Render();
+		score_container_.Render();
 	}
 }
 
 void ScoreDialog::OnEvent(Aegis::Event& event)
 {
 	if (visible_){
-		button_container_->OnEvent(event);
-		score_container_->OnEvent(event);
+		button_container_.OnEvent(event);
+		score_container_.OnEvent(event);
 	}
 }
 
@@ -92,7 +99,7 @@ void ScoreDialog::Show(double time)
 
 void ScoreDialog::AddButton(const std::string& label, std::function<void()> callback)
 {
-	auto button = button_container_->AddWidget<Aegis::Button>(Aegis::AABB(0,0, 100, 40), label);
+	auto button = button_container_.AddWidget<Aegis::Button>(Aegis::AABB(0,0, 100, 40), label);
 	button->ConnectSignal("pressed", [&visible = visible_, callback]{visible = false; callback();});
 	StylizeButton(*button, 2, 16);
 }

@@ -20,10 +20,19 @@ LevelCard::LevelCard(int level, const std::array<int, 2>& star_thresholds, const
 {
 	AddSignal("pressed");
 	AddSignal("double pressed");
-	v_box_ = std::make_shared<Aegis::Container>(rect_, Aegis::Container::Vertical, 4, Aegis::Alignment::Center);
-	auto label = v_box_->AddWidget<Aegis::Label>(std::to_string(level), Aegis::Vec2());
+
+	v_box_.SetSize(rect_.size);
+	v_box_.SetPadding(4);
+	v_box_.SetAlignment(Aegis::Alignment::Center);
+
+	auto label = v_box_.AddWidget<Aegis::Label>(std::to_string(level), Aegis::Vec2());
 	label->SetFont(Aegis::FontManager::Load("assets/fonts/roboto_bold.ttf", 24));
-	auto star_container = v_box_->AddWidget<Aegis::Container>(Aegis::AABB(0,0, 100, 50), Aegis::Container::Horizontal, 1, Aegis::Alignment::VCenter | Aegis::Alignment::HCenter);
+
+	auto star_container = v_box_.AddWidget<Aegis::HContainer>();
+	star_container->SetSize({100, 50});
+	star_container->SetPadding(1);
+	star_container->SetAlignment(Aegis::Alignment::Center);
+
 	auto sprite_sheet = Aegis::TextureManager::Load("assets/textures/tile_map.png");
 
 	int num_stars_earned = GetNumStarsEarned(star_thresholds, fastest_time);
@@ -34,10 +43,10 @@ LevelCard::LevelCard(int level, const std::array<int, 2>& star_thresholds, const
 	
 	auto font = Aegis::FontManager::Load("assets/fonts/roboto_regular.ttf", 14);
 
-	auto label1 = v_box_->AddWidget<Aegis::Label>("Record: " + FormatTime(fastest_time), Aegis::Vec2());
+	auto label1 = v_box_.AddWidget<Aegis::Label>("Record: " + FormatTime(fastest_time), Aegis::Vec2());
 
 	double next_star_time = num_stars_earned == 3 || num_stars_earned == 0 ? -1 : star_thresholds[2 - num_stars_earned];
-	auto label2 = v_box_->AddWidget<Aegis::Label>("Next Star: " + FormatTime(next_star_time), Aegis::Vec2());
+	auto label2 = v_box_.AddWidget<Aegis::Label>("Next Star: " + FormatTime(next_star_time), Aegis::Vec2());
 
 	label1->SetFont(font);
 	label2->SetFont(font);
@@ -50,7 +59,7 @@ void LevelCard::Render() const
 	if (selected_){
 		DrawQuad(rect_.pos, rect_.size, {0.9f, 0.9f, 0.9f, 0.2f}); 
 	}
-	v_box_->Render();
+	v_box_.Render();
 }
 
 void LevelCard::OnEvent(Aegis::Event& event)
@@ -74,7 +83,7 @@ void LevelCard::OnEvent(Aegis::Event& event)
 void LevelCard::SetPos(Aegis::Vec2 pos)
 {
 	rect_.pos = pos;
-	v_box_->SetPos(pos);
+	v_box_.SetPos(pos);
 }
 
 LockedLevelCard::LockedLevelCard(int level)

@@ -12,7 +12,7 @@ public:
 
 	void SetPos(Aegis::Vec2 pos) override;
  
-	std::shared_ptr<Aegis::Container> v_box_;
+	Aegis::VContainer v_box_;
 	bool selected_ = false;
 };
 

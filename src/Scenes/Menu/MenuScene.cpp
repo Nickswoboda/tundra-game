@@ -14,7 +14,12 @@ MenuScene::MenuScene(GameData& game_data)
 	title_background_ = Aegis::TextureManager::Load("assets/textures/menu_bg.png");
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>();
-	v_box_ = ui_layer_->AddWidget<Aegis::Container>(Aegis::AABB(0, 50, 1280, 720), Aegis::Container::Vertical, 12, Aegis::Alignment::HCenter);
+
+	v_box_ = ui_layer_->AddWidget<Aegis::VContainer>();
+	v_box_->SetPos({0, 50});
+	v_box_->SetSize({1280, 720});
+	v_box_->SetPadding(12);
+	v_box_->SetAlignment(Aegis::Alignment::HCenter);
 
 	auto title_texture = Aegis::Texture::Create("assets/textures/title.png");
 	auto title_sprite = v_box_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(0, 50), title_texture);

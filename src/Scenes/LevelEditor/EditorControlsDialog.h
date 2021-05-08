@@ -11,5 +11,5 @@ public:
 
 	void AddButton(const std::string& label, std::function<void()> callback) override;
 
-	std::shared_ptr<Aegis::Container> text_box_;
+	Aegis::VContainer text_box_;
 };
