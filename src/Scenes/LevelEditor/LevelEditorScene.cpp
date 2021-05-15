@@ -25,9 +25,9 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level)
 
 	level_editor_ = std::make_unique<LevelEditor>(*tile_map_);
 
+	//used to center tilemap within window
 	camera_.SetPosition({-270, -24});
 	bg_texture_ = Aegis::TextureManager::Load("assets/textures/scene_bg.png");
-	//used to center tilemap within window
 
 	ui_layer_ = std::make_unique<Aegis::UILayer>(); 
 	
@@ -90,29 +90,38 @@ LevelEditorScene::LevelEditorScene(GameData& game_data, int level)
 	auto editor_buttons_box = button_box->AddWidget<Aegis::VContainer>();
 	editor_buttons_box->SetSize({150, 120});
 
-	auto undo_button = editor_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 50, 400, 150, 50 ), "Undo");
-	auto reset_button = editor_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 140, 400, 150, 50 ), "Reset");
+	auto undo_button = editor_buttons_box->AddWidget<Aegis::Button>("Undo");
+	undo_button->SetSize({ 150, 50 });
+	StylizeButton(*undo_button, 3, 16);
 	undo_button->ConnectSignal("pressed", [&](){level_editor_->Undo();});
+
+	auto reset_button = editor_buttons_box->AddWidget<Aegis::Button>( "Reset");
+	reset_button->SetSize({ 150, 50 });
+	StylizeButton(*reset_button, 3, 16);
 	reset_button->ConnectSignal("pressed", [&]() {level_editor_->ResetTileMap();});
 
 	auto validity_buttons_box = button_box->AddWidget<Aegis::VContainer>();
 	validity_buttons_box->SetSize({150, 120});
 
-	auto preview_button = validity_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB(  50, 450, 150, 50  ), "Preview");
-	auto save_button = validity_buttons_box->AddWidget<Aegis::Button>(Aegis::AABB( 140, 450, 150, 50 ), "Save");
-	auto controls_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 70, 500, 150, 50 ), "Controls");  
-	auto back_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 70, 500, 150, 50 ), "Exit");  
-	preview_button->ConnectSignal("pressed", [&](){PreviewLevel();});
-	save_button->ConnectSignal("pressed", [&](){SaveLevel();});
-	controls_button->ConnectSignal("pressed", [&](){controls_dialog_->visible_ = true;});
-	back_button->ConnectSignal("pressed", [&](){manager_->ReplaceScene<LevelSelectScene>(game_data, true);});
-
-	StylizeButton(*undo_button, 3, 16);
-	StylizeButton(*reset_button, 3, 16);
+	auto preview_button = validity_buttons_box->AddWidget<Aegis::Button>("Preview");
+	preview_button->SetSize({ 150, 50 });
 	StylizeButton(*preview_button, 3, 16);
+	preview_button->ConnectSignal("pressed", [&](){PreviewLevel();});
+
+	auto save_button = validity_buttons_box->AddWidget<Aegis::Button>("Save");
+	save_button->SetSize({ 150, 50 });
 	StylizeButton(*save_button, 3, 16);
+	save_button->ConnectSignal("pressed", [&](){SaveLevel();});
+
+	auto controls_button = button_box->AddWidget<Aegis::Button>("Controls");  
+	controls_button->SetSize({ 150, 50 });
 	StylizeButton(*controls_button, 3, 16);
+	controls_button->ConnectSignal("pressed", [&](){controls_dialog_->visible_ = true;});
+	
+	auto back_button = button_box->AddWidget<Aegis::Button>("Exit");  
+	back_button->SetSize({ 150, 50 });
 	StylizeButton(*back_button, 3, 16);
+	back_button->ConnectSignal("pressed", [&](){manager_->ReplaceScene<LevelSelectScene>(game_data, true);});
 }
 
 void LevelEditorScene::OnEvent(Aegis::Event& event)

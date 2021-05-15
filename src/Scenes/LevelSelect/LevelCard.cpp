@@ -16,8 +16,8 @@ int GetNumStarsEarned(const std::array<int, 2>& star_thresholds, const double ti
 }
 
 LevelCard::LevelCard(int level, const std::array<int, 2>& star_thresholds, const double fastest_time)
-	:Aegis::Widget({0,0, 160, 128})
 {
+	SetSize({ 160, 128 });
 	AddSignal("pressed");
 	AddSignal("double pressed");
 
@@ -87,8 +87,8 @@ void LevelCard::SetPos(Aegis::Vec2 pos)
 }
 
 LockedLevelCard::LockedLevelCard(int level)
-	: Aegis::Widget({0,0,160, 128})
 {
+	SetSize({ 160, 128 });
 	auto text = std::to_string(level);
 	auto font = Aegis::FontManager::Load("assets/fonts/roboto_regular.ttf", 64);
 	Aegis::Vec2 text_size = font->GetStringPixelSize(text);

@@ -37,16 +37,19 @@ LevelSelectScene::LevelSelectScene(GameData& game_data, bool show_custom)
 	button_box->SetPadding(16);
 	button_box->SetAlignment(Aegis::Alignment::Center);
 
-	auto play_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Play");
-	auto back_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Back");
-
+	auto play_button = button_box->AddWidget<Aegis::Button>("Play");
+	play_button->SetSize({ 200, 50 });
 	play_button->ConnectSignal("pressed", [&, show_custom]() { if (selected_level_ != -1) manager_->ReplaceScene<GameplayScene>(selected_level_, show_custom, game_data); });
-	back_button->ConnectSignal("pressed", [&]() { manager_->PopScene();});
 	StylizeButton(*play_button, 3, 24);
+
+	auto back_button = button_box->AddWidget<Aegis::Button>("Back");
+	back_button->SetSize({ 200, 50 });
+	back_button->ConnectSignal("pressed", [&]() { manager_->PopScene();});
 	StylizeButton(*back_button, 3, 24);
 
 	if (!show_custom){
-		auto custom_levels_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Custom Levels");
+		auto custom_levels_button = v_box_->AddWidget<Aegis::Button>("Custom Levels");
+		custom_levels_button->SetSize({ 200, 50 });
 		custom_levels_button->ConnectSignal("pressed", [&]() {manager_->PushScene<LevelSelectScene>(game_data, true);});
 		StylizeButton(*custom_levels_button, 3, 24);
 	} else {
@@ -55,9 +58,12 @@ LevelSelectScene::LevelSelectScene(GameData& game_data, bool show_custom)
 		button_box->SetPadding(16);
 		button_box->SetAlignment(Aegis::Alignment::Center);
 
-		auto new_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "New");
-		auto edit_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Edit");
-		auto delete_button = button_box->AddWidget<Aegis::Button>(Aegis::AABB( 0, 0, 200, 50 ), "Delete");
+		auto new_button = button_box->AddWidget<Aegis::Button>("New");
+		new_button->SetSize({ 200, 50 });
+		auto edit_button = button_box->AddWidget<Aegis::Button>("Edit");
+		edit_button->SetSize({ 200, 50 });
+		auto delete_button = button_box->AddWidget<Aegis::Button>("Delete");
+		delete_button->SetSize({ 200, 50 });
 
 		err_dialog_ = ui_layer_->AddWidget<PopUpDialog>();
 		new_button->ConnectSignal("pressed", [&]() { 

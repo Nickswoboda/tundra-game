@@ -62,7 +62,8 @@ OptionsScene::OptionsScene(GameData& game_data)
 	vsync_checkbox->SetState(game_data.vsync_);
 	StylizeCheckbox(*vsync_checkbox, 3, 32);
 
-	auto back_button_ = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 600, 150, 50 ), "Back");
+	auto back_button_ = v_box_->AddWidget<Aegis::Button>("Back");
+	back_button_->SetSize({ 200, 50 });
 	back_button_->ConnectSignal("pressed", [&](){manager_->PopScene();});
 	StylizeButton(*back_button_, 3, 16);
 }

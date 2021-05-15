@@ -24,19 +24,24 @@ MenuScene::MenuScene(GameData& game_data)
 	auto title_texture = Aegis::Texture::Create("assets/textures/title.png");
 	auto title_sprite = v_box_->AddWidget<Aegis::SpriteWidget>(Aegis::Vec2(0, 50), title_texture);
 
-	auto new_game_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 170, 200, 50 ), "PLAY");
-	auto level_select_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 220, 200, 50 ), "LEVEL SELECT");
-	auto options_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 230, 200, 50 ), "OPTIONS");
-	auto exit_button = v_box_->AddWidget<Aegis::Button>(Aegis::AABB( 580, 270, 200, 50 ), "EXIT");
-
+	auto new_game_button = v_box_->AddWidget<Aegis::Button>("PLAY");
+	new_game_button->SetSize({ 200, 50 });
 	StylizeButton(*new_game_button, 3, 32);
-	StylizeButton(*level_select_button, 3, 28);
-	StylizeButton(*options_button, 3, 32);
-	StylizeButton(*exit_button, 3, 32);
-
 	new_game_button->ConnectSignal("pressed", [&]() {manager_->PushScene<GameplayScene>(1, false, game_data_);});
+
+	auto level_select_button = v_box_->AddWidget<Aegis::Button>("LEVEL SELECT");
+	level_select_button->SetSize({ 200, 50 });
+	StylizeButton(*level_select_button, 3, 28);
 	level_select_button->ConnectSignal("pressed", [&]() {manager_->PushScene<LevelSelectScene>(game_data_);});
+
+	auto options_button = v_box_->AddWidget<Aegis::Button>("OPTIONS");
+	options_button->SetSize({ 200, 50 });
+	StylizeButton(*options_button, 3, 32);
 	options_button->ConnectSignal("pressed", [&]() {manager_->PushScene<OptionsScene>(game_data_);});
+
+	auto exit_button = v_box_->AddWidget<Aegis::Button>("EXIT");
+	exit_button->SetSize({ 200, 50 });
+	StylizeButton(*exit_button, 3, 32);
 	exit_button->ConnectSignal("pressed", []() { Aegis::Application::Quit();});
 
 	mute_button_ = ui_layer_->AddWidget<Aegis::Checkbox>("");

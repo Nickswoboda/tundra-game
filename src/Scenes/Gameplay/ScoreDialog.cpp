@@ -5,8 +5,9 @@
 #include "../LevelSelect/LevelSelectScene.h"
 
 ScoreDialog::ScoreDialog(GameplayScene& scene)
-	:Aegis::Dialog("", {0,0, 350, 200})
+	:Aegis::Dialog("")
 {
+	SetSize({ 350, 200 });
 	if (scene.custom_level_){
 		star_thresholds_ = scene.game_data_.custom_star_thresholds_[scene.level_ - 1];
 	}else {
@@ -99,7 +100,8 @@ void ScoreDialog::Show(double time)
 
 void ScoreDialog::AddButton(const std::string& label, std::function<void()> callback)
 {
-	auto button = button_container_.AddWidget<Aegis::Button>(Aegis::AABB(0,0, 100, 40), label);
+	auto button = button_container_.AddWidget<Aegis::Button>(label);
+	button->SetSize({ 100, 40 });
 	button->ConnectSignal("pressed", [&visible = visible_, callback]{visible = false; callback();});
 	StylizeButton(*button, 2, 16);
 }

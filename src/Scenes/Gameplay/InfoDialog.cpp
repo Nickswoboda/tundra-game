@@ -72,7 +72,9 @@ InfoDialog::InfoDialog()
 
 	Aegis::AABB button_rect = {0, rect_.pos.y + rect_.size.y - 96, 200, 50};
 	Aegis::CenterAABBHorizontally(button_rect, rect_);
-	close_button_ = std::make_shared<Aegis::Button>(button_rect, "Close");
+	close_button_ = std::make_shared<Aegis::Button>("Close");
+	close_button_->SetSize(button_rect.size);
+	close_button_->SetPos(button_rect.pos);
 	close_button_->ConnectSignal("pressed", [&]() { visible_ = false; Emit("closed"); });
 	StylizeButton(*close_button_, 3, 32);
 }

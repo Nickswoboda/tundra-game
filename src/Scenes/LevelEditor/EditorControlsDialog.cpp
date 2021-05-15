@@ -3,8 +3,9 @@
 #include "../../Utilities.h"
 
 EditorControlsDialog::EditorControlsDialog()
-	:Aegis::Dialog("",{0, 0, 310, 250})
+	:Aegis::Dialog("")
 {
+	SetSize({ 310, 250 });
 	auto temp_rect = rect_;
 	Aegis::CenterAABB(temp_rect, Aegis::Application::GetWindow().GetViewport());
 	SetPos(temp_rect.pos);
@@ -24,7 +25,6 @@ EditorControlsDialog::EditorControlsDialog()
 	text_box_.AddWidget<Aegis::Label>("- Press 'G' to place ground tiles", Aegis::Vec2{0,0});
 	text_box_.AddWidget<Aegis::Label>("- Press 'F' to place fish on ice tiles. ", Aegis::Vec2{0,0});
 	text_box_.AddWidget<Aegis::Label>("- Click and hold to drag Bruce/Bears.", Aegis::Vec2{0,0});
-	
 }
 
 void EditorControlsDialog::Render() const
@@ -38,7 +38,8 @@ void EditorControlsDialog::Render() const
 
 void EditorControlsDialog::AddButton(const std::string& label, std::function<void()> callback)
 {
-	auto button = button_container_.AddWidget<Aegis::Button>(Aegis::AABB(0,0, 100, 40), label);
+	auto button = button_container_.AddWidget<Aegis::Button>(label);
+	button->SetSize({ 100, 40 });
 	button->ConnectSignal("pressed", [&visible = visible_, callback]{visible = false; callback();});
 	StylizeButton(*button, 2, 16);
 }

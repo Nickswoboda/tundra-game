@@ -3,8 +3,9 @@
 #include "Utilities.h"
 
 PopUpDialog::PopUpDialog()
-	:Aegis::Dialog("", {0, 0, 350, 200})
+	:Aegis::Dialog("")
 {
+	SetSize({ 350, 200 });
 	auto temp_rect = rect_;
 	Aegis::CenterAABB(temp_rect, Aegis::Application::GetWindow().GetViewport());
 	SetPos(temp_rect.pos);
@@ -63,7 +64,8 @@ void PopUpDialog::Show(const std::string& text)
 }
 void PopUpDialog::AddButton(const std::string& label, std::function<void()> callback)
 {
-	auto button = button_container_.AddWidget<Aegis::Button>(Aegis::AABB(0,0, 100, 40), label);
+	auto button = button_container_.AddWidget<Aegis::Button>(label);
+	button->SetSize({ 100, 40 });
 	button->ConnectSignal("pressed", [&visible = visible_, callback]{visible = false; callback();});
 	StylizeButton(*button, 2, 16);
 }

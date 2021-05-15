@@ -5,8 +5,9 @@
 
 
 GameOverDialog::GameOverDialog(GameplayScene& scene)
-	:Aegis::Dialog("You lose. Try Again?", {0,0,300, 200})
+	:Aegis::Dialog("You lose. Try Again?")
 {
+	SetSize({ 300, 200 });
 	Aegis::AABB temp_rect = {0,0, 300, 200};
 	Aegis::CenterAABB(temp_rect, Aegis::Application::GetWindow().GetViewport());
 	SetPos(temp_rect.pos);
@@ -24,7 +25,8 @@ GameOverDialog::GameOverDialog(GameplayScene& scene)
 
 void GameOverDialog::AddButton(const std::string& label, std::function<void()> callback)
 {
-	auto button = button_container_.AddWidget<Aegis::Button>(Aegis::AABB(0,0, 100, 40), label);
+	auto button = button_container_.AddWidget<Aegis::Button>(label);
+	button->SetSize({ 100, 40 });
 	button->ConnectSignal("pressed", [&visible = visible_, callback]{visible = false; callback();});
 	StylizeButton(*button, 2, 24);
 }
